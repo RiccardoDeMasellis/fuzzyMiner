@@ -71,7 +71,7 @@
         <artifactId>PetriNets</artifactId>
         <version>1.0</version>
         <scope>system</scope>
-        <systemPath>${basedir}/stdlib/PetriNets.jar</systemPath>
+        <systemPath>${basedir}/packagelib/PetriNets.jar</systemPath>
     </dependency>
 
     <dependency>
