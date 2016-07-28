@@ -1,7 +1,6 @@
-package fbk.processmining.causalgraph;
+package org.processmining.models.causalgraph;
 
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphEdge;
-import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
 
 /**
  * Created by demas on 27/07/16.

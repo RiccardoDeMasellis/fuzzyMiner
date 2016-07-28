@@ -1,8 +1,7 @@
-package fbk.processmining.fuzzyminer;
+package org.processmining.plugins.fuzzyminer;
 
 import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix2D;
-import fbk.processmining.plugin.fuzzyminer.FuzzyMinerPlugin;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;

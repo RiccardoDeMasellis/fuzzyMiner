@@ -1,4 +1,4 @@
-package fbk.processmining.fuzzypetrinet;
+package org.processmining.models.fuzzypetrinet;
 
 import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetImpl;
 

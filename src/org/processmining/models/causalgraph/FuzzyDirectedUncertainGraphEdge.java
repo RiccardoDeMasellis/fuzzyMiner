@@ -1,4 +1,4 @@
-package fbk.processmining.causalgraph;
+package org.processmining.models.causalgraph;
 
 /**
  * Created by demas on 27/07/16.

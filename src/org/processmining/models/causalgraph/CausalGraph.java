@@ -1,8 +1,7 @@
-package fbk.processmining.causalgraph;
+package org.processmining.models.causalgraph;
 
 import org.processmining.models.graphbased.directed.*;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

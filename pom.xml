@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ fuzzyMiner  Copyright (C) 2015  Riccardo De Masellis and Chiara Di Francescomarino.
+  -->
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>eu.fbk.shell</groupId>
+    <artifactId>fuzzyMiner</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <!-- <generatedSourcesDirectory>antlr4-generated</generatedSourcesDirectory> -->
+                </configuration>
+            </plugin>
+
+        </plugins>
+        <sourceDirectory>src</sourceDirectory>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>local-repo-stdlib</id>
+            <url>file:///${basedir}/stdlib</url>
+      </repository>
+        <!--      <repository>
+                <id>local-repo-lib</id>
+                <url>file:///${basedir}/lib</url>
+            </repository>
+            <repository>
+                <id>local-repo-packagelib</id>
+                <url>file:///${basedir}/packagelib</url>
+            </repository>  -->
+    </repositories>
+
+</project>

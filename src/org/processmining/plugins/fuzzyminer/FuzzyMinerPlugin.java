@@ -1,9 +1,6 @@
-package fbk.processmining.plugin.fuzzyminer;
+package org.processmining.plugins.fuzzyminer;
 
 
-import fbk.processmining.fuzzyminer.FuzzyMiner;
-import fbk.processmining.fuzzyminer.FuzzyMinerSettings;
-import fbk.processmining.fuzzyminer.UncertaintyNet;
 import org.deckfour.uitopia.api.event.TaskListener;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
