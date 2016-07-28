@@ -47,6 +47,7 @@ public class FuzzyMiner extends HeuristicsMiner {
 
         FuzzyPetrinet result = new FuzzyPetrinet(originalNet);
 
+
         //Now building the uncertainty-specific of the net.
 
         int eventsNumber = this.getMetrics().getEventsNumber();

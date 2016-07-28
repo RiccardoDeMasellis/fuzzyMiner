@@ -28,11 +28,8 @@ public abstract class CausalGraph<N extends DirectedGraphNode, E extends Directe
     public CausalGraph(Set<N> nodes, Set<E> edges) {
         this(nodes);
         for (E edge : edges) {
-            if (this.getNodes().contains(edge.getSource()) && this.getNodes().contains(edge.getTarget()))
-                this.graphElementAdded(edge);
-            else {
-                throw new RuntimeException("You are try to add an edge between nodes that are not in the graph!");
-            }
+            this.checkAddEdge(edge.getSource(), edge.getTarget());
+            this.graphElementAdded(edge);
         }
     }
 
