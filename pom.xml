@@ -26,23 +26,110 @@
                 </configuration>
             </plugin>
 
-        </plugins>
-        <sourceDirectory>src</sourceDirectory>
-    </build>
+    <!--  <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-install-plugin</artifactId>
+           <version>2.4</version>
+           <executions>
+               <execution>
+                   <phase>initialize</phase>
+                   <goals>
+                       <goal>install-file</goal>
+                   </goals>
+                   <configuration>
+                       <groupId>OpenXES</groupId>
+                       <artifactId>OpenXES</artifactId>
+                       <version>1.0</version>
+                       <packaging>jar</packaging>
+                       <file>${basedir}/stdlib/OpenXES.jar</file>
+                   </configuration>
+               </execution>
+           </executions>
+       </plugin> -->
+   </plugins>
 
-    <repositories>
-        <repository>
-            <id>local-repo-stdlib</id>
-            <url>file:///${basedir}/stdlib</url>
-      </repository>
-        <!--      <repository>
-                <id>local-repo-lib</id>
-                <url>file:///${basedir}/lib</url>
-            </repository>
-            <repository>
-                <id>local-repo-packagelib</id>
-                <url>file:///${basedir}/packagelib</url>
-            </repository>  -->
-    </repositories>
+   <sourceDirectory>src</sourceDirectory>
+</build>
+
+<dependencies>
+   <dependency>
+       <groupId>colt</groupId>
+       <artifactId>colt</artifactId>
+       <version>1.2.0</version>
+   </dependency>
+
+  <dependency>
+       <groupId>OpenXES</groupId>
+       <artifactId>OpenXES</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/stdlib/OpenXES.jar</systemPath>
+   </dependency>
+
+    <dependency>
+        <groupId>PetriNets</groupId>
+        <artifactId>PetriNets</artifactId>
+        <version>1.0</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/stdlib/PetriNets.jar</systemPath>
+    </dependency>
+
+    <dependency>
+        <groupId>ProM-Contexts</groupId>
+        <artifactId>ProM-Contexts</artifactId>
+        <version>1.0</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/stdlib/ProM-Contexts.jar</systemPath>
+    </dependency>
+
+    <dependency>
+        <groupId>ProM-Framework</groupId>
+        <artifactId>ProM-Framework</artifactId>
+        <version>1.0</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/stdlib/ProM-Framework.jar</systemPath>
+    </dependency>
+
+    <dependency>
+        <groupId>ProM-Framework_n</groupId>
+        <artifactId>ProM-Framework_n</artifactId>
+        <version>1.0</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/stdlib/ProM-Framework_n.jar</systemPath>
+    </dependency>
+
+    <dependency>
+        <groupId>ProM-Models_n</groupId>
+        <artifactId>ProM-Models_n</artifactId>
+        <version>1.0</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/stdlib/ProM-Models_n.jar</systemPath>
+    </dependency>
+
+    <dependency>
+        <groupId>Uitopia</groupId>
+        <artifactId>Uitopia</artifactId>
+        <version>1.0</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/stdlib/Uitopia.jar</systemPath>
+    </dependency>
+
+</dependencies>
+
+
+ <!--  <repositories>
+       <repository>
+           <id>local-repo-stdlib</id>
+           <url>file:///${basedir}/stdlib</url>
+     </repository>
+             <repository>
+               <id>local-repo-lib</id>
+               <url>file:///${basedir}/lib</url>
+           </repository>
+           <repository>
+               <id>local-repo-packagelib</id>
+               <url>file:///${basedir}/packagelib</url>
+           </repository>
+    </repositories> -->
 
 </project>

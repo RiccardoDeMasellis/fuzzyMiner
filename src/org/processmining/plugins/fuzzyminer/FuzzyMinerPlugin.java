@@ -17,6 +17,7 @@ import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginCategory;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
+import org.processmining.models.fuzzypetrinet.FuzzyPetrinet;
 import org.processmining.models.heuristics.HeuristicsNet;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.gui.ParametersPanel;
 
@@ -24,16 +25,16 @@ import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.gui.Parame
  * Created by demas on 25/07/16.
  */
 
-@Plugin(name = "Mine for a Uncertainty Net",
+@Plugin(name = "Mine for a Fuzzy Net",
         level = PluginLevel.PeerReviewed,
         //parameterLabels = {"Log", "Settings", "Log Info"},
         parameterLabels = {"Log", "Settings"},
         //parameterLabels = {"Log"},
         returnLabels = {"Mined Model"},
-        returnTypes = {UncertaintyNet.class},
+        returnTypes = {FuzzyPetrinet.class},
         userAccessible = true,
         categories = { PluginCategory.Discovery },
-        help = "Uncertainty Miner to discover a Uncertainty Net.")
+        help = "Fuzzy Miner to discover a Fuzzy Net.")
 public class FuzzyMinerPlugin {
 
     public static double SURE_THRESHOLD = 0.8;
@@ -69,7 +70,7 @@ public class FuzzyMinerPlugin {
     }
 
     @PluginVariant(variantLabel = "Mine Fuzzy Net using Given Settings (2)", requiredParameterLabels = { 0, 1, 2 })
-    public static UncertaintyNet run(PluginContext context, XLog log, FuzzyMinerSettings settings, XLogInfo logInfo) {
+    public static FuzzyPetrinet run(PluginContext context, XLog log, FuzzyMinerSettings settings, XLogInfo logInfo) {
 
         FuzzyMiner fm = new FuzzyMiner(context, log, logInfo, settings);
         return fm.mine();

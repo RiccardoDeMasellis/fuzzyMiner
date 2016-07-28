@@ -6,6 +6,7 @@ import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.PluginContext;
+import org.processmining.models.fuzzypetrinet.FuzzyPetrinet;
 import org.processmining.models.heuristics.HeuristicsNet;
 import org.processmining.models.heuristics.impl.ActivitiesMappingStructures;
 import org.processmining.models.heuristics.impl.HNSet;
@@ -31,7 +32,7 @@ public class FuzzyMiner extends HeuristicsMiner {
         uncertaintyOutputSet = new HNSubSet[eventsNumber];
     }
 
-    public UncertaintyNet mine() {
+    public FuzzyPetrinet mine() {
 
         this.keys = new HashMap<String, Integer>();
 
@@ -44,7 +45,7 @@ public class FuzzyMiner extends HeuristicsMiner {
 
         HeuristicsNet originalNet = this.makeBasicRelations(this.getMetrics());
 
-        UncertaintyNet result = new UncertaintyNet(originalNet);
+        FuzzyPetrinet result = new FuzzyPetrinet(originalNet);
 
         //Now building the uncertainty-specific of the net.
 
