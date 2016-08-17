@@ -32,7 +32,8 @@ public abstract class CausalGraph<N extends DirectedGraphNode, E extends Directe
             this.graphElementAdded(edge);
         }
     }
-
+    
+    
     @Override //TODO
     protected AbstractDirectedGraph<N, E> getEmptyClone() {
         return null;
@@ -87,4 +88,18 @@ public abstract class CausalGraph<N extends DirectedGraphNode, E extends Directe
         result = 31 * result + getNodes().hashCode();
         return result;
     }
+    
+    /* 
+     * ADDED
+     */
+    public void addNode(N node){
+    	nodes.add(node);
+    	this.graphElementAdded(node);
+    }
+    
+    public void addEdge(E edge){
+    	this.checkAddEdge(edge.getSource(), edge.getTarget());
+    	this.graphElementAdded(edge);
+    }
+
 }
