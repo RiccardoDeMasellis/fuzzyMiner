@@ -66,6 +66,23 @@
       <systemPath>${basedir}/stdlib/OpenXES.jar</systemPath>
    </dependency>
 
+  <dependency>
+       <groupId>jgraph</groupId>
+       <artifactId>jgraph</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/stdlib/jgraph.jar</systemPath>
+  </dependency>
+  
+  <dependency>
+       <groupId>slickerbox</groupId>
+       <artifactId>slickerbox</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/stdlib/slickerbox1.0rc1.jar</systemPath>
+  </dependency>
+
+
     <dependency>
         <groupId>PetriNets</groupId>
         <artifactId>PetriNets</artifactId>
@@ -81,6 +98,14 @@
         <scope>system</scope>
         <systemPath>${basedir}/stdlib/ProM-Contexts.jar</systemPath>
     </dependency>
+    
+    <dependency>
+        <groupId>ProM-Framework_n</groupId>
+        <artifactId>ProM-Framework_n</artifactId>
+        <version>1.0</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/stdlib/ProM-Framework_n.jar</systemPath>
+    </dependency>
 
     <dependency>
         <groupId>ProM-Framework</groupId>
@@ -88,14 +113,6 @@
         <version>1.0</version>
         <scope>system</scope>
         <systemPath>${basedir}/stdlib/ProM-Framework.jar</systemPath>
-    </dependency>
-
-    <dependency>
-        <groupId>ProM-Framework_n</groupId>
-        <artifactId>ProM-Framework_n</artifactId>
-        <version>1.0</version>
-        <scope>system</scope>
-        <systemPath>${basedir}/stdlib/ProM-Framework_n.jar</systemPath>
     </dependency>
 
     <dependency>

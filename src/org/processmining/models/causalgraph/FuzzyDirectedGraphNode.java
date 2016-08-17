@@ -8,13 +8,27 @@ import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
 public class FuzzyDirectedGraphNode extends AbstractDirectedGraphNode {
 
     private final FuzzyCausalGraph graph;
+    //ADDED
+    private final String label;
 
     public FuzzyDirectedGraphNode(FuzzyCausalGraph graph) {
         this.graph = graph;
+        this.label = "";
     }
 
+    public FuzzyDirectedGraphNode(FuzzyCausalGraph graph, String label) {
+        this.graph = graph;
+        this.label = label;
+    }
+    
     @Override
     public FuzzyCausalGraph getGraph() {
         return this.graph;
     }
+
+	public String getLabel() {
+		return label;
+	}
+    
+    
 }
