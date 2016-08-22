@@ -23,6 +23,13 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
     private Set<N> inputNodes, outputNodes;
     private boolean updatable;
 
+    private Set<PlaceEvaluation> places;
+
+
+
+
+
+
     public Cluster() {
         this.edges = new HashSet<>();
         this.inputNodes = null;
@@ -92,4 +99,12 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
         result = 31 * result + (updatable ? 1 : 0);
         return result;
     }
+
+    public Set<PlaceEvaluation> evaluateClusterPlaces() {
+        // for each placesEvaluation in the Cluster call replayPlace
+
+        //choose the best one(s)!
+    }
+
+
 }
