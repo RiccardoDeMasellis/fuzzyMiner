@@ -14,9 +14,9 @@ class PlaceEvaluation<E extends AbstractDirectedGraphEdge> {
     private int currentTokenNumber;
     private XLog log;
 
-    public PlaceEvaluation(Set<E> placeInputNodes, Set<E> placeOutputNodes, XLog log) {
-        this.placeInputNodes = placeInputNodes;
+    public PlaceEvaluation(Set<E> placeOutputNodes, Set<E> placeInputNodes, XLog log) {
         this.placeOutputNodes = placeOutputNodes;
+        this.placeInputNodes = placeInputNodes;
         this.log = log;
         this.acceptedTracesNumber = 0;
         this.currentTokenNumber = 0;

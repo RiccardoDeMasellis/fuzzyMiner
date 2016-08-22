@@ -1,11 +1,11 @@
 package org.processmining.models.fuzzypetrinet;
 
+import org.deckfour.xes.model.XLog;
+import org.processmining.fuzzycg2fuzzypn.Utils;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphEdge;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by demas on 19/08/16.
@@ -21,89 +21,74 @@ import java.util.Set;
 public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDirectedGraphNode> {
     private Set<E> edges;
     private Set<N> inputNodes, outputNodes;
-    private boolean updatable;
 
     private Set<PlaceEvaluation> places;
 
 
-
-
-
-
-    public Cluster() {
-        this.edges = new HashSet<>();
-        this.inputNodes = null;
-        this.outputNodes = null;
-        this.updatable = true;
+    public Cluster(Set<E> edges) {
+        this.edges = edges;
+        computeInputAndOutputNodes();
+        this.places = new HashSet<>();
     }
 
-    public synchronized void addEdge(E edge) {
-        if (!updatable)
-            throw new RuntimeException("Cannot add edges to a stable cluster!");
-        this.edges.add(edge);
-    }
-
-    public synchronized void addAllEdges(Collection<E> edges) {
-        if (!updatable)
-            throw new RuntimeException("Cannot add edges to a stable cluster!");
-        this.edges.addAll(edges);
-    }
-
-    public synchronized void updateInputAndOutputNodes() {
-        this.updatable = false;
+    private void computeInputAndOutputNodes() {
         for(E edge : this.edges) {
             inputNodes.add((N) edge.getTarget());
             outputNodes.add((N) edge.getSource());
         }
     }
 
-
     public Set<E> getEdges() {
         return new HashSet<>(edges);
     }
 
 
-    public synchronized Set<N> getInputNodes() {
-        if (this.updatable = true)
-            throw new RuntimeException("The input and output nodes have not yet been computed. Cluster still unstable.");
+    public Set<N> getInputNodes() {
         return new HashSet<>(inputNodes);
     }
 
 
-    public synchronized Set<N> getOutputNodes() {
-        if (this.updatable = true)
-            throw new RuntimeException("The input and output nodes have not yet been computed. Cluster still unstable.");
+    public Set<N> getOutputNodes() {
         return new HashSet<>(outputNodes);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
 
-        Cluster<?, ?> cluster = (Cluster<?, ?>) o;
+    public PlaceEvaluation evaluateBestPlace(XLog log) {
+        // First generate the possible places
+        Set<Set<N>> inputNodesPowerSet = Utils.powerSet(inputNodes);
+        Set<Set<N>> outputNodesPowerSet = Utils.powerSet(outputNodes);
 
-        if (updatable != cluster.updatable) return false;
-        if (!getEdges().equals(cluster.getEdges())) return false;
-        if (getInputNodes() != null ? !getInputNodes().equals(cluster.getInputNodes()) : cluster.getInputNodes() != null)
-            return false;
-        return getOutputNodes() != null ? getOutputNodes().equals(cluster.getOutputNodes()) : cluster.getOutputNodes() == null;
+        int bestTraceNumberAccepted = 0;
 
+        for (Set<N> outputNodeSet : outputNodesPowerSet) {
+            for (Set<N> inputNodeSet : inputNodesPowerSet) {
+                if (outputNodeSet.size() != 0 && inputNodeSet.size() != 0) {
+                    PlaceEvaluation placeEval = new PlaceEvaluation(outputNodeSet, inputNodeSet, log);
+                    this.places.add(placeEval);
+                    // Replay the place
+                    placeEval.replayPlace();
+                    // Update bestTraceNumberAccepted
+                    if (placeEval.getAcceptedTracesNumber() >= bestTraceNumberAccepted)
+                        bestTraceNumberAccepted = placeEval.getAcceptedTracesNumber();
+                }
+            }
+        }
+        // return the places with getAcceptedTracesNumber() = bestTraceNumber
+        Set<PlaceEvaluation> result = new HashSet<>();
+        for (PlaceEvaluation pe : this.places) {
+            if (pe.getAcceptedTracesNumber() == bestTraceNumberAccepted)
+                result.add(pe);
+        }
+
+        // Strategy for selecting just one!
+        return selectPlaceEvaluation(result);
     }
 
-    @Override
-    public int hashCode() {
-        int result = getEdges().hashCode();
-        result = 31 * result + (getInputNodes() != null ? getInputNodes().hashCode() : 0);
-        result = 31 * result + (getOutputNodes() != null ? getOutputNodes().hashCode() : 0);
-        result = 31 * result + (updatable ? 1 : 0);
-        return result;
-    }
 
-    public Set<PlaceEvaluation> evaluateClusterPlaces() {
-        // for each placesEvaluation in the Cluster call replayPlace
-
-        //choose the best one(s)!
+    // Just return a random one!
+    public static PlaceEvaluation selectPlaceEvaluation(Set<PlaceEvaluation> bestPlaces) {
+        PlaceEvaluation[] arrayBest = (PlaceEvaluation[]) bestPlaces.toArray();
+        return arrayBest[0];
     }
 
 

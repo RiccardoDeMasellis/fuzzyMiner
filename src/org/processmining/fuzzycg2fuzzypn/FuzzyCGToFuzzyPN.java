@@ -41,27 +41,26 @@ public class FuzzyCGToFuzzyPN {
              if (alreadyAnalyzed.contains(edge))
                  continue;
 
-            // create the new cluster
-            Cluster newCluster = new Cluster();
-            // add it to the set of cluster
-            clusterSet.add(newCluster);
+            // create the new set of edges constituting the new cluster
+            Set<E> newCluster = new HashSet<>();
+
             // add the current edge to it
-            newCluster.addEdge(edge);
+            newCluster.add(edge);
             alreadyAnalyzed.add(edge);
-            Cluster oldCluster = new Cluster();
+            Set<E> oldCluster = new HashSet<>();
             // add all the other edges to the current cluster.
             while (! oldCluster.equals(newCluster)) {
                 // 1) oldCluster = new Cluster
-                oldCluster.addAllEdges(newCluster.getEdges());
+                oldCluster.addAll(newCluster);
 
                 // 2) Analyze all the edges in OldCluster and add them to newCluster...
-                for (E e : (Set<E>) oldCluster.getEdges()) {
+                for (E e : oldCluster) {
                     N source = (N) e.getSource();
                     N target = (N) e.getTarget();
                     Set<E> edgesForSource = getEdgesForNode(source, edges);
                     Set<E> edgesForTarget = getEdgesForNode(target, edges);
-                    newCluster.addAllEdges(edgesForSource);
-                    newCluster.addAllEdges(edgesForTarget);
+                    newCluster.addAll(edgesForSource);
+                    newCluster.addAll(edgesForTarget);
 
                     //Add them to already analyzed, as they are already part of a cluster.
                     alreadyAnalyzed.addAll(edgesForSource);
@@ -69,8 +68,8 @@ public class FuzzyCGToFuzzyPN {
                 }
                 // ...until there is no other edge to add.
             }
-            // Finalize the current cluster as it is stable
-            newCluster.updateInputAndOutputNodes();
+            // add it to the set of cluster
+            clusterSet.add(new Cluster<>(newCluster));
         }
         return clusterSet;
     }
@@ -84,25 +83,6 @@ public class FuzzyCGToFuzzyPN {
                 result.add(edge);
         }
         return result;
-    }
-
-    public static <T> Set<Set<T>> powerSet(Set<T> originalSet) {
-        Set<Set<T>> sets = new HashSet<Set<T>>();
-        if (originalSet.isEmpty()) {
-            sets.add(new HashSet<T>());
-            return sets;
-        }
-        List<T> list = new ArrayList<T>(originalSet);
-        T head = list.get(0);
-        Set<T> rest = new HashSet<T>(list.subList(1, list.size()));
-        for (Set<T> set : powerSet(rest)) {
-            Set<T> newSet = new HashSet<T>();
-            newSet.add(head);
-            newSet.addAll(set);
-            sets.add(newSet);
-            sets.add(set);
-        }
-        return sets;
     }
 
 }
