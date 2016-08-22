@@ -8,7 +8,6 @@ import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
 public class FuzzyDirectedGraphNode extends AbstractDirectedGraphNode {
 
     private final FuzzyCausalGraph graph;
-    //ADDED
     private final String label;
 
     public FuzzyDirectedGraphNode(FuzzyCausalGraph graph) {
@@ -29,6 +28,7 @@ public class FuzzyDirectedGraphNode extends AbstractDirectedGraphNode {
 	public String getLabel() {
 		return label;
 	}
-    
+
+	//The equals method is inherited from AbstractGraphNode, and it is based on the id of the node!
     
 }

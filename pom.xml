@@ -46,89 +46,99 @@
                </execution>
            </executions>
        </plugin> -->
+
    </plugins>
 
    <sourceDirectory>src</sourceDirectory>
 </build>
 
-<dependencies>
-   <dependency>
-       <groupId>colt</groupId>
-       <artifactId>colt</artifactId>
-       <version>1.2.0</version>
-   </dependency>
 
-  <dependency>
-       <groupId>OpenXES</groupId>
-       <artifactId>OpenXES</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/stdlib/OpenXES.jar</systemPath>
-   </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>colt</groupId>
+            <artifactId>colt</artifactId>
+            <version>1.2.0</version>
+        </dependency>
 
-  <dependency>
-       <groupId>jgraph</groupId>
-       <artifactId>jgraph</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/stdlib/jgraph.jar</systemPath>
-  </dependency>
-  
-  <dependency>
-       <groupId>slickerbox</groupId>
-       <artifactId>slickerbox</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/stdlib/slickerbox1.0rc1.jar</systemPath>
-  </dependency>
+       <dependency>
+            <groupId>OpenXES</groupId>
+            <artifactId>OpenXES</artifactId>
+           <version>1.0</version>
+           <scope>system</scope>
+           <systemPath>${basedir}/stdlib/OpenXES.jar</systemPath>
+        </dependency>
 
+       <dependency>
+            <groupId>jgraph</groupId>
+            <artifactId>jgraph</artifactId>
+           <version>1.0</version>
+           <scope>system</scope>
+           <systemPath>${basedir}/stdlib/jgraph.jar</systemPath>
+       </dependency>
+
+       <dependency>
+            <groupId>slickerbox</groupId>
+            <artifactId>slickerbox</artifactId>
+           <version>1.0</version>
+           <scope>system</scope>
+           <systemPath>${basedir}/stdlib/slickerbox1.0rc1.jar</systemPath>
+       </dependency>
+
+
+         <dependency>
+             <groupId>PetriNets</groupId>
+             <artifactId>PetriNets</artifactId>
+             <version>1.0</version>
+             <scope>system</scope>
+             <systemPath>${basedir}/packagelib/PetriNets.jar</systemPath>
+         </dependency>
+
+         <dependency>
+             <groupId>ProM-Contexts</groupId>
+             <artifactId>ProM-Contexts</artifactId>
+             <version>1.0</version>
+             <scope>system</scope>
+             <systemPath>${basedir}/stdlib/ProM-Contexts.jar</systemPath>
+         </dependency>
+
+          <!-- <dependency>
+             <groupId>ProM-Framework</groupId>
+             <artifactId>ProM-Framework</artifactId>
+             <version>1.0</version>
+             <scope>system</scope>
+             <systemPath>${basedir}/stdlib/ProM-Framework.jar</systemPath>
+         </dependency> -->
+
+         <dependency>
+             <groupId>ProM-Framework_n</groupId>
+             <artifactId>ProM-Framework_n</artifactId>
+             <version>1.0</version>
+             <scope>system</scope>
+             <systemPath>${basedir}/stdlib/ProM-Framework_n.jar</systemPath>
+         </dependency>
+
+         <dependency>
+             <groupId>ProM-Models_n</groupId>
+             <artifactId>ProM-Models_n</artifactId>
+             <version>1.0</version>
+             <scope>system</scope>
+             <systemPath>${basedir}/stdlib/ProM-Models_n.jar</systemPath>
+         </dependency>
+
+         <dependency>
+             <groupId>Uitopia</groupId>
+             <artifactId>Uitopia</artifactId>
+             <version>1.0</version>
+             <scope>system</scope>
+             <systemPath>${basedir}/stdlib/Uitopia.jar</systemPath>
+         </dependency>
 
     <dependency>
-        <groupId>PetriNets</groupId>
-        <artifactId>PetriNets</artifactId>
+        <groupId>HeuristicMinerOriginal-2</groupId>
+        <artifactId>HeuristicMinerOriginal-2</artifactId>
         <version>1.0</version>
         <scope>system</scope>
-        <systemPath>${basedir}/packagelib/PetriNets.jar</systemPath>
-    </dependency>
-
-    <dependency>
-        <groupId>ProM-Contexts</groupId>
-        <artifactId>ProM-Contexts</artifactId>
-        <version>1.0</version>
-        <scope>system</scope>
-        <systemPath>${basedir}/stdlib/ProM-Contexts.jar</systemPath>
-    </dependency>
-    
-    <dependency>
-        <groupId>ProM-Framework_n</groupId>
-        <artifactId>ProM-Framework_n</artifactId>
-        <version>1.0</version>
-        <scope>system</scope>
-        <systemPath>${basedir}/stdlib/ProM-Framework_n.jar</systemPath>
-    </dependency>
-
-    <dependency>
-        <groupId>ProM-Framework</groupId>
-        <artifactId>ProM-Framework</artifactId>
-        <version>1.0</version>
-        <scope>system</scope>
-        <systemPath>${basedir}/stdlib/ProM-Framework.jar</systemPath>
-    </dependency>
-
-    <dependency>
-        <groupId>ProM-Models_n</groupId>
-        <artifactId>ProM-Models_n</artifactId>
-        <version>1.0</version>
-        <scope>system</scope>
-        <systemPath>${basedir}/stdlib/ProM-Models_n.jar</systemPath>
-    </dependency>
-
-    <dependency>
-        <groupId>Uitopia</groupId>
-        <artifactId>Uitopia</artifactId>
-        <version>1.0</version>
-        <scope>system</scope>
-        <systemPath>${basedir}/stdlib/Uitopia.jar</systemPath>
+        <systemPath>${basedir}/stdlib/HeuristicMinerOriginal-2.jar</systemPath>
     </dependency>
 
 </dependencies>

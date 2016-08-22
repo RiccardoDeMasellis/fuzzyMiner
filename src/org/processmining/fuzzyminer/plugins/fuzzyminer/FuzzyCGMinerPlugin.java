@@ -1,4 +1,4 @@
-package org.processmining.plugins.fuzzyminer;
+package org.processmining.fuzzyminer.plugins.fuzzyminer;
 
 import org.deckfour.uitopia.api.event.TaskListener.InteractionResult;
 import org.deckfour.xes.classification.XEventClassifier;
@@ -14,6 +14,8 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.framework.plugin.impl.ProgressBarImpl;
+import org.processmining.fuzzyminer.FuzzyCGMiner;
+import org.processmining.fuzzyminer.FuzzyMinerSettings;
 import org.processmining.models.causalgraph.FuzzyCausalGraph;
 import org.processmining.models.causalgraph.gui.FuzzyCausalGraphVisualization;
 import org.processmining.models.causalgraph.gui.FuzzyCausalGraphVisualizer;

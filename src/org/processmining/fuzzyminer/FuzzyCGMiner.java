@@ -1,6 +1,5 @@
-package org.processmining.plugins.fuzzyminer;
+package org.processmining.fuzzyminer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -8,32 +7,26 @@ import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
 import org.processmining.confs.FuzzyCGConfiguration;
-import org.processmining.framework.plugin.PluginContext;
+import org.processmining.fuzzyminer.heuristicminer.HeuristicMinerLight;
 import org.processmining.models.causalgraph.FuzzyCausalGraph;
 import org.processmining.models.causalgraph.FuzzyDirectedGraphEdge;
 import org.processmining.models.causalgraph.FuzzyDirectedGraphNode;
 import org.processmining.models.causalgraph.FuzzyDirectedSureGraphEdge;
 import org.processmining.models.heuristics.HeuristicsNet;
 import org.processmining.models.heuristics.impl.ActivitiesMappingStructures;
-import org.processmining.models.heuristics.impl.HNSet;
-import org.processmining.models.heuristics.impl.HNSubSet;
-import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.HeuristicsMiner;
-import org.w3c.dom.NodeList;
-
-import cern.colt.matrix.DoubleFactory2D;
-import cern.colt.matrix.DoubleMatrix2D;
 
 /**
  * Created by demas on 25/07/16.
  */
 
-public class FuzzyCGMiner  extends HeuristicsMiner {
+public class FuzzyCGMiner  extends HeuristicMinerLight {
 
     /*private DoubleMatrix2D uncertainDependencyMeasuresAccepted;
     HNSubSet[] uncertaintyInputSet, uncertaintyOutputSet;*/
 
-    public FuzzyCGMiner(PluginContext context, XLog log, XLogInfo logInfo, FuzzyMinerSettings settings) {
-        super(context, log, logInfo, settings.getHmSettings());
+
+    public FuzzyCGMiner(XLog log, XLogInfo logInfo, FuzzyMinerSettings settings) {
+        super(log, logInfo, settings.getHmSettings());
 
         int eventsNumber = this.getMetrics().getEventsNumber();
         /*uncertainDependencyMeasuresAccepted = DoubleFactory2D.sparse.make(eventsNumber, eventsNumber, 0);
