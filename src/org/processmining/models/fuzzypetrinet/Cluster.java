@@ -86,6 +86,7 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
 
 
     // Just return a random one!
+    // todo: may be redundant?
     public static PlaceEvaluation selectPlaceEvaluation(Set<PlaceEvaluation> bestPlaces) {
         PlaceEvaluation[] arrayBest = (PlaceEvaluation[]) bestPlaces.toArray();
         return arrayBest[0];
