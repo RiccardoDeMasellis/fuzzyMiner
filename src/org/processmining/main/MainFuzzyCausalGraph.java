@@ -40,6 +40,7 @@ public class MainFuzzyCausalGraph {
         FuzzyCGConfiguration configuration = new FuzzyCGConfiguration(log);
         configuration.setSureThreshold(SURETHRESHOLD);
         configuration.setQuestionMarkThreshold(QUESTIONMARKTHRESHOLD);
+   
 
 
         XEventClassifier nameCl = new XEventNameClassifier();

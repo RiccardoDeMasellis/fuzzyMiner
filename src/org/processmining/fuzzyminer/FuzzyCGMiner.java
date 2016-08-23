@@ -96,6 +96,7 @@ public class FuzzyCGMiner  extends HeuristicMinerLight {
 	
 	public void printGraph (FuzzyCausalGraph graph){
         Set<FuzzyDirectedGraphNode> nodes  = graph.getNodes();
+        System.out.println ("** NODES **");
         for (FuzzyDirectedGraphNode node : nodes) {
 			System.out.println(node.getId()+" "+node.getLabel());
 		}
