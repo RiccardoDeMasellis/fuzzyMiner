@@ -1,5 +1,6 @@
 package org.processmining.models.causalgraph;
 
+import org.processmining.models.graphbased.AttributeMap;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
 
 /**
@@ -8,25 +9,25 @@ import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
 public class FuzzyDirectedGraphNode extends AbstractDirectedGraphNode {
 
     private final FuzzyCausalGraph graph;
-    private final String label;
 
     public FuzzyDirectedGraphNode(FuzzyCausalGraph graph) {
+    	super();
         this.graph = graph;
-        this.label = "";
     }
 
     public FuzzyDirectedGraphNode(FuzzyCausalGraph graph, String label) {
         this.graph = graph;
-        this.label = label;
+		getAttributeMap().put(AttributeMap.LABEL, label);
     }
     
+  
     @Override
     public FuzzyCausalGraph getGraph() {
         return this.graph;
     }
 
 	public String getLabel() {
-		return label;
+		return super.getLabel();
 	}
 
 	//The equals method is inherited from AbstractGraphNode, and it is based on the id of the node!

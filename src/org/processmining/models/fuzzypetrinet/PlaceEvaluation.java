@@ -56,6 +56,7 @@ class PlaceEvaluation<E extends AbstractDirectedGraphEdge> {
             // update Accepted traces
     		if (isCurrentTokenNumberZero())
     			increaseAcceptedTracesNumber();
+    		resetCurrentTokenNumber();
 		}
 
 
@@ -118,6 +119,10 @@ class PlaceEvaluation<E extends AbstractDirectedGraphEdge> {
     
     public boolean isCurrentTokenNumberZero(){
     	return currentTokenNumber==0;
+    }
+    
+    public void resetCurrentTokenNumber(){
+    	currentTokenNumber = 0;
     }
 
 }
