@@ -1,6 +1,5 @@
 package org.processmining.models.causalgraph.gui;
 
-// BVD: REMOVED THIS CODE AS I THINK ITS NOT NECESSARY ANYMORE
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -14,7 +13,13 @@ import javax.swing.SwingConstants;
 
 import org.jgraph.graph.AttributeMap.SerializablePoint2D;
 import org.jgraph.graph.GraphConstants;
+import org.processmining.contexts.uitopia.annotations.Visualizer;
+import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.Progress;
+import org.processmining.framework.plugin.annotations.Plugin;
+import org.processmining.framework.plugin.annotations.PluginVariant;
+import org.processmining.framework.plugin.impl.ProgressBarImpl;
+import org.processmining.models.causalgraph.FuzzyCausalGraph;
 import org.processmining.models.connections.GraphLayoutConnection;
 import org.processmining.models.graphbased.AttributeMap;
 import org.processmining.models.graphbased.ViewSpecificAttributeMap;
@@ -29,7 +34,15 @@ import com.jgraph.layout.JGraphFacade;
 import com.jgraph.layout.JGraphLayoutProgress;
 import com.jgraph.layout.hierarchical.JGraphHierarchicalLayout;
 
+@Plugin(name = "Visualize Fuzzy Causal Graph", parameterLabels = { "HeuristicsNet" }, returnLabels = { "HN Annotated Visualization - No Semantics" }, returnTypes = { JComponent.class })
+@Visualizer
 public class FuzzyCausalGraphVisualizer {
+	
+	@PluginVariant(requiredParameterLabels = { 0 })
+	public static JComponent visualize(PluginContext context, FuzzyCausalGraph fCG) {
+
+		return FuzzyCausalGraphVisualizer.getVisualizationPanel(fCG, new AnnotatedVisualizationSettings(), new ProgressBarImpl(context));
+	}
 
 	protected FuzzyCausalGraphVisualizer() {
 	};
