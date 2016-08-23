@@ -1,5 +1,6 @@
 package org.processmining.fuzzycg2fuzzypn;
 
+import org.processmining.fuzzyminer.FuzzyMinerSettings;
 import org.processmining.models.causalgraph.FuzzyCausalGraph;
 import org.processmining.models.causalgraph.FuzzyDirectedGraphNode;
 import org.processmining.models.causalgraph.FuzzyDirectedSureGraphEdge;
@@ -17,13 +18,22 @@ import java.util.*;
  */
 public class FuzzyCGToFuzzyPN {
 
-    public static FuzzyPetrinet fuzzyCGToFuzzyPN(FuzzyCausalGraph graph) {
+    public static FuzzyPetrinet fuzzyCGToFuzzyPN(FuzzyCausalGraph graph, FuzzyMinerSettings settings) {
         // We consider only sure edges!
         Set<FuzzyDirectedSureGraphEdge> edges = graph.getSureEdges();
 
         // Build the clusters
         Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> clusters = identifyClusters(edges);
 
+        // Call clusters evaluations
+
+        // For each cluster
+            // select the placeEval above the threshold
+            // eliminate redundant placeEval
+
+        // build the net
+
+        // remove reduntant places
 
     }
 
