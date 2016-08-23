@@ -2,6 +2,7 @@ package org.processmining.models.fuzzypetrinet;
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.fuzzycg2fuzzypn.Utils;
+import org.processmining.fuzzyminer.FuzzyMinerSettings;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphEdge;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
 
@@ -21,7 +22,6 @@ import java.util.*;
 public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDirectedGraphNode> {
     private Set<E> edges;
     private Set<N> inputNodes, outputNodes;
-
     private Set<PlaceEvaluation> places;
 
 
@@ -55,12 +55,12 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
     }
 
 
-    public PlaceEvaluation evaluateBestPlace(XLog log) {
+    public Set<PlaceEvaluation> evaluateBestPlace(XLog log) {
         // First generate the possible places
         Set<Set<N>> inputNodesPowerSet = Utils.powerSet(inputNodes);
         Set<Set<N>> outputNodesPowerSet = Utils.powerSet(outputNodes);
 
-        int bestTraceNumberAccepted = 0;
+        Set<PlaceEvaluation> result = new HashSet<>();
 
         for (Set<N> outputNodeSet : outputNodesPowerSet) {
             for (Set<N> inputNodeSet : inputNodesPowerSet) {
@@ -69,30 +69,29 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
                     this.places.add(placeEval);
                     // Replay the place
                     placeEval.replayPlace();
-                    // Update bestTraceNumberAccepted
-                    if (placeEval.getAcceptedTracesNumber() >= bestTraceNumberAccepted)
-                        bestTraceNumberAccepted = placeEval.getAcceptedTracesNumber();
+                    result.add(placeEval);
                 }
             }
         }
-        // return the places with getAcceptedTracesNumber() = bestTraceNumber
+        return result;
+    }
+
+
+    public Set<PlaceEvaluation> getPlacesAboveThreshold(double threshold) {
         Set<PlaceEvaluation> result = new HashSet<>();
         for (PlaceEvaluation pe : this.places) {
-            if (pe.getAcceptedTracesNumber() == bestTraceNumberAccepted)
+            if (pe.evaluateReplayScore() >= threshold)
                 result.add(pe);
         }
-
-        // Strategy for selecting just one!
-        return selectPlaceEvaluation(result);
+        return result;
     }
 
 
-    // Just return a random one!
-    // todo: may be redundant?
-    public static PlaceEvaluation selectPlaceEvaluation(Set<PlaceEvaluation> bestPlaces) {
-        PlaceEvaluation[] arrayBest = (PlaceEvaluation[]) bestPlaces.toArray();
-        return arrayBest[0];
-    }
+    // todo
+    //public Set<PlaceEvaluation> discardRedundantPlaces(Set<PlaceEvaluation> placesAboveThreshold) {
+
+    //}
+
 
 
 }

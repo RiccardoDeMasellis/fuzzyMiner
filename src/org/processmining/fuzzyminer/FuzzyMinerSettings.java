@@ -18,10 +18,13 @@ public class FuzzyMinerSettings {
     */
     private double questionMarkThreshold;
 
-    public FuzzyMinerSettings(HeuristicsMinerSettings hms, double sureThreshold, double questionMarkThreshold) {
+    private double placeEvalThreshold;
+
+    public FuzzyMinerSettings(HeuristicsMinerSettings hms, double sureThreshold, double questionMarkThreshold, double placeEvalThreshold) {
         this.hmSettings = hms;
         this.sureThreshold = sureThreshold;
         this.questionMarkThreshold = questionMarkThreshold;
+        this.placeEvalThreshold = placeEvalThreshold;
     }
 
     public HeuristicsMinerSettings getHmSettings() {
@@ -45,6 +48,7 @@ public class FuzzyMinerSettings {
 
         if (Double.compare(that.getSureThreshold(), getSureThreshold()) != 0) return false;
         if (Double.compare(that.getQuestionMarkThreshold(), getQuestionMarkThreshold()) != 0) return false;
+        if (Double.compare(that.placeEvalThreshold, placeEvalThreshold) != 0) return false;
         return getHmSettings().equals(that.getHmSettings());
 
     }
@@ -57,6 +61,8 @@ public class FuzzyMinerSettings {
         temp = Double.doubleToLongBits(getSureThreshold());
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(getQuestionMarkThreshold());
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(placeEvalThreshold);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }

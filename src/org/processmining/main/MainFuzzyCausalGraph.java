@@ -28,6 +28,7 @@ public class MainFuzzyCausalGraph {
     private static String LOGFILENAME = "logs/registrationLog2.xes";
     private static double SURETHRESHOLD = 0.6;
     private static double QUESTIONMARKTHRESHOLD = 0.5;
+    private static double PLACEEVALTHRESHOLD = 0.7;
 
     public static void main(String args[]) {
         File logFile = new File(LOGFILENAME);
@@ -50,7 +51,7 @@ public class MainFuzzyCausalGraph {
         HeuristicsMinerSettings hMS = new HeuristicsMinerSettings();
         hMS.setClassifier(nameCl);
 
-        FuzzyMinerSettings settings = new FuzzyMinerSettings(hMS, SURETHRESHOLD, QUESTIONMARKTHRESHOLD);
+        FuzzyMinerSettings settings = new FuzzyMinerSettings(hMS, SURETHRESHOLD, QUESTIONMARKTHRESHOLD, PLACEEVALTHRESHOLD);
         FuzzyCGMiner miner = new FuzzyCGMiner(log, logInfo, settings);
         FuzzyCausalGraph fCG = miner.mineFCG(log, configuration);
         miner.printGraph(fCG);
