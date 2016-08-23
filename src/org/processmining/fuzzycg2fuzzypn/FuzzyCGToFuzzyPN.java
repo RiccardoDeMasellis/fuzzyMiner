@@ -57,8 +57,11 @@ public class FuzzyCGToFuzzyPN {
                 for (E e : oldCluster) {
                     N source = (N) e.getSource();
                     N target = (N) e.getTarget();
-                    Set<E> edgesForSource = getEdgesForNode(source, edges);
-                    Set<E> edgesForTarget = getEdgesForNode(target, edges);
+
+                    // Non e cosi. Modificare!
+
+                    Set<E> edgesForSource = getEdgesHavingSourceNode(source, edges);
+                    Set<E> edgesForTarget = getEdgesHavingTargetNode(target, edges);
                     newCluster.addAll(edgesForSource);
                     newCluster.addAll(edgesForTarget);
 
@@ -75,11 +78,25 @@ public class FuzzyCGToFuzzyPN {
     }
 
 
-    // Given a node and a set of edges, it returns all the edges of the set having that node as source or target
-    private static <E extends AbstractDirectedGraphEdge, N extends AbstractDirectedGraphNode> Set<E> getEdgesForNode(N node, Set<E> edges) {
+    /*
+    Given a source node s and a set of edges, the method returns all edges having s as source.
+     */
+    private static <E extends AbstractDirectedGraphEdge, N extends AbstractDirectedGraphNode> Set<E> getEdgesHavingSourceNode(N source, Set<E> edges) {
         Set<E> result = new HashSet<>();
         for (E edge : edges) {
-            if (edge.getSource().equals(node) || edge.getTarget().equals(node))
+            if (edge.getSource().equals(source))
+                result.add(edge);
+        }
+        return result;
+    }
+
+    /*
+    Given a target node t and a set of edges, the method returns all edges having t as source.
+     */
+    private static <E extends AbstractDirectedGraphEdge, N extends AbstractDirectedGraphNode> Set<E> getEdgesHavingTargetNode(N target, Set<E> edges) {
+        Set<E> result = new HashSet<>();
+        for (E edge : edges) {
+            if (edge.getTarget().equals(target))
                 result.add(edge);
         }
         return result;
