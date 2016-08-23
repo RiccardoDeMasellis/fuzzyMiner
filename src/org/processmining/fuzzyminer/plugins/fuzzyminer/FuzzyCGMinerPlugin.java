@@ -38,7 +38,7 @@ public class FuzzyCGMinerPlugin {
 		hMS.setClassifier(nameCl);
 			
 		FuzzyMinerSettings settings = new FuzzyMinerSettings(hMS, 0.8, 0.5);
-		FuzzyCGMiner miner = new FuzzyCGMiner(context, log, logInfo, settings);
+		FuzzyCGMiner miner = new FuzzyCGMiner(log, logInfo, settings);
 		FuzzyCausalGraph fCG = miner.mineFCG(log, configuration);
 		
 		FuzzyCausalGraphVisualization fCGV = FuzzyCausalGraphVisualizer.getVisualizationPanel(fCG, new AnnotatedVisualizationSettings(), new ProgressBarImpl(context));
