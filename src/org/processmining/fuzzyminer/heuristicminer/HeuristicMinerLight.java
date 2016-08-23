@@ -540,9 +540,18 @@ public class HeuristicMinerLight {
         double divisor = countI + countJ + settings.getDependencyDivisor();
         double difference = Math.abs(countI - countJ);
 
+        
+        // TODO: So far it has be changed from  this formula
+        // 2 * (countSuccession - difference) / divisor; 
+        // to this other formula:
+        // 2 * (countSuccession) / divisor; 
+        // Check and choose the best one
+        
+
         double measure =
                 //		((2 * countSuccession) / divisor) - ((2 * difference) / divisor);
-                2 * (countSuccession - difference) / divisor; // equivalent
+               // 2 * (countSuccession - difference) / divisor; // equivalent
+        		 2 * (countSuccession) / divisor; // equivalent
 
         return measure;
     }

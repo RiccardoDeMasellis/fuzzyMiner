@@ -23,7 +23,7 @@ public class FuzzyCGToFuzzyPN {
 
         // Build the clusters
         Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> clusters = identifyClusters(edges);
-
+        return null;
 
     }
 
@@ -101,5 +101,6 @@ public class FuzzyCGToFuzzyPN {
         }
         return result;
     }
+
 
 }

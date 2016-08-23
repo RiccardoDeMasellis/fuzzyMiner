@@ -9,6 +9,8 @@ import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
 import org.processmining.confs.FuzzyCGConfiguration;
 import org.processmining.models.causalgraph.FuzzyCausalGraph;
+import org.processmining.models.fuzzypetrinet.FuzzyPetrinet;
+import org.processmining.fuzzycg2fuzzypn.FuzzyCGToFuzzyPN;
 import org.processmining.fuzzyminer.FuzzyCGMiner;
 import org.processmining.fuzzyminer.FuzzyMinerSettings;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.settings.HeuristicsMinerSettings;
@@ -23,8 +25,8 @@ import java.util.List;
 // QUESTIONS: What is the difference between FuzzyCGConfiguration e FuzzyMinerSettings?
 
 public class MainFuzzyCausalGraph {
-    private static String LOGFILENAME = "logs/registrationLog.xes";
-    private static double SURETHRESHOLD = 0.8;
+    private static String LOGFILENAME = "logs/registrationLog2.xes";
+    private static double SURETHRESHOLD = 0.6;
     private static double QUESTIONMARKTHRESHOLD = 0.5;
 
     public static void main(String args[]) {
@@ -51,7 +53,10 @@ public class MainFuzzyCausalGraph {
         FuzzyMinerSettings settings = new FuzzyMinerSettings(hMS, SURETHRESHOLD, QUESTIONMARKTHRESHOLD);
         FuzzyCGMiner miner = new FuzzyCGMiner(log, logInfo, settings);
         FuzzyCausalGraph fCG = miner.mineFCG(log, configuration);
-
-        System.out.println(fCG);
+        miner.printGraph(fCG);
+        
+        FuzzyPetrinet fPN = FuzzyCGToFuzzyPN.fuzzyCGToFuzzyPN(fCG);
+        
+        System.out.println(fPN);
     }
 }

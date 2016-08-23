@@ -27,6 +27,8 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
 
     public Cluster(Set<E> edges) {
         this.edges = edges;
+        this.inputNodes = new HashSet<>();
+        this.outputNodes = new HashSet<>();
         computeInputAndOutputNodes();
         this.places = new HashSet<>();
     }
