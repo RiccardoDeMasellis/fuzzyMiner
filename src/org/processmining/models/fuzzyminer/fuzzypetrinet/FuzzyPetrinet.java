@@ -216,4 +216,12 @@ public class FuzzyPetrinet extends PetrinetImpl {
         return super.addArc(t, p);
     }
 
+    @Override
+    public String toString() {
+    	String fuzzyPetriNetString = "*** FUZZY PETRI NET "+this.getLabel()+" *** \n";
+    	for (PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : getEdges()) {
+			fuzzyPetriNetString+=edge.getSource()+" -> "+edge.getTarget()+"\n";
+		}
+    	return fuzzyPetriNetString;
+    }
 }
