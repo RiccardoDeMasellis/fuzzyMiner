@@ -25,7 +25,7 @@ import java.util.List;
 // QUESTIONS: What is the difference between FuzzyCGConfiguration e FuzzyMinerSettings?
 
 public class MainFuzzyCausalGraph {
-    private static String LOGFILENAME = "logs/registrationLog2.xes";
+    private static String LOGFILENAME = "logs/registrationLog.xes";
     private static double SURETHRESHOLD = 0.6;
     private static double QUESTIONMARKTHRESHOLD = 0.5;
     private static double PLACEEVALTHRESHOLD = 0.7;

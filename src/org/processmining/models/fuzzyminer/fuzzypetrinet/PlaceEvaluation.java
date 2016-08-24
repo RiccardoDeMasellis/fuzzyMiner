@@ -77,14 +77,14 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> {
 			String eventName = XConceptExtension.instance().extractName(event);
 			System.out.println(eventName);
 
-			//if it is input increase
-			for (N placeInputNode : getPlaceInputNodes()) {
-				if (placeInputNode.getLabel().equalsIgnoreCase(eventName))
-					increaseTokenNumber();
-			}
-	        // if it is output decrease
+			//if it is output increase
 			for (N placeOutputNode : getPlaceOutputNodes()) {
 				if (placeOutputNode.getLabel().equalsIgnoreCase(eventName))
+					increaseTokenNumber();
+			}
+	        // if it is input decrease
+			for (N placeInputNode : getPlaceInputNodes()) {
+				if (placeInputNode.getLabel().equalsIgnoreCase(eventName))
 					decreaseTokenNumber();
 		        // CHECK: if negative return;
 				if (isCurrentTokenNumberNegative())
@@ -111,7 +111,9 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> {
     }
 
     public double evaluateReplayScore() {
-    	return getAcceptedTracesNumber()/log.size();
+        double acceptedTraces = new Double(this.getAcceptedTracesNumber());
+        double logS = new Double(log.size());
+    	return acceptedTraces/logS;
     }
 
     public void increaseTokenNumber() {

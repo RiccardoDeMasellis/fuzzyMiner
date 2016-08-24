@@ -14,4 +14,6 @@ public class SureTransitionsArc extends TransitionsArc {
     public SureTransitionsArc(Transition source, Transition target) {
         this(source, target, 1);
     }
+
+
 }

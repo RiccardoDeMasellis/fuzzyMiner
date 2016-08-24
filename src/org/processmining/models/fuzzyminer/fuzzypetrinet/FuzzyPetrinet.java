@@ -154,7 +154,7 @@ public class FuzzyPetrinet extends PetrinetImpl {
     private synchronized Set<Place> checkIfPlacesArePresent(Transition source, Transition target) {
         Set<Place> result = new HashSet<>();
         Set<PetrinetNode> sourceOutputNodes = this.getOutputNodes(source);
-        Set<PetrinetNode> targetInputNodes = this.getOutputNodes(source);
+        Set<PetrinetNode> targetInputNodes = this.getInputNodes(target);
         sourceOutputNodes.retainAll(targetInputNodes);
         for (PetrinetNode node : sourceOutputNodes) {
             if (node instanceof Place)
@@ -221,9 +221,11 @@ public class FuzzyPetrinet extends PetrinetImpl {
     	String fuzzyPetriNetString = "*** FUZZY PETRI NET "+this.getLabel()+" *** \n";
     	for (PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : getEdges()) {
     		if (edge instanceof SureTransitionsArc)
-    			fuzzyPetriNetString+=edge.getSource()+" -> "+edge.getTarget()+"\n";
-    		else
-    			fuzzyPetriNetString+=edge.getSource()+" ->? "+edge.getTarget()+"\n";
+    			fuzzyPetriNetString+=edge.getSource()+" ->- "+edge.getTarget()+"\n";
+            if (edge instanceof UncertainTransitionsArc)
+    			fuzzyPetriNetString+=edge.getSource()+" ->-? "+edge.getTarget()+"\n";
+            else
+                fuzzyPetriNetString+=edge.getSource()+" -> "+edge.getTarget()+"\n";
 		}
     	return fuzzyPetriNetString;
     }
