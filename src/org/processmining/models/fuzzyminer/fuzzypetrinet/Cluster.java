@@ -1,10 +1,10 @@
-package org.processmining.models.fuzzypetrinet;
+package org.processmining.models.fuzzyminer.fuzzypetrinet;
 
 import org.deckfour.xes.model.XLog;
-import org.processmining.fuzzycg2fuzzypn.Utils;
-import org.processmining.fuzzyminer.FuzzyMinerSettings;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphEdge;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
+import org.processmining.plugins.fuzzyminer.FuzzyMinerSettings;
+import org.processmining.plugins.fuzzyminer.fuzzycg2fuzzypn.Utils;
 
 import java.util.*;
 

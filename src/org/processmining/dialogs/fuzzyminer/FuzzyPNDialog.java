@@ -1,10 +1,10 @@
-package org.processmining.dialogs;
+package org.processmining.dialogs.fuzzyminer;
 
 import javax.swing.JPanel;
 
-import org.processmining.confs.FuzzyPNConfiguration;
+import org.processmining.confs.fuzzyminer.FuzzyPNConfiguration;
 import org.processmining.contexts.uitopia.UIPluginContext;
-import org.processmining.models.causalgraph.FuzzyCausalGraph;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
 
 
 

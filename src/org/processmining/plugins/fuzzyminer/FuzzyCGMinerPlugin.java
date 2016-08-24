@@ -6,20 +6,15 @@ import org.deckfour.xes.classification.XEventNameClassifier;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
-import org.processmining.confs.FuzzyCGConfiguration;
+import org.processmining.confs.fuzzyminer.FuzzyCGConfiguration;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
-import org.processmining.dialogs.FuzzyCGDialog;
+import org.processmining.dialogs.fuzzyminer.FuzzyCGDialog;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.framework.plugin.impl.ProgressBarImpl;
-import org.processmining.fuzzyminer.FuzzyMinerSettings;
-import org.processmining.models.causalgraph.FuzzyCausalGraph;
-import org.processmining.models.causalgraph.gui.FuzzyCausalGraphVisualization;
-import org.processmining.models.causalgraph.gui.FuzzyCausalGraphVisualizer;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.settings.HeuristicsMinerSettings;
-import org.processmining.plugins.heuristicsnet.visualizer.annotatedvisualization.AnnotatedVisualizationSettings;
 
 /**
  * Created by demas on 25/07/16.
@@ -37,10 +32,10 @@ public class FuzzyCGMinerPlugin {
 		hMS.setClassifier(nameCl);
 			
 		FuzzyMinerSettings settings = new FuzzyMinerSettings(hMS, 0.8, 0.5, 0.3);
-		FuzzyCGMiner miner = new FuzzyCGMiner(context, log, logInfo, settings);
+		FuzzyCGMiner miner = new FuzzyCGMiner(log, logInfo, settings);
 		FuzzyCausalGraph fCG = miner.mineFCG(log, configuration);
 		
-		FuzzyCausalGraphVisualization fCGV = FuzzyCausalGraphVisualizer.getVisualizationPanel(fCG, new AnnotatedVisualizationSettings(), new ProgressBarImpl(context));
+		//FuzzyCausalGraphVisualization fCGV = FuzzyCausalGraphVisualizer.getVisualizationPanel(fCG, new AnnotatedVisualizationSettings(), new ProgressBarImpl(context));
 		
 		return fCG;
 

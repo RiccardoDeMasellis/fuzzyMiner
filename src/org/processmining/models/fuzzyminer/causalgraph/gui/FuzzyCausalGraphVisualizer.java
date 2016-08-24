@@ -1,4 +1,4 @@
-package org.processmining.models.causalgraph.gui;
+package org.processmining.models.fuzzyminer.causalgraph.gui;
 
 
 import java.awt.geom.Point2D;
@@ -19,8 +19,8 @@ import org.processmining.framework.plugin.Progress;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.framework.plugin.impl.ProgressBarImpl;
-import org.processmining.models.causalgraph.FuzzyCausalGraph;
 import org.processmining.models.connections.GraphLayoutConnection;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
 import org.processmining.models.graphbased.AttributeMap;
 import org.processmining.models.graphbased.ViewSpecificAttributeMap;
 import org.processmining.models.graphbased.directed.DirectedGraph;

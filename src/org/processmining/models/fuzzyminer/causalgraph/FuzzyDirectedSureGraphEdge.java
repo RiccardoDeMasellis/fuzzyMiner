@@ -1,4 +1,4 @@
-package org.processmining.models.causalgraph;
+package org.processmining.models.fuzzyminer.causalgraph;
 
 /**
  * Created by demas on 27/07/16.

@@ -1,4 +1,4 @@
-package org.processmining.models.causalgraph.gui;
+package org.processmining.models.fuzzyminer.causalgraph.gui;
 
 // BVD: REMOVED THIS CODE AS I THINK ITS NOT NECESSARY ANYMORE
 

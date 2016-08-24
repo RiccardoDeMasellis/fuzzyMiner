@@ -1,4 +1,4 @@
-package org.processmining.fuzzyminer.heuristicminer;
+package org.processmining.plugins.fuzzyminer.heuristicminer;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.info.XLogInfo;

@@ -1,4 +1,4 @@
-package org.processmining.confs;
+package org.processmining.confs.fuzzyminer;
 
 import org.deckfour.xes.model.XLog;
 

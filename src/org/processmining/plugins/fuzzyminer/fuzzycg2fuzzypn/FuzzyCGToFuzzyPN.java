@@ -1,15 +1,15 @@
-package org.processmining.fuzzycg2fuzzypn;
+package org.processmining.plugins.fuzzyminer.fuzzycg2fuzzypn;
 
-import org.processmining.fuzzyminer.FuzzyMinerSettings;
-import org.processmining.models.causalgraph.FuzzyCausalGraph;
-import org.processmining.models.causalgraph.FuzzyDirectedGraphNode;
-import org.processmining.models.causalgraph.FuzzyDirectedSureGraphEdge;
-import org.processmining.models.fuzzypetrinet.Cluster;
-import org.processmining.models.fuzzypetrinet.FuzzyPetrinet;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedGraphNode;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedSureGraphEdge;
+import org.processmining.models.fuzzyminer.fuzzypetrinet.Cluster;
+import org.processmining.models.fuzzyminer.fuzzypetrinet.FuzzyPetrinet;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraph;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphEdge;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
 import org.processmining.models.graphbased.directed.DirectedGraph;
+import org.processmining.plugins.fuzzyminer.FuzzyMinerSettings;
 
 import java.util.*;
 

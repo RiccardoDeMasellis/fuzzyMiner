@@ -1,6 +1,6 @@
-package org.processmining.confs;
+package org.processmining.confs.fuzzyminer;
 
-import org.processmining.models.causalgraph.FuzzyCausalGraph;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
 
 public class FuzzyPNConfiguration {
 	

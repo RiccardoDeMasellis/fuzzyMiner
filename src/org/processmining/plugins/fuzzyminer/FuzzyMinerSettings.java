@@ -1,4 +1,4 @@
-package org.processmining.fuzzyminer;
+package org.processmining.plugins.fuzzyminer;
 
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.settings.HeuristicsMinerSettings;
 

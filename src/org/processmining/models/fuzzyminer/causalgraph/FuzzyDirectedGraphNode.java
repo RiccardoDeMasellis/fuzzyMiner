@@ -1,4 +1,4 @@
-package org.processmining.models.causalgraph;
+package org.processmining.models.fuzzyminer.causalgraph;
 
 import org.processmining.models.graphbased.AttributeMap;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;

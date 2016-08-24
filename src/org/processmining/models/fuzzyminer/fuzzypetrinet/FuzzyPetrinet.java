@@ -1,4 +1,4 @@
-package org.processmining.models.fuzzypetrinet;
+package org.processmining.models.fuzzyminer.fuzzypetrinet;
 
 import org.processmining.models.graphbased.directed.petrinet.PetrinetEdge;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;

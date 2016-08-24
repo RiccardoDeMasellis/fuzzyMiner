@@ -1,4 +1,4 @@
-package org.processmining.fuzzycg2fuzzypn;
+package org.processmining.plugins.fuzzyminer.fuzzycg2fuzzypn;
 
 import java.util.ArrayList;
 import java.util.HashSet;

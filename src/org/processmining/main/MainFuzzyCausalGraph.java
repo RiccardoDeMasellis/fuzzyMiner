@@ -7,12 +7,12 @@ import org.deckfour.xes.in.XesXmlParser;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
-import org.processmining.confs.FuzzyCGConfiguration;
-import org.processmining.models.causalgraph.FuzzyCausalGraph;
-import org.processmining.models.fuzzypetrinet.FuzzyPetrinet;
-import org.processmining.fuzzycg2fuzzypn.FuzzyCGToFuzzyPN;
-import org.processmining.fuzzyminer.FuzzyCGMiner;
-import org.processmining.fuzzyminer.FuzzyMinerSettings;
+import org.processmining.confs.fuzzyminer.FuzzyCGConfiguration;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
+import org.processmining.models.fuzzyminer.fuzzypetrinet.FuzzyPetrinet;
+import org.processmining.plugins.fuzzyminer.FuzzyCGMiner;
+import org.processmining.plugins.fuzzyminer.FuzzyMinerSettings;
+import org.processmining.plugins.fuzzyminer.fuzzycg2fuzzypn.FuzzyCGToFuzzyPN;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.settings.HeuristicsMinerSettings;
 
 import java.io.File;

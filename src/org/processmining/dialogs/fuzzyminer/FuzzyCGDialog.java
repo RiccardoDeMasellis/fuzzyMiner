@@ -1,4 +1,4 @@
-package org.processmining.dialogs;
+package org.processmining.dialogs.fuzzyminer;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -12,7 +12,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.deckfour.xes.model.XLog;
-import org.processmining.confs.FuzzyCGConfiguration;
+import org.processmining.confs.fuzzyminer.FuzzyCGConfiguration;
 import org.processmining.contexts.uitopia.UIPluginContext;
 
 

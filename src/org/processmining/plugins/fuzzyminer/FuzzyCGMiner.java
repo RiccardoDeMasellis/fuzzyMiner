@@ -1,35 +1,33 @@
 package org.processmining.plugins.fuzzyminer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
-import org.processmining.confs.FuzzyCGConfiguration;
-import org.processmining.framework.plugin.PluginContext;
-import org.processmining.fuzzyminer.FuzzyMinerSettings;
-import org.processmining.models.causalgraph.FuzzyCausalGraph;
-import org.processmining.models.causalgraph.FuzzyDirectedGraphEdge;
-import org.processmining.models.causalgraph.FuzzyDirectedGraphNode;
-import org.processmining.models.causalgraph.FuzzyDirectedSureGraphEdge;
+import org.processmining.confs.fuzzyminer.FuzzyCGConfiguration;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedGraphEdge;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedGraphNode;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedSureGraphEdge;
 import org.processmining.models.heuristics.HeuristicsNet;
 import org.processmining.models.heuristics.impl.ActivitiesMappingStructures;
-
-import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.HeuristicsMiner;
+import org.processmining.plugins.fuzzyminer.FuzzyMinerSettings;
+import org.processmining.plugins.fuzzyminer.heuristicminer.HeuristicMinerLight;
 
 /**
  * Created by demas on 25/07/16.
  */
 
-public class FuzzyCGMiner  extends HeuristicsMiner {
+public class FuzzyCGMiner  extends HeuristicMinerLight {
 
     /*private DoubleMatrix2D uncertainDependencyMeasuresAccepted;
     HNSubSet[] uncertaintyInputSet, uncertaintyOutputSet;*/
 
-    public FuzzyCGMiner(PluginContext context, XLog log, XLogInfo logInfo, FuzzyMinerSettings settings) {
-        super(context, log, logInfo, settings.getHmSettings());
+
+    public FuzzyCGMiner(XLog log, XLogInfo logInfo, FuzzyMinerSettings settings) {
+        super(log, logInfo, settings.getHmSettings());
 
         int eventsNumber = this.getMetrics().getEventsNumber();
         /*uncertainDependencyMeasuresAccepted = DoubleFactory2D.sparse.make(eventsNumber, eventsNumber, 0);
@@ -92,13 +90,13 @@ public class FuzzyCGMiner  extends HeuristicsMiner {
                 }*/
             }
         }
-        printGraph(fCG);
 		
 		return fCG;
 	}
 	
 	public void printGraph (FuzzyCausalGraph graph){
         Set<FuzzyDirectedGraphNode> nodes  = graph.getNodes();
+        System.out.println ("** NODES **");
         for (FuzzyDirectedGraphNode node : nodes) {
 			System.out.println(node.getId()+" "+node.getLabel());
 		}

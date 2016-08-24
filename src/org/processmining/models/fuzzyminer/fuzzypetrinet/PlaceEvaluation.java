@@ -1,4 +1,4 @@
-package org.processmining.models.fuzzypetrinet;
+package org.processmining.models.fuzzyminer.fuzzypetrinet;
 
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.model.XEvent;
