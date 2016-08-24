@@ -220,7 +220,10 @@ public class FuzzyPetrinet extends PetrinetImpl {
     public String toString() {
     	String fuzzyPetriNetString = "*** FUZZY PETRI NET "+this.getLabel()+" *** \n";
     	for (PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : getEdges()) {
-			fuzzyPetriNetString+=edge.getSource()+" -> "+edge.getTarget()+"\n";
+    		if (edge instanceof SureTransitionsArc)
+    			fuzzyPetriNetString+=edge.getSource()+" -> "+edge.getTarget()+"\n";
+    		else
+    			fuzzyPetriNetString+=edge.getSource()+" ->? "+edge.getTarget()+"\n";
 		}
     	return fuzzyPetriNetString;
     }
