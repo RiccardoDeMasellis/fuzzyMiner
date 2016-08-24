@@ -22,17 +22,10 @@ import org.processmining.plugins.fuzzyminer.heuristicminer.HeuristicMinerLight;
 
 public class FuzzyCGMiner  extends HeuristicMinerLight {
 
-    /*private DoubleMatrix2D uncertainDependencyMeasuresAccepted;
-    HNSubSet[] uncertaintyInputSet, uncertaintyOutputSet;*/
-
-
     public FuzzyCGMiner(XLog log, XLogInfo logInfo, FuzzyMinerSettings settings) {
         super(log, logInfo, settings.getHmSettings());
 
         int eventsNumber = this.getMetrics().getEventsNumber();
-        /*uncertainDependencyMeasuresAccepted = DoubleFactory2D.sparse.make(eventsNumber, eventsNumber, 0);
-        uncertaintyInputSet = new HNSubSet[eventsNumber];
-        uncertaintyOutputSet = new HNSubSet[eventsNumber];*/
     }  
 	
 	public FuzzyCausalGraph mineFCG(XLog log, FuzzyCGConfiguration configuration){
@@ -72,47 +65,21 @@ public class FuzzyCGMiner  extends HeuristicMinerLight {
                 double dependencyAccepted = metrics.getDependencyMeasuresAccepted(i, j);
                 if (abdependency>=configuration.getSureThreshold()){
                 	fCG.addSureEdge(nodeI, nodeJ);
-                    System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
+                    //System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
                 } else if (abdependency>=configuration.getQuestionMarkThreshold()){
                 	fCG.addUncertainEdge(nodeI, nodeJ);
-                    System.out.println("UNCERTAIN"+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
-                } else
-                    System.out.println("NOTHING "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
+                    //System.out.println("UNCERTAIN"+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
+                } /*else
+                    System.out.println("NOTHING "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);*/
                 
-                /*if (abdependency>= FuzzyMinerPlugin.QUESTIONMARK_THRESHOLD && !(dependencyAccepted>0.0)) {
-                    uncertainDependencyMeasuresAccepted.set(i, j, abdependency);
-                    this.addUncertaintyInputSet(j, i);
-                    this.addUncertaintyOutputSet(i, j);
-
-                    // Add to the net
-                    result.setInputSet(i, this.getUncertaintyInputSet(i));
-                    result.setOutputSet(i, this.getUncertaintyOutputSet(i));
-                }*/
             }
         }
 		
 		return fCG;
 	}
 	
-	public void printGraph (FuzzyCausalGraph graph){
-        Set<FuzzyDirectedGraphNode> nodes  = graph.getNodes();
-        System.out.println ("** NODES **");
-        for (FuzzyDirectedGraphNode node : nodes) {
-			System.out.println(node.getId()+" "+node.getLabel());
-		}
-        System.out.println ("** EDGES **");
-        Set<FuzzyDirectedGraphEdge> edges = graph.getEdges();
-        for (FuzzyDirectedGraphEdge edge : edges) {
-        	if (edge instanceof FuzzyDirectedSureGraphEdge)
-        		System.out.println("SURE EDGE "+edge.getSource().getLabel()+" "+edge.getTarget().getLabel()+" "+edge.getLabel());
-        	else
-        		System.out.println("UNSURE EDGE "+edge.getSource().getLabel()+" "+edge.getTarget().getLabel()+" "+edge.getLabel());
-			
-		}
+	
 
-	}
-	
-	
 
    /* public void addUncertaintyInputSet(int x, int value){ this.uncertaintyInputSet[x].add(value); }
     public void addUncertaintyOutputSet(int x, int value){ this.uncertaintyOutputSet[x].add(value); }

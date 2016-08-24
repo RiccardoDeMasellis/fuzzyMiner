@@ -63,4 +63,26 @@ public class FuzzyCausalGraph extends CausalGraph<FuzzyDirectedGraphNode, FuzzyD
 		return result;
 	}
 
+	@Override
+	public String toString() {
+		String graphString = "*** GRAPH *** "+this.getLabel()+"\n";
+        Set<FuzzyDirectedGraphNode> nodes  = this.getNodes();
+        graphString+= "** NODES **\n";
+        for (FuzzyDirectedGraphNode node : nodes) {
+        	graphString+= node.getId()+" "+node.getLabel()+"\n";
+		}
+        graphString+= "** EDGES **";
+        Set<FuzzyDirectedGraphEdge> edges = this.getEdges();
+        for (FuzzyDirectedGraphEdge edge : edges) {
+        	if (edge instanceof FuzzyDirectedSureGraphEdge)
+        		graphString+= "SURE EDGE "+edge.getSource().getLabel()+" "+edge.getTarget().getLabel()+" "+edge.getLabel()+"\n";
+        	else
+        		graphString+= "UNSURE EDGE "+edge.getSource().getLabel()+" "+edge.getTarget().getLabel()+" "+edge.getLabel()+"\n";
+			
+		}
+        return graphString;
+	}
+
+	
+	
 }
