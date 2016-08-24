@@ -22,7 +22,7 @@ import java.util.*;
 public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDirectedGraphNode> {
     private Set<E> edges;
     private Set<N> inputNodes, outputNodes;
-    private Set<PlaceEvaluation> places;
+    private Set<PlaceEvaluation<N>> places;
 
 
     public Cluster(Set<E> edges) {
@@ -55,17 +55,17 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
     }
 
 
-    public Set<PlaceEvaluation> evaluateBestPlaces(XLog log) {
+    public Set<PlaceEvaluation<N>> evaluateBestPlaces(XLog log) {
         // First generate the possible places
         Set<Set<N>> inputNodesPowerSet = Utils.powerSet(inputNodes);
         Set<Set<N>> outputNodesPowerSet = Utils.powerSet(outputNodes);
 
-        Set<PlaceEvaluation> result = new HashSet<>();
+        Set<PlaceEvaluation<N>> result = new HashSet<>();
 
         for (Set<N> outputNodeSet : outputNodesPowerSet) {
             for (Set<N> inputNodeSet : inputNodesPowerSet) {
                 if (outputNodeSet.size() != 0 && inputNodeSet.size() != 0) {
-                    PlaceEvaluation placeEval = new PlaceEvaluation(outputNodeSet, inputNodeSet, log);
+                    PlaceEvaluation<N> placeEval = new PlaceEvaluation(outputNodeSet, inputNodeSet, log);
                     this.places.add(placeEval);
                     // Replay the place
                     placeEval.replayPlace();
@@ -77,8 +77,8 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
     }
 
 
-    public Set<PlaceEvaluation> getPlacesAboveThreshold(double threshold) {
-        Set<PlaceEvaluation> result = new HashSet<>();
+    public Set<PlaceEvaluation<N>> getPlacesAboveThreshold(double threshold) {
+        Set<PlaceEvaluation<N>> result = new HashSet<>();
         for (PlaceEvaluation pe : this.places) {
             if (pe.evaluateReplayScore() >= threshold)
                 result.add(pe);

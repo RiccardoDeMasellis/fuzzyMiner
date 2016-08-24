@@ -6,6 +6,7 @@ import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphEdge;
 
+import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
 import weka.classifiers.bayes.net.search.fixed.FromFile;
 
 import java.util.Iterator;
@@ -14,13 +15,13 @@ import java.util.Set;
 /**
  * Created by demas on 22/08/16.
  */
-public class PlaceEvaluation<E extends AbstractDirectedGraphEdge> {
-    private Set<E> placeInputNodes, placeOutputNodes;
+public class PlaceEvaluation<N extends AbstractDirectedGraphNode> {
+    private Set<N> placeInputNodes, placeOutputNodes;
     private int acceptedTracesNumber;
     private int currentTokenNumber;
     private XLog log;
 
-    public PlaceEvaluation(Set<E> placeOutputNodes, Set<E> placeInputNodes, XLog log) {
+    public PlaceEvaluation(Set<N> placeOutputNodes, Set<N> placeInputNodes, XLog log) {
         this.placeOutputNodes = placeOutputNodes;
         this.placeInputNodes = placeInputNodes;
         this.log = log;
@@ -77,12 +78,12 @@ public class PlaceEvaluation<E extends AbstractDirectedGraphEdge> {
 			System.out.println(eventName);
 
 			//if it is input increase
-			for (E placeInputNode : getPlaceInputNodes()) {
+			for (N placeInputNode : getPlaceInputNodes()) {
 				if (placeInputNode.getLabel().equalsIgnoreCase(eventName))
 					increaseTokenNumber();
 			}
 	        // if it is output decrease
-			for (E placeOutputNode : getPlaceOutputNodes()) {
+			for (N placeOutputNode : getPlaceOutputNodes()) {
 				if (placeOutputNode.getLabel().equalsIgnoreCase(eventName))
 					decreaseTokenNumber();
 		        // CHECK: if negative return;
@@ -97,11 +98,11 @@ public class PlaceEvaluation<E extends AbstractDirectedGraphEdge> {
     }
 
 
-    public Set<E> getPlaceInputNodes() {
+    public Set<N> getPlaceInputNodes() {
         return placeInputNodes;
     }
 
-    public Set<E> getPlaceOutputNodes() {
+    public Set<N> getPlaceOutputNodes() {
         return placeOutputNodes;
     }
 

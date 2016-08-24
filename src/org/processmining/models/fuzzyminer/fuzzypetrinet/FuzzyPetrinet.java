@@ -1,5 +1,6 @@
 package org.processmining.models.fuzzyminer.fuzzypetrinet;
 
+import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetEdge;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
 import org.processmining.models.graphbased.directed.petrinet.elements.Arc;
@@ -50,7 +51,7 @@ public class FuzzyPetrinet extends PetrinetImpl {
      * @return the SureTransitionArc if not present or if already present with a different weight. Null if there is already a place
      * connecting source and target.
      */
-    protected synchronized SureTransitionsArc addSureTransitionsArcPrivate(Transition source, Transition target, int weight) {
+    private synchronized SureTransitionsArc addSureTransitionsArcPrivate(Transition source, Transition target, int weight) {
         synchronized (arcs) {
             // Following check just makes sure that source and target already exist in the net
             checkAddEdge(source, target);
@@ -91,7 +92,7 @@ public class FuzzyPetrinet extends PetrinetImpl {
      * @return the uncertainTransitionArc if not present or if already present with a different weight. Null if there is already a place
      * connecting source and target.
      */
-    protected synchronized UncertainTransitionsArc addUncertainTransitionsArcPrivate(Transition source, Transition target, int weight) {
+    private synchronized UncertainTransitionsArc addUncertainTransitionsArcPrivate(Transition source, Transition target, int weight) {
         synchronized (arcs) {
             // Following check just makes sure that source and target already exist in the net
             checkAddEdge(source, target);
@@ -174,6 +175,17 @@ public class FuzzyPetrinet extends PetrinetImpl {
         }
         else {
             return alreadyPresent;
+        }
+    }
+
+
+    public synchronized <N extends AbstractDirectedGraphNode> void addPlaceFromPlaceEvaluation(PlaceEvaluation<N> place) {
+        // todo: name of the places?
+        this.addPlace(place.toString());
+        for (N node : place.getPlaceInputNodes()) {
+
+
+
         }
     }
 

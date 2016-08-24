@@ -26,11 +26,11 @@ public class FuzzyCGMiner  extends HeuristicMinerLight {
         super(log, logInfo, settings.getHmSettings());
 
         int eventsNumber = this.getMetrics().getEventsNumber();
-    }  
-	
-	public FuzzyCausalGraph mineFCG(XLog log, FuzzyCGConfiguration configuration){
-		FuzzyCausalGraph fCG = new FuzzyCausalGraph();
-		
+    }
+
+    public FuzzyCausalGraph mineFCG(XLog log, FuzzyCGConfiguration configuration){
+        FuzzyCausalGraph fCG = new FuzzyCausalGraph();
+
         this.keys = new HashMap<String, Integer>();
 
         // Building activitymappingStructures...
@@ -39,44 +39,36 @@ public class FuzzyCGMiner  extends HeuristicMinerLight {
             this.keys.put(event.getId(), event.getIndex());
         }
         activitiesMappingStructures = new ActivitiesMappingStructures(logInfo.getEventClasses(settings.getClassifier()));
-        
-        
+
+
 
         HeuristicsNet originalNet = this.makeBasicRelations(this.getMetrics());
 
         int eventsNumber = this.getMetrics().getEventsNumber();
         for(int i=0; i<eventsNumber; i++) {
-        	String nodeILabel = activitiesMappingStructures.getActivitiesMapping()[i].getId();
-        	FuzzyDirectedGraphNode nodeI = null, nodeJ = null;
-        	if ((nodeI=fCG.getNode(nodeILabel))==null){
-	        	System.out.println(nodeILabel);
-	        	nodeI = new FuzzyDirectedGraphNode(fCG, nodeILabel);
-	        	fCG.addNode(nodeI);
-        	}
+            String nodeILabel = activitiesMappingStructures.getActivitiesMapping()[i].getId();
+            FuzzyDirectedGraphNode nodeI = null, nodeJ = null;
+            fCG.addNode(nodeILabel);
             for (int j=0; j<eventsNumber; j++) {
-            	String nodeJLabel = activitiesMappingStructures.getActivitiesMapping()[j].getId();
-            	if ((nodeJ=fCG.getNode(nodeJLabel))==null){
-            		System.out.println(nodeJLabel);
-            		nodeJ = new FuzzyDirectedGraphNode(fCG, nodeJLabel);
-            		fCG.addNode(nodeJ);
-            	}
+                String nodeJLabel = activitiesMappingStructures.getActivitiesMapping()[j].getId();
+                fCG.addNode(nodeJLabel);
 
                 double abdependency = metrics.getABdependencyMeasuresAll(i, j);
                 double dependencyAccepted = metrics.getDependencyMeasuresAccepted(i, j);
                 if (abdependency>=configuration.getSureThreshold()){
-                	fCG.addSureEdge(nodeI, nodeJ);
+                    fCG.addSureEdge(nodeI, nodeJ);
                     //System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
                 } else if (abdependency>=configuration.getQuestionMarkThreshold()){
-                	fCG.addUncertainEdge(nodeI, nodeJ);
+                    fCG.addUncertainEdge(nodeI, nodeJ);
                     //System.out.println("UNCERTAIN"+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
                 } /*else
                     System.out.println("NOTHING "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);*/
-                
+
             }
         }
-		
-		return fCG;
-	}
+
+        return fCG;
+    }
 	
 	
 

@@ -18,7 +18,9 @@ import java.util.*;
  */
 public class FuzzyCGToFuzzyPN {
 
-    public static FuzzyPetrinet fuzzyCGToFuzzyPN(FuzzyCausalGraph graph, XLog log, FuzzyMinerSettings settings) {
+    public static <N extends AbstractDirectedGraphNode> FuzzyPetrinet fuzzyCGToFuzzyPN(FuzzyCausalGraph graph, XLog log, FuzzyMinerSettings settings) {
+        FuzzyPetrinet result = new FuzzyPetrinet("minedFuzzyPetrinet");
+
         // We consider only sure edges!
         Set<FuzzyDirectedSureGraphEdge> edges = graph.getSureEdges();
 
@@ -36,7 +38,12 @@ public class FuzzyCGToFuzzyPN {
             placesToBeAdded.addAll(c.getPlacesAboveThreshold(settings.getPlaceEvalThreshold()));
         }
 
-        // Build the net
+        // Build the net. For each PlaceEvaluation in placesToBeAdded
+        for (PlaceEvaluation<N> pe : placesToBeAdded) {
+            // Add source and target transitions (the check of existence is inside the method)
+            result.addTransition()
+
+        }
 
         // Remove reduntant places
         
