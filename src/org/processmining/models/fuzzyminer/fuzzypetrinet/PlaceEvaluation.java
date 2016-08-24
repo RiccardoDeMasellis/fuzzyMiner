@@ -16,7 +16,7 @@ import java.util.Set;
  * Created by demas on 22/08/16.
  */
 public class PlaceEvaluation<N extends AbstractDirectedGraphNode> {
-    private Set<N> placeInputNodes, placeOutputNodes;
+    private Set<N> placeOutputNodes, placeInputNodes;
     private int acceptedTracesNumber;
     private int currentTokenNumber;
     private XLog log;

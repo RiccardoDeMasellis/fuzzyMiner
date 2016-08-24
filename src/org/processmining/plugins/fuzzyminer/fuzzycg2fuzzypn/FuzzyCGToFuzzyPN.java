@@ -2,6 +2,7 @@ package org.processmining.plugins.fuzzyminer.fuzzycg2fuzzypn;
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedGraphEdge;
 import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedGraphNode;
 import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedSureGraphEdge;
 import org.processmining.models.fuzzyminer.fuzzypetrinet.Cluster;
@@ -32,22 +33,27 @@ public class FuzzyCGToFuzzyPN {
 
         // For each cluster:
         for (Cluster c : clusters) {
+
+            System.out.println(c);
+
             // call clusters evaluations
             c.evaluateBestPlaces(log);
             // select the places above the threshold and add them to the set of places to be added to the fuzzynet
             placesToBeAdded.addAll(c.getPlacesAboveThreshold(settings.getPlaceEvalThreshold()));
         }
 
-        // Build the net. For each PlaceEvaluation in placesToBeAdded
-        for (PlaceEvaluation<N> pe : placesToBeAdded) {
-            // Add source and target transitions (the check of existence is inside the method)
-            result.addTransition()
+        // Build the net. For each PlaceEvaluation in placesToBeAdded, add a place and the respective transitions
+        for (PlaceEvaluation<N> pe : placesToBeAdded)
+            result.addPlaceFromPlaceEvaluation(pe);
 
-        }
-
-        // Remove reduntant places
+        /* Then add the sure and uncertain arcs between transitions in the net coming from the causal graph
+            I do not know which sure transitions have met the threshold thus have been replaced by a place transition,
+             but such a check is directly in the method
+         */
+        for (FuzzyDirectedGraphEdge edge : graph.getEdges())
+            result.addTransitionsArcFromFCGEdge(edge);
         
-        return null;
+        return result;
     }
 
 

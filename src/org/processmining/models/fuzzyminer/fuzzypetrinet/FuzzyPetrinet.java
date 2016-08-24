@@ -1,5 +1,7 @@
 package org.processmining.models.fuzzyminer.fuzzypetrinet;
 
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedGraphEdge;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedSureGraphEdge;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetEdge;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
@@ -22,20 +24,24 @@ public class FuzzyPetrinet extends PetrinetImpl {
         this.labelTransitionsMap = new HashMap<>();
     }
 
-    public synchronized SureTransitionsArc addSureTransitionsArc(Transition source, Transition target) {
-        return addSureTransitionsArc(source, target, 1);
+    public synchronized TransitionsArc addTransitionsArcFromFCGEdge(FuzzyDirectedGraphEdge edge) {
+        Transition source = this.addTransition(edge.getSource().getLabel());
+        Transition target = this.addTransition(edge.getTarget().getLabel());
+
+        if (edge instanceof FuzzyDirectedSureGraphEdge)
+            return this.addSureTransitionsArcPrivate(source, target, 1);
+        else
+            return this.addUncertainTransitionsArcPrivate(source, target, 1);
     }
 
-    public synchronized UncertainTransitionsArc addUncertainTransitionsArc(Transition source, Transition target) {
-        return addUncertainTransitionsArc(source, target, 1);
-    }
+    public synchronized TransitionsArc addTransitionsArcFromFCGEdge(FuzzyDirectedGraphEdge edge, int weight) {
+        Transition source = this.addTransition(edge.getSource().getLabel());
+        Transition target = this.addTransition(edge.getTarget().getLabel());
 
-    public synchronized SureTransitionsArc addSureTransitionsArc(Transition source, Transition target, int weight) {
-        return addSureTransitionsArcPrivate(source, target, weight);
-    }
-
-    public synchronized UncertainTransitionsArc addUncertainTransitionsArc(Transition source, Transition target, int weight) {
-        return addUncertainTransitionsArcPrivate(source, target, weight);
+        if (edge instanceof FuzzyDirectedSureGraphEdge)
+            return this.addSureTransitionsArcPrivate(source, target, weight);
+        else
+            return this.addUncertainTransitionsArcPrivate(source, target, weight);
     }
 
     /**
@@ -179,13 +185,16 @@ public class FuzzyPetrinet extends PetrinetImpl {
     }
 
 
-    public synchronized <N extends AbstractDirectedGraphNode> void addPlaceFromPlaceEvaluation(PlaceEvaluation<N> place) {
+    public synchronized <N extends AbstractDirectedGraphNode> void addPlaceFromPlaceEvaluation(PlaceEvaluation<N> placeEval) {
         // todo: name of the places?
-        this.addPlace(place.toString());
-        for (N node : place.getPlaceInputNodes()) {
-
-
-
+        Place p = this.addPlace(placeEval.toString());
+        for (N node : placeEval.getPlaceOutputNodes()) {
+            Transition t = this.addTransition(node.getLabel());
+            this.addArc(t, p);
+        }
+        for (N node: placeEval.getPlaceInputNodes()) {
+            Transition t = this.addTransition(node.getLabel());
+            this.addArc(p, t);
         }
     }
 

@@ -49,16 +49,11 @@ public class FuzzyCausalGraph extends CausalGraph<FuzzyDirectedGraphNode, FuzzyD
 		return this.labelNodeMap.get(label);
 	}
 
-
 	public Set<FuzzyDirectedSureGraphEdge> getSureEdges() {
 		HashSet<FuzzyDirectedSureGraphEdge> result = new HashSet<>();
-		for (DirectedGraphNode node : this.getNodes()) {
-			Collection<FuzzyDirectedGraphEdge> inOutEdges = this.getInEdges(node);
-			inOutEdges.addAll(this.getOutEdges(node));
-			for (FuzzyDirectedGraphEdge edge : inOutEdges) {
-				if (edge instanceof FuzzyDirectedSureGraphEdge)
-					result.add((FuzzyDirectedSureGraphEdge) edge);
-			}
+		for (FuzzyDirectedGraphEdge edge : this.getEdges()) {
+			if (edge instanceof FuzzyDirectedSureGraphEdge)
+				result.add((FuzzyDirectedSureGraphEdge)edge);
 		}
 		return result;
 	}
