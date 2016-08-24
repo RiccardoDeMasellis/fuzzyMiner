@@ -48,10 +48,10 @@ public class FuzzyCGMiner  extends HeuristicMinerLight {
         for(int i=0; i<eventsNumber; i++) {
             String nodeILabel = activitiesMappingStructures.getActivitiesMapping()[i].getId();
             FuzzyDirectedGraphNode nodeI = null, nodeJ = null;
-            fCG.addNode(nodeILabel);
+            nodeI = fCG.addNode(nodeILabel);
             for (int j=0; j<eventsNumber; j++) {
                 String nodeJLabel = activitiesMappingStructures.getActivitiesMapping()[j].getId();
-                fCG.addNode(nodeJLabel);
+                nodeJ = fCG.addNode(nodeJLabel);
 
                 double abdependency = metrics.getABdependencyMeasuresAll(i, j);
                 double dependencyAccepted = metrics.getDependencyMeasuresAccepted(i, j);
