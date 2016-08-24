@@ -54,7 +54,7 @@ public class MainFuzzyCausalGraph {
         FuzzyMinerSettings settings = new FuzzyMinerSettings(hMS, SURETHRESHOLD, QUESTIONMARKTHRESHOLD, PLACEEVALTHRESHOLD);
         FuzzyCGMiner miner = new FuzzyCGMiner(log, logInfo, settings);
         FuzzyCausalGraph fCG = miner.mineFCG(log, configuration);
-        miner.printGraph(fCG);
+        System.out.println(fCG);
         
         FuzzyPetrinet fPN = FuzzyCGToFuzzyPN.fuzzyCGToFuzzyPN(fCG, settings);
         
