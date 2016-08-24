@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Created by demas on 22/08/16.
  */
-class PlaceEvaluation<E extends AbstractDirectedGraphEdge> {
+public class PlaceEvaluation<E extends AbstractDirectedGraphEdge> {
     private Set<E> placeInputNodes, placeOutputNodes;
     private int acceptedTracesNumber;
     private int currentTokenNumber;
@@ -39,6 +39,14 @@ class PlaceEvaluation<E extends AbstractDirectedGraphEdge> {
         if (!getPlaceOutputNodes().equals(that.getPlaceOutputNodes())) return false;
         return log.equals(that.log);
 
+    }
+
+    @Override
+    public String toString() {
+        return "PlaceEvaluation{" +
+                "placeInputNodes=" + placeInputNodes +
+                ", placeOutputNodes=" + placeOutputNodes +
+                '}';
     }
 
     @Override

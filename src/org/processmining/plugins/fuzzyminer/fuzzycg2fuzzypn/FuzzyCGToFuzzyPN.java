@@ -1,14 +1,14 @@
 package org.processmining.plugins.fuzzyminer.fuzzycg2fuzzypn;
 
+import org.deckfour.xes.model.XLog;
 import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
 import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedGraphNode;
 import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedSureGraphEdge;
 import org.processmining.models.fuzzyminer.fuzzypetrinet.Cluster;
 import org.processmining.models.fuzzyminer.fuzzypetrinet.FuzzyPetrinet;
-import org.processmining.models.graphbased.directed.AbstractDirectedGraph;
+import org.processmining.models.fuzzyminer.fuzzypetrinet.PlaceEvaluation;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphEdge;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
-import org.processmining.models.graphbased.directed.DirectedGraph;
 import org.processmining.plugins.fuzzyminer.FuzzyMinerSettings;
 
 import java.util.*;
@@ -18,23 +18,27 @@ import java.util.*;
  */
 public class FuzzyCGToFuzzyPN {
 
-    public static FuzzyPetrinet fuzzyCGToFuzzyPN(FuzzyCausalGraph graph, FuzzyMinerSettings settings) {
+    public static FuzzyPetrinet fuzzyCGToFuzzyPN(FuzzyCausalGraph graph, XLog log, FuzzyMinerSettings settings) {
         // We consider only sure edges!
         Set<FuzzyDirectedSureGraphEdge> edges = graph.getSureEdges();
 
         // Build the clusters
         Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> clusters = identifyClusters(edges);
 
+        // Prepare the data structure for the nodes to be added
+        Set<PlaceEvaluation> placesToBeAdded = new HashSet<>();
 
-        // Call clusters evaluations
+        // For each cluster:
+        for (Cluster c : clusters) {
+            // call clusters evaluations
+            c.evaluateBestPlaces(log);
+            // select the places above the threshold and add them to the set of places to be added to the fuzzynet
+            placesToBeAdded.addAll(c.getPlacesAboveThreshold(settings.getPlaceEvalThreshold()));
+        }
 
-        // For each cluster
-            // select the placeEval above the threshold
-            // eliminate redundant placeEval
+        // Build the net
 
-        // build the net
-
-        // remove reduntant places
+        // Remove reduntant places
         
         return null;
     }

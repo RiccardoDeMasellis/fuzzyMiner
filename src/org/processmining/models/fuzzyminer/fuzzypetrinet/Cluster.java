@@ -55,7 +55,7 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
     }
 
 
-    public Set<PlaceEvaluation> evaluateBestPlace(XLog log) {
+    public Set<PlaceEvaluation> evaluateBestPlaces(XLog log) {
         // First generate the possible places
         Set<Set<N>> inputNodesPowerSet = Utils.powerSet(inputNodes);
         Set<Set<N>> outputNodesPowerSet = Utils.powerSet(outputNodes);
@@ -86,6 +86,14 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "Cluster{" +
+                "edges=" + edges +
+                ", inputNodes=" + inputNodes +
+                ", outputNodes=" + outputNodes +
+                '}';
+    }
 
     // todo
     //public Set<PlaceEvaluation> discardRedundantPlaces(Set<PlaceEvaluation> placesAboveThreshold) {

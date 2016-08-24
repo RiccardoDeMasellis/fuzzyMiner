@@ -92,9 +92,10 @@ public abstract class CausalGraph<N extends DirectedGraphNode, E extends Directe
     /* 
      * ADDED
      */
-    public void addNode(N node){
+    public N addNode(N node){
     	nodes.add(node);
     	this.graphElementAdded(node);
+        return node;
     }
     
     public void addEdge(E edge){

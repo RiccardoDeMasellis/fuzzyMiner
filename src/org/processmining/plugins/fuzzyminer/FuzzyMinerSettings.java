@@ -39,6 +39,10 @@ public class FuzzyMinerSettings {
         return questionMarkThreshold;
     }
 
+    public double getPlaceEvalThreshold() {
+        return placeEvalThreshold;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
