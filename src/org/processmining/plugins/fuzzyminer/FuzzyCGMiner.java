@@ -22,13 +22,12 @@ import org.processmining.plugins.fuzzyminer.heuristicminer.HeuristicMinerLight;
 
 public class FuzzyCGMiner  extends HeuristicMinerLight {
 
-    public FuzzyCGMiner(XLog log, XLogInfo logInfo, FuzzyMinerSettings settings) {
-        super(log, logInfo, settings.getHmSettings());
+    public FuzzyCGMiner(XLog log, XLogInfo logInfo, FuzzyMinerSettings fMSettings) {
+        super(log, logInfo, fMSettings.getHmSettings());
 
-        int eventsNumber = this.getMetrics().getEventsNumber();
     }
 
-    public FuzzyCausalGraph mineFCG(XLog log, FuzzyCGConfiguration configuration){
+    public FuzzyCausalGraph mineFCG(XLog log, FuzzyMinerSettings fMSettings){
         FuzzyCausalGraph fCG = new FuzzyCausalGraph();
 
         this.keys = new HashMap<String, Integer>();
@@ -55,15 +54,14 @@ public class FuzzyCGMiner  extends HeuristicMinerLight {
 
                 double abdependency = metrics.getABdependencyMeasuresAll(i, j);
                 double dependencyAccepted = metrics.getDependencyMeasuresAccepted(i, j);
-                if (abdependency>=configuration.getSureThreshold()){
+                if (abdependency>=fMSettings.getSureThreshold()){
                     fCG.addSureEdge(nodeI, nodeJ);
                     System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
-                } else if (abdependency>=configuration.getQuestionMarkThreshold()){
+                } else if (abdependency>=fMSettings.getQuestionMarkThreshold()){
                     fCG.addUncertainEdge(nodeI, nodeJ);
                     System.out.println("UNCERTAIN"+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
-                } else
-                    System.out.println("NOTHING "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
-
+                } /*else
+                    System.out.println("NOTHING "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);*/
             }
         }
 

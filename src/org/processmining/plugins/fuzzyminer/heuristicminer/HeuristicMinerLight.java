@@ -27,11 +27,10 @@ public class HeuristicMinerLight {
     protected XLog log;
     protected XLogInfo logInfo;
     protected HeuristicsMetrics metrics;
-    //protected PluginContext context;
 
     //-------------------------------
 
-    public final static double CAUSALITY_FALL = 0.8; // PUT THIS ON CONSTANTS/SETTINGS???
+    //public final static double CAUSALITY_FALL = 0.8; // PUT THIS ON CONSTANTS/SETTINGS???
     // public final static boolean LT_DEBUG = false;
 
     protected HashMap<String, Integer> keys;
@@ -53,66 +52,30 @@ public class HeuristicMinerLight {
     }
 
     public HeuristicMinerLight(XLog log, XLogInfo logInfo) {
-
         this.log = log;
         this.settings = new HeuristicsMinerSettings();
-
         this.logInfo = logInfo;
         this.metrics = new HeuristicsMetrics(logInfo);
     }
 
+    public HeuristicMinerLight(XLog log, HeuristicsMinerSettings settings) {
+        this(log, XLogInfoFactory.createLogInfo(log, settings.getClassifier()));
+        this.settings = settings;
+    }
+    
     public HeuristicMinerLight(XLog log, XLogInfo logInfo, HeuristicsMinerSettings settings) {
 
         this(log, logInfo);
         this.settings = settings;
-        this.metrics = new HeuristicsMetrics(logInfo, settings.getClassifier());
-    }
-
-    public HeuristicMinerLight(XLog log, HeuristicsMinerSettings settings) {
-
-        this(log, XLogInfoFactory.createLogInfo(log, settings.getClassifier()), settings);
-
-        this.settings = settings;
     }
 
     /*
-    DEMAS added this to have the matrics back!
+    DEMAS added this to have the metrics back!
      */
     public HeuristicsMetrics getMetrics() {
         return metrics;
     }
 
-    public HeuristicsNet mine() {
-        long startTime = (new Date()).getTime();
-
-        //----------------------
-
-        this.keys = new HashMap<String, Integer>();
-
-        System.out.println(logInfo.getEventClasses());
-
-        for (XEventClass event : logInfo.getEventClasses(settings.getClassifier()).getClasses()) {
-
-            this.keys.put(event.getId(), event.getIndex());
-        }
-
-        activitiesMappingStructures = new ActivitiesMappingStructures(logInfo.getEventClasses(settings.getClassifier()));
-
-        SimpleHeuristicsNet net = new SimpleHeuristicsNet(makeBasicRelations(metrics), metrics, settings);
-
-        metrics.printData();
-
-        //----------------------
-
-        System.out.println(net.toString() + "\n");
-        System.out.println(this.settings.toString());
-
-        long finishTime = (new Date()).getTime();
-
-        System.out.println(("\nMining Time: " + (finishTime - startTime) / 1000.0));
-
-        return net;
-    }
 
     /*
     DEMAS made this method from private to public.
@@ -145,14 +108,15 @@ public class HeuristicMinerLight {
                 //String eventKey = eventName + "+" + eventTransition;
                 eventIndex = keys.get(eventKey);
 
-                if (!lastEvents.contains(eventIndex)) {
+                /*CHIARA commented
+                 * if (!lastEvents.contains(eventIndex)) {
 
                     for (Integer index : lastEvents) {
 
                         // update long range matrix
                         metrics.incrementLongRangeSuccessionCount(index, eventIndex, 1);
                     }
-                }
+                }*/
 
                 metrics.incrementEventCount(eventIndex, 1);
 
@@ -160,8 +124,10 @@ public class HeuristicMinerLight {
 
                     metrics.incrementDirectSuccessionCount(lastEventIndex, eventIndex, 1);
 
-                    if (lastEventIndex == eventIndex)
+                    /* CHIARA commented
+                     * if (lastEventIndex == eventIndex)
                         metrics.incrementL1LdependencyMeasuresAll(eventIndex, 1);
+                       */
                 }
 
                 if (penultEventIndex == eventIndex) {

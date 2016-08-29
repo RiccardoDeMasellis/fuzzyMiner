@@ -26,6 +26,13 @@ public class FuzzyMinerSettings {
         this.questionMarkThreshold = questionMarkThreshold;
         this.placeEvalThreshold = placeEvalThreshold;
     }
+    
+    public FuzzyMinerSettings(){
+    	this.hmSettings = new HeuristicsMinerSettings();
+		setSureThreshold(0.6);
+		setQuestionMarkThreshold(0.5);
+		setPlaceEvalThreshold(0.7);
+    }
 
     public HeuristicsMinerSettings getHmSettings() {
         return hmSettings;
@@ -42,8 +49,24 @@ public class FuzzyMinerSettings {
     public double getPlaceEvalThreshold() {
         return placeEvalThreshold;
     }
+    
+    public void setSureThreshold(double sureThreshold) {
+		this.sureThreshold = sureThreshold;
+	}
 
-    @Override
+	public void setQuestionMarkThreshold(double questionMarkThreshold) {
+		this.questionMarkThreshold = questionMarkThreshold;
+	}
+
+	public void setPlaceEvalThreshold(double placeEvalThreshold) {
+		this.placeEvalThreshold = placeEvalThreshold;
+	}
+	
+	public void setHmSettings(HeuristicsMinerSettings hmSettings) {
+		this.hmSettings = hmSettings;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

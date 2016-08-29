@@ -21,9 +21,12 @@ import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.framework.plugin.impl.ProgressBarImpl;
 import org.processmining.models.connections.GraphLayoutConnection;
 import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
+import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedUncertainGraphEdge;
+import org.processmining.models.fuzzyminer.fuzzypetrinet.UncertainTransitionsArc;
 import org.processmining.models.graphbased.AttributeMap;
 import org.processmining.models.graphbased.ViewSpecificAttributeMap;
 import org.processmining.models.graphbased.directed.DirectedGraph;
+import org.processmining.models.graphbased.directed.DirectedGraphEdge;
 import org.processmining.models.heuristics.HeuristicsNet;
 import org.processmining.models.jgraph.ProMGraphModel;
 import org.processmining.models.jgraph.ProMJGraph;
@@ -34,14 +37,14 @@ import com.jgraph.layout.JGraphFacade;
 import com.jgraph.layout.JGraphLayoutProgress;
 import com.jgraph.layout.hierarchical.JGraphHierarchicalLayout;
 
-@Plugin(name = "Visualize Fuzzy Causal Graph", parameterLabels = { "HeuristicsNet" }, returnLabels = { "HN Annotated Visualization - No Semantics" }, returnTypes = { JComponent.class })
+@Plugin(name = "Visualize Fuzzy Causal Graph", parameterLabels = { "Fuzzy Causal Graph" }, returnLabels = { "Fuzzy Causal Graph" }, returnTypes = { JComponent.class })
 @Visualizer
 public class FuzzyCausalGraphVisualizer {
 	
 	@PluginVariant(requiredParameterLabels = { 0 })
 	public static JComponent visualize(PluginContext context, FuzzyCausalGraph fCG) {
 
-		return FuzzyCausalGraphVisualizer.getVisualizationPanel(fCG, new AnnotatedVisualizationSettings(), new ProgressBarImpl(context));
+		return FuzzyCausalGraphVisualizer.getVisualizationPanel(fCG, new ProgressBarImpl(context));
 	}
 
 	protected FuzzyCausalGraphVisualizer() {
@@ -49,32 +52,28 @@ public class FuzzyCausalGraphVisualizer {
 
 	public static FuzzyCausalGraphVisualization getVisualizationPanel(
 			DirectedGraph<?, ?> graph, 
-			AnnotatedVisualizationSettings settings, 
 			Progress progress) {
 		
-		return getResultsPanel(graph, new ViewSpecificAttributeMap(), settings, progress);
+		return getResultsPanel(graph, new ViewSpecificAttributeMap(), progress);
 	}
 
 	public static FuzzyCausalGraphVisualization getResultsPanel(DirectedGraph<?, ?> graph,
-			ViewSpecificAttributeMap map, AnnotatedVisualizationSettings settings, Progress progress) {
-
+			ViewSpecificAttributeMap map, Progress progress) {
+		
 		ProMJGraph jgraph = createJGraph(graph, map, progress);
 
-//		return new ResultsPanel(jgraph);
-		return new FuzzyCausalGraphVisualization(jgraph, settings);
+		return new FuzzyCausalGraphVisualization(jgraph);
 	}
 	
-	public static ProMJGraph createJGraph(DirectedGraph<?, ?> causalNet,
+	public static ProMJGraph createJGraph(DirectedGraph<?, ?> fuzzyCausalNet,
 			ViewSpecificAttributeMap map, Progress progress){
 		
-//		ViewSpecificAttributeMap map = new ViewSpecificAttributeMap();
-		GraphLayoutConnection layoutConnection = new GraphLayoutConnection(causalNet);
+		GraphLayoutConnection layoutConnection = new GraphLayoutConnection(fuzzyCausalNet);
 		
-		ProMGraphModel model = new ProMGraphModel(causalNet);
+		ProMGraphModel model = new ProMGraphModel(fuzzyCausalNet);
 		ProMJGraph jGraph = new ProMJGraph(model, map, layoutConnection);
 		
-//		this.test(model);
-		
+	
 		JGraphHierarchicalLayout layout = new JGraphHierarchicalLayout();
 		layout.setDeterministic(false);
 		layout.setCompactLayout(false);
@@ -82,7 +81,7 @@ public class FuzzyCausalGraphVisualizer {
 		layout.setParallelEdgeSpacing(15);
 		layout.setFixRoots(false);
 
-		layout.setOrientation(map.get(causalNet, AttributeMap.PREF_ORIENTATION, SwingConstants.SOUTH));
+		layout.setOrientation(map.get(fuzzyCausalNet, AttributeMap.PREF_ORIENTATION, SwingConstants.SOUTH));
 
 		if(!layoutConnection.isLayedOut()){
 		
@@ -262,7 +261,7 @@ public class FuzzyCausalGraphVisualizer {
 			AnnotatedVisualizationSettings settings, 
 			Progress progress) {
 		
-		return getResultsPanel(graph, new ViewSpecificAttributeMap(), settings, progress);
+		return getResultsPanel(graph, new ViewSpecificAttributeMap(), progress);
 	}
 }
 

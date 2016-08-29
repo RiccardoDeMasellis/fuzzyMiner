@@ -7,8 +7,6 @@ import org.deckfour.xes.model.XTrace;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphEdge;
 
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
-import weka.classifiers.bayes.net.search.fixed.FromFile;
-
 import java.util.Iterator;
 import java.util.Set;
 

@@ -20,23 +20,15 @@ import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.settings.H
  * Created by demas on 25/07/16.
  */
 
-@Plugin(name = "Fuzzy Causal Graph Miner", parameterLabels = { "log", "Fuzzy Causal Graph Configuration" }, 
-	    returnLabels = { "Fuzzy Causal Graph" }, returnTypes = { FuzzyCausalGraph.class })
+@Plugin(name = "Fuzzy Causal Graph Miner", parameterLabels = {"log", "Fuzzy Causal Graph Configuration" }, 
+	    returnLabels = {"Fuzzy Causal Graph" }, returnTypes = {FuzzyCausalGraph.class })
 public class FuzzyCGMinerPlugin {
 
-	private FuzzyCausalGraph privateFCGMinerPlugin(PluginContext context, XLog log, FuzzyCGConfiguration configuration) {
-	    //return configuration.isYourBoolean() ? new YourOutput(input2) : new YourOutput(input2);
-		XEventClassifier nameCl = new XEventNameClassifier();
-		XLogInfo logInfo = XLogInfoFactory.createLogInfo(log, nameCl);
-		HeuristicsMinerSettings hMS = new HeuristicsMinerSettings();
-		hMS.setClassifier(nameCl);
-			
-		FuzzyMinerSettings settings = new FuzzyMinerSettings(hMS, 0.8, 0.5, 0.3);
+	private FuzzyCausalGraph privateFCGMinerPlugin(PluginContext context, XLog log, FuzzyMinerSettings settings) {
+		XLogInfo logInfo = XLogInfoFactory.createLogInfo(log, settings.getHmSettings().getClassifier());
 		FuzzyCGMiner miner = new FuzzyCGMiner(log, logInfo, settings);
-		FuzzyCausalGraph fCG = miner.mineFCG(log, configuration);
-		
-		//FuzzyCausalGraphVisualization fCGV = FuzzyCausalGraphVisualizer.getVisualizationPanel(fCG, new AnnotatedVisualizationSettings(), new ProgressBarImpl(context));
-		
+		FuzzyCausalGraph fCG = miner.mineFCG(log, settings);
+				
 		return fCG;
 
 	}
@@ -46,9 +38,8 @@ public class FuzzyCGMinerPlugin {
 	 */ 
 	@UITopiaVariant(affiliation = "FBK", author = "R. De Masellis, C. Di Francescomarino", email = "r.demasellis|dfmchiara@fbk.eu")
 	@PluginVariant(variantLabel = "FuzzyCGMiner, parameters", requiredParameterLabels = { 0, 1})
-	public FuzzyCausalGraph configuredFCGMinerPlugin(PluginContext context, XLog log, FuzzyCGConfiguration configuration) {
-		// Do the heavy lifting.
-	    return privateFCGMinerPlugin(context, log, configuration);
+	public FuzzyCausalGraph configuredFCGMinerPlugin(PluginContext context, XLog log, FuzzyMinerSettings settings) {
+		return privateFCGMinerPlugin(context, log, settings);
 	}
 	
 	/**
@@ -58,9 +49,14 @@ public class FuzzyCGMinerPlugin {
 	@PluginVariant(variantLabel = "FuzzyCGMiner, parameters", requiredParameterLabels = { 0 })
 	public FuzzyCausalGraph defaultFCGMinerPlugin(PluginContext context, XLog log) {
 		// Get the default configuration.
-	    FuzzyCGConfiguration configuration = new FuzzyCGConfiguration(log);
+		XEventClassifier nameCl = new XEventNameClassifier();
+		XLogInfo logInfo = XLogInfoFactory.createLogInfo(log, nameCl);
+		HeuristicsMinerSettings hMS = new HeuristicsMinerSettings();
+		hMS.setClassifier(nameCl);
+			
+		FuzzyMinerSettings settings = new FuzzyMinerSettings(hMS, 0.8, 0.5, 0.3);
 		// Do the heavy lifting.
-	    return privateFCGMinerPlugin(context, log, configuration);
+	    return privateFCGMinerPlugin(context, log, settings);
 	}
 	
 	/**
@@ -70,15 +66,22 @@ public class FuzzyCGMinerPlugin {
 	@PluginVariant(variantLabel = "FuzzyCGMiner, dialog", requiredParameterLabels = { 0 })
 	public FuzzyCausalGraph yourDefaultPlugin(UIPluginContext context, XLog log) {
 		// Get the default configuration.
-	    FuzzyCGConfiguration configuration = new FuzzyCGConfiguration(log);
+	    FuzzyMinerSettings settings = new FuzzyMinerSettings();
+	    
+		XEventClassifier nameCl = new XEventNameClassifier();
+		XLogInfo logInfo = XLogInfoFactory.createLogInfo(log, nameCl);
+		HeuristicsMinerSettings hMS = new HeuristicsMinerSettings();
+		hMS.setClassifier(nameCl);   
+		settings.setHmSettings(hMS);
+		
 	    // Get a dialog for this configuration.
-	    FuzzyCGDialog dialog = new FuzzyCGDialog(context, log, configuration);
+	    FuzzyCGDialog dialog = new FuzzyCGDialog(context, log, settings);
 	    // Show the dialog. User can now change the configuration.
-	    InteractionResult result = context.showWizard("Your dialog title", true, true, dialog);
+	    InteractionResult result = context.showWizard("Fuzzy Causal Graph Settings", true, true, dialog);
 	    // User has close the dialog.
 	    if (result == InteractionResult.FINISHED) {
 			// Do the heavy lifting.
-	    	return privateFCGMinerPlugin(context, log, configuration);
+	    	return privateFCGMinerPlugin(context, log, settings);
 	    }
 	    // Dialog got canceled.
 	    return null;

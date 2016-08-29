@@ -114,8 +114,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 			0);
 	private ContextMenuCreator creator = null;
 
-	public FuzzyCausalGraphVisualization(final ProMJGraph graph,
-			final AnnotatedVisualizationSettings settings) {
+	public FuzzyCausalGraphVisualization(final ProMJGraph graph) {
 
 		this.setLayout(null);
 		this.graph = graph;
@@ -248,8 +247,8 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 				int x = scroll.getHorizontalScrollBar().getValue();
 				int y = scroll.getVerticalScrollBar().getValue();
 
-				showSetup(false);
-				showParameters(false);
+				//showSetup(false);
+				//showParameters(false);
 				// showOptions(false);
 				showZoom(false);
 				showPIP(true);
@@ -356,8 +355,8 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 				int x = scroll.getHorizontalScrollBar().getValue();
 				int y = scroll.getVerticalScrollBar().getValue();
 
-				showSetup(false);
-				showParameters(false);
+				//showSetup(false);
+				//showParameters(false);
 				// showOptions(false);
 				showPIP(false);
 				showZoom(true);
@@ -467,11 +466,11 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 				public void mouseEntered(MouseEvent e) {
 
-					showSetup(false);
+					//showSetup(false);
 					// showOptions(false);
 					showPIP(false);
 					showZoom(false);
-					showParameters(true);
+					//showParameters(true);
 
 					if (hasNodeSelected) {
 
@@ -516,7 +515,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 					if (flag) {
 
-						showParameters(false);
+						//showParameters(false);
 
 						if (hasNodeSelected) {
 
@@ -551,7 +550,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 		// this.optionsPanelOFF.add(optionsPanelTitle);
 		// optionsPanelTitle.setBounds(10, 10, 70, 30);
 
-		this.setupPanelON = factory.createRoundedPanel(15, Color.LIGHT_GRAY);
+		/*this.setupPanelON = factory.createRoundedPanel(15, Color.LIGHT_GRAY);
 		this.setupPanelOFF = factory.createRoundedPanel(15, Color.DARK_GRAY);
 		this.setupPanelON.setLayout(null);
 		this.setupPanelOFF.setLayout(null);
@@ -650,7 +649,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 			public void mouseReleased(MouseEvent e) {
 			}
-		});
+		});*/
 
 		this.fitnessPanel = factory.createRoundedPanel(15, Color.GRAY);
 		this.fitnessPanel.setLayout(null);
@@ -662,7 +661,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 		this.fitnessPanel.add(fitnessInfo);
 		fitnessInfo.setBounds(20, 0, 140, 30);*/
 
-		this.joinsPanel = factory.createRoundedPanel(15, Color.LIGHT_GRAY);
+		/*this.joinsPanel = factory.createRoundedPanel(15, Color.LIGHT_GRAY);
 		this.joinsPanel.setLayout(null);
 		this.joins = new AnnotationsPanel(factory, decorator, null, "");
 		this.joinsPanel.add(this.joins);
@@ -674,7 +673,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 		this.splits = new AnnotationsPanel(factory, decorator, null, "");
 		this.splitsPanel.add(this.splits);
 		this.splitsPanel.setVisible(false);
-		this.splitsPanel.setEnabled(false);
+		this.splitsPanel.setEnabled(false);*/
 
 		this.add(this.zoomPanelON);
 		this.add(this.zoomPanelOFF);
@@ -684,11 +683,11 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 		this.add(this.parametersPanelOFF);
 		// this.add(this.optionsPanelON);
 		// this.add(this.optionsPanelOFF);
-		this.add(this.setupPanelON);
+		/*this.add(this.setupPanelON);
 		this.add(this.setupPanelOFF);
 		this.add(this.fitnessPanel);
 		this.add(this.joinsPanel);
-		this.add(this.splitsPanel);
+		this.add(this.splitsPanel);*/
 		this.add(this.scroll);
 
 		this.setBackground(Color.WHITE);
@@ -740,18 +739,18 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 		// this.optionsPanelOFF.setBounds(width - 130, -10, 90, 40);
 
-		this.setup.setBounds(10, 10, 330, 420);
-		this.setupPanelON.setBounds(width - 335, height - 370, 345, 330);
+		//this.setup.setBounds(10, 10, 330, 420);
+		/*this.setupPanelON.setBounds(width - 335, height - 370, 345, 330);
 		this.setupPanelOFF.setBounds(width - 30, height - 115, 40, 75);
 
-		this.fitnessPanel.setBounds(-10, height - 30, 160, 40);
+		this.fitnessPanel.setBounds(-10, height - 30, 160, 40);*/
 
 		double fitRatio = scaleToFit(this.graph, this.scroll, false);
 		this.zoom
 				.setFitValue((int) Math.floor(fitRatio * this.zoomRatio * 100));
 		this.scalePIP();
 
-		this.joinsPanel.setBounds((int) (width / 2f) - 305, height - 300, 300,
+		/*this.joinsPanel.setBounds((int) (width / 2f) - 305, height - 300, 300,
 				310);
 		this.joins.setSize(300 - 20, 300 - 20);
 		this.joins.setBounds(10, 10, 300 - 20, 300 - 20);
@@ -759,7 +758,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 		this.splitsPanel.setBounds((int) (width / 2f) + 5, height - 300, 300,
 				310);
 		this.splits.setSize(300 - 20, 300 - 20);
-		this.splits.setBounds(10, 10, 300 - 20, 300 - 20);
+		this.splits.setBounds(10, 10, 300 - 20, 300 - 20);*/
 	}
 
 	private void showZoom(boolean status) {
@@ -799,13 +798,13 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 		}
 	}
 
-	private void showParameters(boolean status) {
+/*	private void showParameters(boolean status) {
 
 		parametersPanelOFF.setVisible(!status);
 		parametersPanelOFF.setEnabled(!status);
 		parametersPanelON.setVisible(status);
 		parametersPanelON.setEnabled(status);
-	}
+	}*/
 
 	// private void showOptions(boolean status){
 	//
@@ -814,13 +813,13 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 	// optionsPanelON.setVisible(status);
 	// optionsPanelON.setEnabled(status);
 	// }
-	private void showSetup(boolean status) {
+	/*private void showSetup(boolean status) {
 
 		setupPanelOFF.setVisible(!status);
 		setupPanelOFF.setEnabled(!status);
 		setupPanelON.setVisible(status);
 		setupPanelON.setEnabled(status);
-	}
+	}*/
 
 	private void redraw() {
 

@@ -101,29 +101,37 @@
              <systemPath>${basedir}/stdlib/ProM-Contexts.jar</systemPath>
          </dependency>
 
-          <!-- <dependency>
+         <dependency>
              <groupId>ProM-Framework</groupId>
              <artifactId>ProM-Framework</artifactId>
              <version>1.0</version>
              <scope>system</scope>
              <systemPath>${basedir}/stdlib/ProM-Framework.jar</systemPath>
-         </dependency> -->
+         </dependency>
 
-         <dependency>
+         <!--<dependency>
              <groupId>ProM-Framework_n</groupId>
              <artifactId>ProM-Framework_n</artifactId>
              <version>1.0</version>
              <scope>system</scope>
              <systemPath>${basedir}/stdlib/ProM-Framework_n.jar</systemPath>
-         </dependency>
+         </dependency> -->
+         
+		<dependency>
+             <groupId>ProM-Models</groupId>
+             <artifactId>ProM-Models</artifactId>
+             <version>1.0</version>
+             <scope>system</scope>
+             <systemPath>${basedir}/stdlib/ProM-Models.jar</systemPath>
+         </dependency>         
 
-         <dependency>
+         <!--<dependency>
              <groupId>ProM-Models_n</groupId>
              <artifactId>ProM-Models_n</artifactId>
              <version>1.0</version>
              <scope>system</scope>
              <systemPath>${basedir}/stdlib/ProM-Models_n.jar</systemPath>
-         </dependency>
+         </dependency> -->
 
          <dependency>
              <groupId>Uitopia</groupId>
@@ -133,12 +141,44 @@
              <systemPath>${basedir}/stdlib/Uitopia.jar</systemPath>
          </dependency>
 
-    <dependency>
+    <!--<dependency>
         <groupId>HeuristicMinerOriginal-2</groupId>
         <artifactId>HeuristicMinerOriginal-2</artifactId>
         <version>1.0</version>
         <scope>system</scope>
         <systemPath>${basedir}/stdlib/HeuristicMinerOriginal-2.jar</systemPath>
+    </dependency> -->
+    
+    <dependency>
+        <groupId>HeuristicsMiner-7.062</groupId>
+        <artifactId>HeuristicsMiner-7.062</artifactId>
+        <version>7.062</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/stdlib/HeuristicsMiner-7.062.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+        <groupId>UITopiaResources</groupId>
+        <artifactId>UITopiaResources</artifactId>
+        <version>1.0</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/stdlib/UITopiaResources.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+        <groupId>Spex</groupId>
+        <artifactId>Spex</artifactId>
+        <version>1.0</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/stdlib/Spex.jar</systemPath>
+    </dependency>        
+    
+     <dependency>
+        <groupId>xstream</groupId>
+        <artifactId>xstream</artifactId>
+        <version>1.3.1</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/stdlib/xstream-1.3.1.jar</systemPath>
     </dependency>
 
 </dependencies>
