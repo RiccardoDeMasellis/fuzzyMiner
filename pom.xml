@@ -69,6 +69,14 @@
         </dependency>
 
        <dependency>
+            <groupId>OpenXES-XStream</groupId>
+            <artifactId>OpenXES-XStream</artifactId>
+           <version>1.0</version>
+           <scope>system</scope>
+           <systemPath>${basedir}/stdlib/OpenXES-XStream.jar</systemPath>
+        </dependency>
+
+       <dependency>
             <groupId>jgraph</groupId>
             <artifactId>jgraph</artifactId>
            <version>1.0</version>
