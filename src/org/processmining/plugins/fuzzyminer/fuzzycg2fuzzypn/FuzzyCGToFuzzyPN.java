@@ -87,7 +87,7 @@ public class FuzzyCGToFuzzyPN {
                     N source = (N) e.getSource();
                     N target = (N) e.getTarget();
 
-                    // Non e cosi. Modificare!
+                    // Non e` cosi. Modificare!
 
                     Set<E> edgesForSource = getEdgesHavingSourceNode(source, edges);
                     Set<E> edgesForTarget = getEdgesHavingTargetNode(target, edges);

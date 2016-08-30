@@ -6,12 +6,16 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 
+import org.deckfour.xes.factory.XFactoryRegistry;
 import org.jgraph.graph.AttributeMap.SerializablePoint2D;
+import org.jgraph.graph.CellView;
 import org.jgraph.graph.GraphConstants;
 import org.processmining.contexts.uitopia.annotations.Visualizer;
 import org.processmining.framework.plugin.PluginContext;
@@ -24,12 +28,14 @@ import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
 import org.processmining.models.fuzzyminer.causalgraph.FuzzyDirectedUncertainGraphEdge;
 import org.processmining.models.fuzzyminer.fuzzypetrinet.UncertainTransitionsArc;
 import org.processmining.models.graphbased.AttributeMap;
+import org.processmining.models.graphbased.AttributeMapOwner;
 import org.processmining.models.graphbased.ViewSpecificAttributeMap;
 import org.processmining.models.graphbased.directed.DirectedGraph;
 import org.processmining.models.graphbased.directed.DirectedGraphEdge;
 import org.processmining.models.heuristics.HeuristicsNet;
 import org.processmining.models.jgraph.ProMGraphModel;
 import org.processmining.models.jgraph.ProMJGraph;
+import org.processmining.models.jgraph.elements.ProMGraphEdge;
 import org.processmining.models.jgraph.elements.ProMGraphPort;
 import org.processmining.plugins.heuristicsnet.visualizer.annotatedvisualization.AnnotatedVisualizationSettings;
 
@@ -53,7 +59,6 @@ public class FuzzyCausalGraphVisualizer {
 	public static FuzzyCausalGraphVisualization getVisualizationPanel(
 			DirectedGraph<?, ?> graph, 
 			Progress progress) {
-		
 		return getResultsPanel(graph, new ViewSpecificAttributeMap(), progress);
 	}
 
@@ -72,8 +77,27 @@ public class FuzzyCausalGraphVisualizer {
 		
 		ProMGraphModel model = new ProMGraphModel(fuzzyCausalNet);
 		ProMJGraph jGraph = new ProMJGraph(model, map, layoutConnection);
+
+		/*Map attributes = jGraph.getGraphLayoutCache().getRoots()[12].getAllAttributes();
+		attributes.put("labelAlongEdge", new Boolean(true));
+		jGraph.getGraphLayoutCache().edit(attributes);*/
 		
-	
+		// A nested map with the edge as key
+		// and its attributes as the value
+		// is required for the edit.
+		/*Map allEdgeAttributes = new HashMap();
+		Object[] cells = jGraph.getGraphLayoutCache().getCells(false, false, false, true);
+		for (Object cell : cells) {
+			ProMGraphEdge cellEdge = (ProMGraphEdge) cell;
+			
+			Map attrs = cellEdge.getAttributes();
+			attrs.put("labelAlongEdge", new Boolean(true));
+			allEdgeAttributes.put(cellEdge, attrs);
+		}
+		org.jgraph.graph.AttributeMap attrsss = (jGraph.getGraphLayoutCache().getAllViews()[0]).getAllAttributes();
+		
+		jGraph.getGraphLayoutCache().edit(allEdgeAttributes);*/
+		
 		JGraphHierarchicalLayout layout = new JGraphHierarchicalLayout();
 		layout.setDeterministic(false);
 		layout.setCompactLayout(false);
