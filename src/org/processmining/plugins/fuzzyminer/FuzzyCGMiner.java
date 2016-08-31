@@ -21,13 +21,13 @@ import org.processmining.plugins.fuzzyminer.heuristicminer.HeuristicMinerLight;
  */
 
 public class FuzzyCGMiner  extends HeuristicMinerLight {
+	
 
     public FuzzyCGMiner(XLog log, XLogInfo logInfo, FuzzyMinerSettings fMSettings) {
         super(log, logInfo, fMSettings.getHmSettings());
-
     }
 
-    public FuzzyCausalGraph mineFCG(XLog log, FuzzyMinerSettings fMSettings){
+    public FuzzyCausalGraph mineFCG(FuzzyMinerSettings fMSettings){
         FuzzyCausalGraph fCG = new FuzzyCausalGraph();
 
         this.keys = new HashMap<String, Integer>();

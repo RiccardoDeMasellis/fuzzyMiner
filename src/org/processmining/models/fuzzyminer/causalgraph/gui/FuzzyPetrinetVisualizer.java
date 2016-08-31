@@ -20,7 +20,7 @@ import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.framework.plugin.impl.ProgressBarImpl;
 import org.processmining.models.connections.GraphLayoutConnection;
-import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
+import org.processmining.models.fuzzyminer.fuzzypetrinet.FuzzyPetrinet;
 import org.processmining.models.graphbased.AttributeMap;
 import org.processmining.models.graphbased.ViewSpecificAttributeMap;
 import org.processmining.models.graphbased.directed.DirectedGraph;
@@ -34,61 +34,42 @@ import com.jgraph.layout.JGraphFacade;
 import com.jgraph.layout.JGraphLayoutProgress;
 import com.jgraph.layout.hierarchical.JGraphHierarchicalLayout;
 
-@Plugin(name = "Visualize Fuzzy Causal Graph", parameterLabels = { "Fuzzy Causal Graph" }, returnLabels = { "Fuzzy Causal Graph" }, returnTypes = { JComponent.class })
+@Plugin(name = "Visualize Fuzzy Petrinet", parameterLabels = { "Fuzzy Petri Net" }, returnLabels = { "Fuzzy Petri Net" }, returnTypes = { JComponent.class })
 @Visualizer
-public class FuzzyCausalGraphVisualizer {
+public class FuzzyPetrinetVisualizer {
 	
 	@PluginVariant(requiredParameterLabels = { 0 })
-	public static JComponent visualize(PluginContext context, FuzzyCausalGraph fCG) {
+	public static JComponent visualize(PluginContext context, FuzzyPetrinet fPN) {
 
-		return FuzzyCausalGraphVisualizer.getVisualizationPanel(fCG, new ProgressBarImpl(context));
+		return FuzzyPetrinetVisualizer.getVisualizationPanel(fPN, new ProgressBarImpl(context));
 	}
 
-	protected FuzzyCausalGraphVisualizer() {
+	protected FuzzyPetrinetVisualizer() {
 	};
 
-	public static FuzzyCausalGraphVisualization getVisualizationPanel(
+	public static FuzzyPetrinetVisualization getVisualizationPanel(
 			DirectedGraph<?, ?> graph, 
 			Progress progress) {
 		return getResultsPanel(graph, new ViewSpecificAttributeMap(), progress);
 	}
 
-	public static FuzzyCausalGraphVisualization getResultsPanel(DirectedGraph<?, ?> graph,
+	public static FuzzyPetrinetVisualization getResultsPanel(DirectedGraph<?, ?> graph,
 			ViewSpecificAttributeMap map, Progress progress) {
 		
 		ProMJGraph jgraph = createJGraph(graph, map, progress);
 
-		return new FuzzyCausalGraphVisualization(jgraph);
+		return new FuzzyPetrinetVisualization(jgraph);
 	}
 	
-	public static ProMJGraph createJGraph(DirectedGraph<?, ?> fuzzyCausalNet,
+	public static ProMJGraph createJGraph(DirectedGraph<?, ?> fuzzyPetrinet,
 			ViewSpecificAttributeMap map, Progress progress){
 		
-		GraphLayoutConnection layoutConnection = new GraphLayoutConnection(fuzzyCausalNet);
+		GraphLayoutConnection layoutConnection = new GraphLayoutConnection(fuzzyPetrinet);
 		
-		ProMGraphModel model = new ProMGraphModel(fuzzyCausalNet);
+		ProMGraphModel model = new ProMGraphModel(fuzzyPetrinet);
 		ProMJGraph jGraph = new ProMJGraph(model, map, layoutConnection);
 
-		/*Map attributes = jGraph.getGraphLayoutCache().getRoots()[12].getAllAttributes();
-		attributes.put("labelAlongEdge", new Boolean(true));
-		jGraph.getGraphLayoutCache().edit(attributes);*/
-		
-		// A nested map with the edge as key
-		// and its attributes as the value
-		// is required for the edit.
-		/*Map allEdgeAttributes = new HashMap();
-		Object[] cells = jGraph.getGraphLayoutCache().getCells(false, false, false, true);
-		for (Object cell : cells) {
-			ProMGraphEdge cellEdge = (ProMGraphEdge) cell;
-			
-			Map attrs = cellEdge.getAttributes();
-			attrs.put("labelAlongEdge", new Boolean(true));
-			allEdgeAttributes.put(cellEdge, attrs);
-		}
-		org.jgraph.graph.AttributeMap attrsss = (jGraph.getGraphLayoutCache().getAllViews()[0]).getAllAttributes();
-		
-		jGraph.getGraphLayoutCache().edit(allEdgeAttributes);*/
-		
+	
 		JGraphHierarchicalLayout layout = new JGraphHierarchicalLayout();
 		layout.setDeterministic(false);
 		layout.setCompactLayout(false);
@@ -96,7 +77,7 @@ public class FuzzyCausalGraphVisualizer {
 		layout.setParallelEdgeSpacing(15);
 		layout.setFixRoots(false);
 
-		layout.setOrientation(map.get(fuzzyCausalNet, AttributeMap.PREF_ORIENTATION, SwingConstants.SOUTH));
+		layout.setOrientation(map.get(fuzzyPetrinet, AttributeMap.PREF_ORIENTATION, SwingConstants.SOUTH));
 
 		if(!layoutConnection.isLayedOut()){
 		

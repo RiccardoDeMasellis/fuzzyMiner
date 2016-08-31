@@ -40,11 +40,7 @@ public class MainFuzzyCausalGraph {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        XLog log = logList.get(0);
-        /*FuzzyCGConfiguration configuration = new FuzzyCGConfiguration(log);
-        configuration.setSureThreshold(SURETHRESHOLD);
-        configuration.setQuestionMarkThreshold(QUESTIONMARKTHRESHOLD);*/
-   
+        XLog log = logList.get(0);  
 		XLog preprocessedLog = LogPreprocessor.preprocessLog(log);
 
         XEventClassifier nameCl = new XEventNameClassifier();
@@ -54,7 +50,7 @@ public class MainFuzzyCausalGraph {
 
         FuzzyMinerSettings settings = new FuzzyMinerSettings(hMS, SURETHRESHOLD, QUESTIONMARKTHRESHOLD, PLACEEVALTHRESHOLD);
         FuzzyCGMiner miner = new FuzzyCGMiner(preprocessedLog, logInfo, settings);
-        FuzzyCausalGraph fCG = miner.mineFCG(preprocessedLog, settings);
+        FuzzyCausalGraph fCG = miner.mineFCG(settings);
         System.out.println(fCG);
         
         FuzzyPetrinet fPN = FuzzyCGToFuzzyPN.fuzzyCGToFuzzyPN(fCG, preprocessedLog, settings);

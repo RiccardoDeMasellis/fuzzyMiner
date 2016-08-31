@@ -195,7 +195,15 @@
         <version>1.1.4c</version>
         <scope>system</scope>
         <systemPath>${basedir}/stdlib/xpp3-1.1.4c.jar</systemPath>
-    </dependency>    
+    </dependency>
+    
+    <dependency>
+        <groupId>TableLayout</groupId>
+        <artifactId>TableLayout</artifactId>
+        <version>20050920</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/stdlib/TableLayout-20050920.jar</systemPath>
+    </dependency>      
 
 </dependencies>
 
