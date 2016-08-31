@@ -39,7 +39,7 @@ public class FuzzyCGToFuzzyPN {
             // call clusters evaluations
             c.evaluateBestPlaces(log);
             // select the places above the threshold and add them to the set of places to be added to the fuzzynet
-            placesToBeAdded.addAll(c.getPlacesAboveThreshold(settings.getPlaceEvalThreshold()));
+            placesToBeAdded.addAll(c.getNonRedundantPlacesAboveThreshold(settings.getPlaceEvalThreshold()));
         }
 
         // Build the net. For each PlaceEvaluation in placesToBeAdded, add a place and the respective transitions
@@ -86,8 +86,6 @@ public class FuzzyCGToFuzzyPN {
                 for (E e : oldCluster) {
                     N source = (N) e.getSource();
                     N target = (N) e.getTarget();
-
-                    // Non e` cosi. Modificare!
 
                     Set<E> edgesForSource = getEdgesHavingSourceNode(source, edges);
                     Set<E> edgesForTarget = getEdgesHavingTargetNode(target, edges);
