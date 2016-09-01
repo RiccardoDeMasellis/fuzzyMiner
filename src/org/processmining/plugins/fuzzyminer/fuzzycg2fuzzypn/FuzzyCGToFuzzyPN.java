@@ -34,8 +34,6 @@ public class FuzzyCGToFuzzyPN {
         // For each cluster:
         for (Cluster c : clusters) {
 
-            System.out.println(c);
-
             // call clusters evaluations
             c.evaluateBestPlaces(log);
             // select the places above the threshold and add them to the set of places to be added to the fuzzynet

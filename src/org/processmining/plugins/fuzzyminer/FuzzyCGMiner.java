@@ -33,7 +33,7 @@ public class FuzzyCGMiner  extends HeuristicMinerLight {
         this.keys = new HashMap<String, Integer>();
 
         // Building activitymappingStructures...
-        System.out.println(logInfo.getEventClasses());
+        //System.out.println(logInfo.getEventClasses());
         for (XEventClass event : logInfo.getEventClasses(settings.getClassifier()).getClasses()) {
             this.keys.put(event.getId(), event.getIndex());
         }

@@ -62,7 +62,7 @@ public class FuzzyPNMinerPlugin {
 		HeuristicsMinerSettings hMS = new HeuristicsMinerSettings();
 		hMS.setClassifier(nameCl);
 			
-		FuzzyMinerSettings settings = new FuzzyMinerSettings(hMS, 0.8, 0.5, 0.3);
+		FuzzyMinerSettings settings = new FuzzyMinerSettings();
 		// Do the heavy lifting.
 	    return privateFPNMinerPlugin(context, log, settings);
 	}

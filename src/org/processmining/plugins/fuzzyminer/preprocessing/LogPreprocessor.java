@@ -1,10 +1,12 @@
 package org.processmining.plugins.fuzzyminer.preprocessing;
 
+import java.io.FileWriter;
 import java.util.Date;
 
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.extension.std.XTimeExtension;
 import org.deckfour.xes.factory.XFactoryRegistry;
+import org.deckfour.xes.model.XAttributeID;
 import org.deckfour.xes.model.XAttributeMap;
 import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
@@ -26,9 +28,12 @@ public class LogPreprocessor {
 			}	
 			preprocessedLog.add(trace);
 		}
+		//writeEventLog(preprocessedLog, "./logs/preprocessed.xes");
 		
 		return preprocessedLog;
 	}
+	
+	
 	
 	public static XTrace addStartEvent (XTrace trace, Date timestamp){
 		XTrace newTrace = XFactoryRegistry.instance().currentDefault().createTrace();
@@ -52,8 +57,32 @@ public class LogPreprocessor {
 		XAttributeTimestamp attrTimestamp = XFactoryRegistry.instance().currentDefault().createAttributeTimestamp(XTimeExtension.KEY_TIMESTAMP, timestamp, XTimeExtension.instance());
 		attributeMap.put(XTimeExtension.KEY_TIMESTAMP,attrTimestamp);
 		event = XFactoryRegistry.instance().currentDefault().createEvent(attributeMap);
+		XConceptExtension.instance().assignName(event, eventName);
 		return event;
 
+	}
+	
+	public static void writeEventLog(XLog log, String outputLogFilePath){
+		try {
+
+			FileWriter fW = new FileWriter(outputLogFilePath);
+			for (XTrace trace : log) {
+				boolean start = true;
+				for (XEvent event : trace) {
+					String eventName = XConceptExtension.instance().extractName(event);
+					if (!start)
+						fW.write(";");
+					fW.write(eventName);
+					start = false;
+				}
+				fW.write("\n");
+			}
+			fW.flush();
+			fW.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
