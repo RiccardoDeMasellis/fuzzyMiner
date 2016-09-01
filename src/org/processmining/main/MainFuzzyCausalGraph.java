@@ -7,7 +7,6 @@ import org.deckfour.xes.in.XesXmlParser;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
-import org.processmining.confs.fuzzyminer.FuzzyCGConfiguration;
 import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
 import org.processmining.models.fuzzyminer.fuzzypetrinet.FuzzyPetrinet;
 import org.processmining.plugins.fuzzyminer.FuzzyCGMiner;
@@ -26,7 +25,7 @@ import java.util.List;
 // QUESTIONS: What is the difference between FuzzyCGConfiguration e FuzzyMinerSettings?
 
 public class MainFuzzyCausalGraph {
-    private static String LOGFILENAME = "logs/registrationLog.xes";
+    private static String LOGFILENAME = "logs/bpi_challenge_2013_incidents.xes";
     private static double SURETHRESHOLD = 0.6;
     private static double QUESTIONMARKTHRESHOLD = 0.5;
     private static double PLACEEVALTHRESHOLD = 0.7;

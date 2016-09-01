@@ -4,10 +4,8 @@ import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
-import org.processmining.models.graphbased.directed.AbstractDirectedGraphEdge;
-
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
-import java.util.Iterator;
+
 import java.util.Set;
 
 /**
@@ -73,7 +71,6 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> {
     public void replayPlaceOnTrace(XTrace trace){
 		for (XEvent event : trace) {
 			String eventName = XConceptExtension.instance().extractName(event);
-			System.out.println(eventName);
 
 			//if it is output increase
 			for (N placeOutputNode : getPlaceOutputNodes()) {
