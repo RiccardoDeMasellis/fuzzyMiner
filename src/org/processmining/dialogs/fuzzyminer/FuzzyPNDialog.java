@@ -53,7 +53,7 @@ public class FuzzyPNDialog extends JPanel {
 		sureThresholdSlider.setValue(intValue);
 		sureThresholdSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				settings.setSureThreshold(sureThresholdSlider.getValue());
+				settings.setSureThreshold(sureThresholdSlider.getValue()/100.0);
 			}
 		});
 		sureThresholdSlider.setMajorTickSpacing(50);
@@ -95,19 +95,11 @@ public class FuzzyPNDialog extends JPanel {
 		questionMarkThresholdSlider.setValue(intValue);
 		questionMarkThresholdSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				settings.setQuestionMarkThreshold(questionMarkThresholdSlider.getValue());
+				settings.setQuestionMarkThreshold(questionMarkThresholdSlider.getValue()/100.0);
 			}
 		});
 		this.add(questionMarkThresholdSlider);
 
-		intValue = (int) (settings.getQuestionMarkThreshold()*100);
-		questionMarkThresholdSlider.setValue(intValue);
-		questionMarkThresholdSlider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				settings.setQuestionMarkThreshold(questionMarkThresholdSlider.getValue());
-			}
-		});
-		this.add(questionMarkThresholdSlider);
 
 		
 		space = Box.createVerticalStrut(20);
@@ -139,7 +131,7 @@ public class FuzzyPNDialog extends JPanel {
 		placeEvaluationThresholdSlider.setValue(intValue);
 		placeEvaluationThresholdSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				settings.setQuestionMarkThreshold(placeEvaluationThresholdSlider.getValue());
+				settings.setPlaceEvalThreshold(placeEvaluationThresholdSlider.getValue()/100.0);
 			}
 		});
 		this.add(placeEvaluationThresholdSlider);
