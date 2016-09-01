@@ -168,7 +168,7 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
         Set<N> unionInputPlaces = new HashSet<>();
         Set<N> unionOutputPlaces = new HashSet<>();
 
-        PlaceEvaluation<N>[] currentCombinationArray = (PlaceEvaluation<N>[]) currentCombination.toArray();
+        PlaceEvaluation<N>[] currentCombinationArray = (PlaceEvaluation<N>[]) currentCombination.toArray(new PlaceEvaluation<?>[currentCombination.size()]);
         intersectionInputPlaces.addAll(currentCombinationArray[0].getPlaceInputNodes());
         intersectionOutputPlaces.addAll(currentCombinationArray[0].getPlaceOutputNodes());
 
