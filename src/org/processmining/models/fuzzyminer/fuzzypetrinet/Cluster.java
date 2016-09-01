@@ -89,7 +89,7 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
 
     public Set<PlaceEvaluation<N>> getNonRedundantPlacesAboveThreshold(double threshold) {
         Set<PlaceEvaluation<N>> aboveThreshold = this.getPlacesAboveThreshold(threshold);
-        aboveThreshold.retainAll(getRedundantPlaces(aboveThreshold));
+        aboveThreshold.removeAll(getRedundantPlaces(aboveThreshold));
         return aboveThreshold;
     }
 
