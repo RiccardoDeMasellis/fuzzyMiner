@@ -73,7 +73,7 @@ import org.processmining.plugins.heuristicsnet.visualizer.annotatedvisualization
 import com.fluxicon.slickerbox.factory.SlickerDecorator;
 import com.fluxicon.slickerbox.factory.SlickerFactory;
 
-public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
+public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphVisualization, Cleanable,
 		ChangeListener, ActionListener {
 
 	/**
@@ -95,14 +95,14 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 	private PIPPanel pip;
 	private JPanel zoomPanelON, zoomPanelOFF;
 	private ZoomPanel zoom;
-	private JPanel splitsPanel, joinsPanel;
-	private AnnotationsPanel splits, joins;
-	private JPanel parametersPanelON, parametersPanelOFF;
-	private ParametersPanel parameters;
+	//private JPanel splitsPanel, joinsPanel;
+	//private AnnotationsPanel splits, joins;
+	//private JPanel parametersPanelON, parametersPanelOFF;
+	//private ParametersPanel parameters;
 	// private JPanel optionsPanelOFF;
-	private JPanel setupPanelON, setupPanelOFF;
-	private SetupPanel setup;
-	private JPanel fitnessPanel;
+	//private JPanel setupPanelON, setupPanelOFF;
+	//private SetupPanel setup;
+	//private JPanel fitnessPanel;
 
 	private float zoomRatio, pipRatio;
 	private double normalScale;
@@ -152,14 +152,14 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 			public void mouseEntered(MouseEvent e) {
 
-				if (hasNodeSelected) {
+				/*if (hasNodeSelected) {
 
 					joinsPanel.setVisible(false);
 					joinsPanel.setEnabled(false);
 
 					splitsPanel.setVisible(false);
 					splitsPanel.setEnabled(false);
-				}
+				}*/
 			}
 
 			public void mouseExited(MouseEvent e) {
@@ -168,14 +168,14 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 					scroll.repaint();
 
-					joinsPanel.repaint();
+					/*joinsPanel.repaint();
 					splitsPanel.repaint();
 
 					joinsPanel.setVisible(true);
 					joinsPanel.setEnabled(true);
 
 					splitsPanel.setVisible(true);
-					splitsPanel.setEnabled(true);
+					splitsPanel.setEnabled(true);*/
 				}
 
 			}
@@ -188,11 +188,11 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 				pipPanelOFF.setVisible(false);
 				pipPanelOFF.setEnabled(false);
 
-				setupPanelOFF.setVisible(false);
+				/*setupPanelOFF.setVisible(false);
 				setupPanelOFF.setEnabled(false);
 
 				parametersPanelOFF.setVisible(false);
-				parametersPanelOFF.setEnabled(false);
+				parametersPanelOFF.setEnabled(false);*/
 			}
 
 			public void mouseReleased(MouseEvent e) {
@@ -203,11 +203,11 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 				pipPanelOFF.setVisible(true);
 				pipPanelOFF.setEnabled(true);
 
-				setupPanelOFF.setVisible(true);
+				/*setupPanelOFF.setVisible(true);
 				setupPanelOFF.setEnabled(true);
 
 				parametersPanelOFF.setVisible(true);
-				parametersPanelOFF.setEnabled(true);
+				parametersPanelOFF.setEnabled(true);*/
 			}
 		};
 
@@ -256,14 +256,14 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 				scroll.getHorizontalScrollBar().setValue((int) (x * pipRatio));
 				scroll.getVerticalScrollBar().setValue((int) (y * pipRatio));
 
-				if (hasNodeSelected) {
+				/*if (hasNodeSelected) {
 
 					joinsPanel.setVisible(false);
 					joinsPanel.setEnabled(false);
 
 					splitsPanel.setVisible(false);
 					splitsPanel.setEnabled(false);
-				}
+				}*/
 			}
 
 			public void mouseExited(MouseEvent e) {
@@ -307,7 +307,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 					scroll.getVerticalScrollBar()
 							.setValue((int) (y / pipRatio));
 
-					if (hasNodeSelected) {
+					/*if (hasNodeSelected) {
 
 						joinsPanel.repaint();
 						splitsPanel.repaint();
@@ -317,7 +317,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 						splitsPanel.setVisible(true);
 						splitsPanel.setEnabled(true);
-					}
+					}*/
 				}
 			}
 
@@ -364,14 +364,14 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 				scroll.getHorizontalScrollBar().setValue((int) (x * zoomRatio));
 				scroll.getVerticalScrollBar().setValue((int) (y * zoomRatio));
 
-				if (hasNodeSelected) {
+				/*if (hasNodeSelected) {
 
 					joinsPanel.setVisible(false);
 					joinsPanel.setEnabled(false);
 
 					splitsPanel.setVisible(false);
 					splitsPanel.setEnabled(false);
-				}
+				}*/
 			}
 
 			public void mouseExited(MouseEvent e) {
@@ -415,7 +415,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 					scroll.getVerticalScrollBar().setValue(
 							(int) (y / zoomRatio));
 
-					if (hasNodeSelected) {
+					/*if (hasNodeSelected) {
 
 						joinsPanel.repaint();
 						splitsPanel.repaint();
@@ -425,7 +425,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 						splitsPanel.setVisible(true);
 						splitsPanel.setEnabled(true);
-					}
+					}*/
 				}
 			}
 
@@ -438,7 +438,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 //		if (this.net instanceof SimpleHeuristicsNet) {
 
-			this.parametersPanelON = factory.createRoundedPanel(15,
+/*			this.parametersPanelON = factory.createRoundedPanel(15,
 					Color.LIGHT_GRAY);
 			this.parametersPanelOFF = factory.createRoundedPanel(15,
 					Color.DARK_GRAY);
@@ -536,7 +536,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 				public void mouseReleased(MouseEvent e) {
 				}
-			});
+			});*/
 //		} else
 //			this.parametersPanelON = new JPanel();
 
@@ -651,8 +651,8 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 			}
 		});*/
 
-		this.fitnessPanel = factory.createRoundedPanel(15, Color.GRAY);
-		this.fitnessPanel.setLayout(null);
+		/*this.fitnessPanel = factory.createRoundedPanel(15, Color.GRAY);
+		this.fitnessPanel.setLayout(null);*/
 /*		JLabel fitnessInfo = factory.createLabel("Fitness: "
 				+ (Math.round(this.net.getFitness() * 10000) / 10000f));
 		fitnessInfo.setForeground(Color.WHITE);
@@ -679,8 +679,8 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 		this.add(this.zoomPanelOFF);
 		this.add(this.pipPanelON);
 		this.add(this.pipPanelOFF);
-		this.add(this.parametersPanelON);
-		this.add(this.parametersPanelOFF);
+		//this.add(this.parametersPanelON);
+		//this.add(this.parametersPanelOFF);
 		// this.add(this.optionsPanelON);
 		// this.add(this.optionsPanelOFF);
 		/*this.add(this.setupPanelON);
@@ -732,10 +732,10 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 		this.zoomPanelON.setBounds(0, 40, zoomWidth + 10, zoomHeight);
 		this.zoomPanelOFF.setBounds(-10, 40, 40, 72);
 
-		int parametersHeight = this.parameters.getHeight();
+		/*int parametersHeight = this.parameters.getHeight();
 		this.parametersPanelON.setBounds(width - 580,
 				height - parametersHeight, 540, parametersHeight + 10);
-		this.parametersPanelOFF.setBounds(width - 165, height - 30, 125, 40);
+		this.parametersPanelOFF.setBounds(width - 165, height - 30, 125, 40);*/
 
 		// this.optionsPanelOFF.setBounds(width - 130, -10, 90, 40);
 
@@ -849,19 +849,19 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 			public void mouseEntered(MouseEvent e) {
 
-				if (hasNodeSelected) {
+				/*if (hasNodeSelected) {
 
 					joinsPanel.setVisible(false);
 					joinsPanel.setEnabled(false);
 
 					splitsPanel.setVisible(false);
 					splitsPanel.setEnabled(false);
-				}
+				}*/
 			}
 
 			public void mouseExited(MouseEvent e) {
 
-				if (hasNodeSelected) {
+				/*if (hasNodeSelected) {
 
 					joinsPanel.repaint();
 					splitsPanel.repaint();
@@ -871,7 +871,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 					splitsPanel.setVisible(true);
 					splitsPanel.setEnabled(true);
-				}
+				}*/
 			}
 
 			public void mousePressed(MouseEvent e) {
@@ -1088,11 +1088,11 @@ public class FuzzyCausalGraphVisualization extends JPanel implements Cleanable,
 
 			public void mouseReleased(MouseEvent e) {
 
-				if (hasNodeSelected) {
+				/*if (hasNodeSelected) {
 
 					joinsPanel.repaint();
 					splitsPanel.repaint();
-				}
+				}*/
 			}
 		});
 
@@ -1400,14 +1400,14 @@ class PIPPanel extends JPanel implements MouseListener, MouseMotionListener {
 	private ProMJGraph pipGraph;
 
 	public PIPPanel(SlickerFactory factory, JScrollPane parentScroll,
-			ProMJGraph pipGraph, FuzzyCausalGraphVisualization panel) {
+			ProMJGraph pipGraph, FuzzyGraphVisualization panel) {
 
 		super(new BorderLayout());
 
 		this.setPIPgraph(pipGraph);
 
 		this.parentScroll = parentScroll;
-		this.panel = panel;
+		this.panel = (FuzzyCausalGraphVisualization) panel;
 
 		setPreferredSize(new Dimension(PIPSIZE, PIPSIZE));
 		setMinimumSize(new Dimension(PIPSIZE, PIPSIZE));

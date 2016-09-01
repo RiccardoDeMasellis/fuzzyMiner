@@ -1,5 +1,6 @@
 package org.processmining.models.fuzzyminer.fuzzypetrinet;
 
+import org.processmining.models.graphbased.AttributeMap;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 
 /**
@@ -9,6 +10,9 @@ public class UncertainTransitionsArc extends TransitionsArc {
 
     public UncertainTransitionsArc(Transition source, Transition target, int weight) {
         super(source, target, weight);
+		getAttributeMap().put(AttributeMap.LABEL, "?");
+		getAttributeMap().put(AttributeMap.LABELALONGEDGE, true);
+		getAttributeMap().put(AttributeMap.SHOWLABEL, true);
     }
 
     public UncertainTransitionsArc(Transition source, Transition target) {

@@ -13,6 +13,7 @@ import org.processmining.models.fuzzyminer.fuzzypetrinet.FuzzyPetrinet;
 import org.processmining.plugins.fuzzyminer.FuzzyCGMiner;
 import org.processmining.plugins.fuzzyminer.FuzzyMinerSettings;
 import org.processmining.plugins.fuzzyminer.fuzzycg2fuzzypn.FuzzyCGToFuzzyPN;
+import org.processmining.plugins.fuzzyminer.preprocessing.LogPreprocessor;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.settings.HeuristicsMinerSettings;
 
 import java.io.File;
@@ -39,23 +40,20 @@ public class MainFuzzyCausalGraph {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        XLog log = logList.get(0);
-        FuzzyCGConfiguration configuration = new FuzzyCGConfiguration(log);
-        configuration.setSureThreshold(SURETHRESHOLD);
-        configuration.setQuestionMarkThreshold(QUESTIONMARKTHRESHOLD);
-   
+        XLog log = logList.get(0);  
+		XLog preprocessedLog = LogPreprocessor.preprocessLog(log);
 
         XEventClassifier nameCl = new XEventNameClassifier();
-        XLogInfo logInfo = XLogInfoFactory.createLogInfo(log, nameCl);
+        XLogInfo logInfo = XLogInfoFactory.createLogInfo(preprocessedLog, nameCl);
         HeuristicsMinerSettings hMS = new HeuristicsMinerSettings();
         hMS.setClassifier(nameCl);
 
         FuzzyMinerSettings settings = new FuzzyMinerSettings(hMS, SURETHRESHOLD, QUESTIONMARKTHRESHOLD, PLACEEVALTHRESHOLD);
-        FuzzyCGMiner miner = new FuzzyCGMiner(log, logInfo, settings);
-        FuzzyCausalGraph fCG = miner.mineFCG(log, settings);
+        FuzzyCGMiner miner = new FuzzyCGMiner(preprocessedLog, logInfo, settings);
+        FuzzyCausalGraph fCG = miner.mineFCG(settings);
         System.out.println(fCG);
         
-        FuzzyPetrinet fPN = FuzzyCGToFuzzyPN.fuzzyCGToFuzzyPN(fCG, log, settings);
+        FuzzyPetrinet fPN = FuzzyCGToFuzzyPN.fuzzyCGToFuzzyPN(fCG, preprocessedLog, settings);
         
         System.out.println(fPN);
     }
