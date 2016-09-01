@@ -131,7 +131,7 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
             throw new RuntimeException("The input place evaluation should be contained in the set of place evaluations above the threshold");
 
         // We need the array to access elements by index (the apache math methods returns an iterator on indices)
-        PlaceEvaluation<N>[] otherPlacesArray = (PlaceEvaluation<N>[]) otherPlaces.toArray();
+        PlaceEvaluation<N>[] otherPlacesArray = (PlaceEvaluation<N>[]) otherPlaces.toArray(new PlaceEvaluation<?>[otherPlaces.size()]);
 
 
         // We need to try every possible combination of i elements from the set otherPlacesArray.
