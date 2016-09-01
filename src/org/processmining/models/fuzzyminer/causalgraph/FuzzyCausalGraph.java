@@ -1,8 +1,9 @@
 package org.processmining.models.fuzzyminer.causalgraph;
 
-import org.processmining.models.graphbased.directed.DirectedGraphNode;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by demas on 27/07/16.
@@ -66,7 +67,7 @@ public class FuzzyCausalGraph extends CausalGraph<FuzzyDirectedGraphNode, FuzzyD
         for (FuzzyDirectedGraphNode node : nodes) {
         	graphString+= node.getId()+" "+node.getLabel()+"\n";
 		}
-        graphString+= "** EDGES **";
+        graphString+= "** EDGES **\n";
         Set<FuzzyDirectedGraphEdge> edges = this.getEdges();
         for (FuzzyDirectedGraphEdge edge : edges) {
         	if (edge instanceof FuzzyDirectedSureGraphEdge)

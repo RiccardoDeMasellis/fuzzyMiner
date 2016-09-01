@@ -31,15 +31,17 @@ public class FuzzyCGToFuzzyPN {
         // Prepare the data structure for the nodes to be added
         Set<PlaceEvaluation> placesToBeAdded = new HashSet<>();
 
+        System.out.println("*********** Start analyzing clusters ***********");
         // For each cluster:
         for (Cluster c : clusters) {
-
+            System.out.println("**** Start analyzing cluster " + c + " ****");
             // call clusters evaluations
             c.evaluateBestPlaces(log);
             // select the places above the threshold and add them to the set of places to be added to the fuzzynet
             placesToBeAdded.addAll(c.getNonRedundantPlacesAboveThreshold(settings.getPlaceEvalThreshold()));
         }
 
+        System.out.println("*********** Start building the FuzzyPetrinet ***********");
         // Build the net. For each PlaceEvaluation in placesToBeAdded, add a place and the respective transitions
         for (PlaceEvaluation<N> pe : placesToBeAdded)
             result.addPlaceFromPlaceEvaluation(pe);
