@@ -12,7 +12,11 @@ import org.processmining.models.graphbased.directed.AbstractDirectedGraphEdge;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
 import org.processmining.plugins.fuzzyminer.FuzzyMinerSettings;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by demas on 19/08/16.
@@ -31,13 +35,25 @@ public class FuzzyCGToFuzzyPN {
         // Prepare the data structure for the nodes to be added
         Set<PlaceEvaluation> placesToBeAdded = new HashSet<>();
 
+        ExecutorService exec = Executors.newCachedThreadPool();
+
         System.out.println("*********** Start analyzing clusters ***********");
         // For each cluster:
         for (Cluster c : clusters) {
             System.out.println("**** Start analyzing cluster " + c + " ****");
             // call clusters evaluations
-            c.evaluateBestPlaces(log);
+            c.evaluateBestPlaces(log, exec);
             // select the places above the threshold and add them to the set of places to be added to the fuzzynet
+        }
+
+        exec.shutdown();
+        try {
+            exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        for (Cluster c : clusters) {
             placesToBeAdded.addAll(c.getNonRedundantPlacesAboveThreshold(settings.getPlaceEvalThreshold()));
         }
 
