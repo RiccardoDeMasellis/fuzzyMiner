@@ -54,6 +54,13 @@ public class FuzzyCGMiner  extends HeuristicMinerLight {
 
                 double abdependency = metrics.getABdependencyMeasuresAll(i, j);
                 double dependencyAccepted = metrics.getDependencyMeasuresAccepted(i, j);
+/*                if (dependencyAccepted>=fMSettings.getSureThreshold()){
+                    fCG.addSureEdge(nodeI, nodeJ);
+                    System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
+                } else if (dependencyAccepted>=fMSettings.getQuestionMarkThreshold()){
+                    fCG.addUncertainEdge(nodeI, nodeJ);
+                    System.out.println("UNCERTAIN"+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
+                }*/
                 if (abdependency>=fMSettings.getSureThreshold()){
                     fCG.addSureEdge(nodeI, nodeJ);
                     System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);

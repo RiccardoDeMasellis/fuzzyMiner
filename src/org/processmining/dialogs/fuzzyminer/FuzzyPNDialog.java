@@ -57,6 +57,7 @@ public class FuzzyPNDialog extends JPanel {
 			}
 		});
 		sureThresholdSlider.setMajorTickSpacing(50);
+		sureThresholdSlider.setMinorTickSpacing(10);
 		sureThresholdSlider.setPaintTicks(true);
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 		labelTable.put(0, new JLabel("0%"));
@@ -81,6 +82,7 @@ public class FuzzyPNDialog extends JPanel {
 		questionMarkThresholdSlider.setMaximum(100);
 		
 		questionMarkThresholdSlider.setMajorTickSpacing(50);
+		questionMarkThresholdSlider.setMinorTickSpacing(10);
 		questionMarkThresholdSlider.setPaintTicks(true);
 		labelTable = new Hashtable<Integer, JLabel>();
 		labelTable.put(0, new JLabel("0%"));
@@ -117,6 +119,7 @@ public class FuzzyPNDialog extends JPanel {
 		placeEvaluationThresholdSlider.setMaximum(100);
 		
 		placeEvaluationThresholdSlider.setMajorTickSpacing(50);
+		placeEvaluationThresholdSlider.setMinorTickSpacing(10);
 		placeEvaluationThresholdSlider.setPaintTicks(true);
 		labelTable = new Hashtable<Integer, JLabel>();
 		labelTable.put(0, new JLabel("0%"));

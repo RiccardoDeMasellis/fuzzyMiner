@@ -19,6 +19,7 @@ public class FuzzyMinerSettings {
     private double questionMarkThreshold;
 
     private double placeEvalThreshold;
+    //private boolean useAllConnectedHeuristics;
 
     public FuzzyMinerSettings(HeuristicsMinerSettings hms, double sureThreshold, double questionMarkThreshold, double placeEvalThreshold) {
         this.hmSettings = hms;
@@ -65,6 +66,14 @@ public class FuzzyMinerSettings {
 	public void setHmSettings(HeuristicsMinerSettings hmSettings) {
 		this.hmSettings = hmSettings;
 	}
+	
+	/*public boolean isUseAllConnectedHeuristics() {
+		return useAllConnectedHeuristics;
+	}
+
+	public void setUseAllConnectedHeuristics(boolean useAllConnectedHeuristics) {
+		this.useAllConnectedHeuristics = useAllConnectedHeuristics;
+	}*/
 
 	@Override
     public boolean equals(Object o) {
