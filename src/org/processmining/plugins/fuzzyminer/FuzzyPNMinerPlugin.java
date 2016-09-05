@@ -16,6 +16,7 @@ import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.models.fuzzyminer.causalgraph.FuzzyCausalGraph;
 import org.processmining.models.fuzzyminer.fuzzypetrinet.FuzzyPetrinet;
 import org.processmining.plugins.fuzzyminer.fuzzycg2fuzzypn.FuzzyCGToFuzzyPN;
+import org.processmining.plugins.fuzzyminer.preprocessing.LogFilterer;
 import org.processmining.plugins.fuzzyminer.preprocessing.LogPreprocessor;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.settings.HeuristicsMinerSettings;
 
@@ -32,9 +33,12 @@ public class FuzzyPNMinerPlugin {
 		
 		XLog preprocessedLog = LogPreprocessor.preprocessLog(log);
 		XLogInfo logInfo = XLogInfoFactory.createLogInfo(preprocessedLog, settings.getHmSettings().getClassifier());
-		FuzzyCGMiner miner = new FuzzyCGMiner(preprocessedLog, logInfo, settings);
+		System.out.println("**** PREPROCESSING OVER ******");
+		XLog filteredLog = LogFilterer.filterLogByActivityFrequency(preprocessedLog, logInfo, settings);
+		System.out.println("**** FILTERING OVER ******");
+		FuzzyCGMiner miner = new FuzzyCGMiner(filteredLog, filteredLog.getInfo(settings.getHmSettings().getClassifier()), settings);
 		FuzzyCausalGraph fCG = miner.mineFCG(settings);
-        FuzzyPetrinet fPN = FuzzyCGToFuzzyPN.fuzzyCGToFuzzyPN(fCG, preprocessedLog, settings);
+        FuzzyPetrinet fPN = FuzzyCGToFuzzyPN.fuzzyCGToFuzzyPN(fCG, filteredLog, settings);
         
 		output[0] = fPN;
 		output[1] = fCG;
@@ -78,7 +82,7 @@ public class FuzzyPNMinerPlugin {
 	    
 		XEventClassifier nameCl = new XEventNameClassifier();
 		HeuristicsMinerSettings hMS = new HeuristicsMinerSettings();
-		hMS.setClassifier(nameCl);   
+		hMS.setClassifier(nameCl);  
 		settings.setHmSettings(hMS);
 		
 	    // Get a dialog for this configuration.

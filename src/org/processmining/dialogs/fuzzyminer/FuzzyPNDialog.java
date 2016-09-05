@@ -1,5 +1,6 @@
 package org.processmining.dialogs.fuzzyminer;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
@@ -21,6 +22,7 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.confs.fuzzyminer.FuzzyCGConfiguration;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.plugins.fuzzyminer.FuzzyMinerSettings;
+import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.settings.HeuristicsMinerSettings;
 
 
 public class FuzzyPNDialog extends JPanel {
@@ -35,21 +37,55 @@ public class FuzzyPNDialog extends JPanel {
 
 	public FuzzyPNDialog(UIPluginContext context, XLog log, 
 			final FuzzyMinerSettings settings) {
-		super(new GridLayout(3,1));
+		super(new GridLayout(5,1));
 		this.settings = settings;
+		
+		final JLabel positiveObservationsLabel = new JLabel();
+		positiveObservationsLabel.setText("Positive observation threshold");
+		this.add(positiveObservationsLabel);
+
+		Component space = Box.createHorizontalStrut(10);
+		this.add(space);
+	
+		final JSlider positiveObservationsSlider = new JSlider();
+		positiveObservationsSlider.setMinimum(0);
+		positiveObservationsSlider.setMaximum(100);
+		
+		int intValue = (int) (settings.getHmSettings().getPositiveObservationThreshold());
+		positiveObservationsSlider.setValue(intValue);
+		positiveObservationsSlider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				HeuristicsMinerSettings hMS= settings.getHmSettings();
+				hMS.setPositiveObservationThreshold((positiveObservationsSlider.getValue()));
+				settings.setHmSettings(hMS);
+			}
+		});
+		positiveObservationsSlider.setMajorTickSpacing(50);
+		positiveObservationsSlider.setMinorTickSpacing(10);
+		positiveObservationsSlider.setPaintTicks(true);
+		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+		labelTable.put(0, new JLabel("0"));
+		labelTable.put(50, new JLabel("50"));
+		labelTable.put(100, new JLabel("100"));
+		positiveObservationsSlider.setLabelTable(labelTable);
+		positiveObservationsSlider.setPaintLabels(true);
+		this.add(positiveObservationsSlider);
+		
+		space = Box.createVerticalStrut(20);
+		this.add(space);
 
 		final JLabel sureThresholdLabel = new JLabel();
 		sureThresholdLabel.setText("Sure arc threshold");
 		this.add(sureThresholdLabel);
 
-		Component space = Box.createHorizontalStrut(10);
+		space = Box.createHorizontalStrut(10);
 		this.add(space);
 		
 		final JSlider sureThresholdSlider = new JSlider();
 		sureThresholdSlider.setMinimum(0);
 		sureThresholdSlider.setMaximum(100);
 		
-		int intValue = (int) (settings.getSureThreshold()*100);
+		intValue = (int) (settings.getSureThreshold()*100);
 		sureThresholdSlider.setValue(intValue);
 		sureThresholdSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -59,7 +95,7 @@ public class FuzzyPNDialog extends JPanel {
 		sureThresholdSlider.setMajorTickSpacing(50);
 		sureThresholdSlider.setMinorTickSpacing(10);
 		sureThresholdSlider.setPaintTicks(true);
-		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+		labelTable = new Hashtable<Integer, JLabel>();
 		labelTable.put(0, new JLabel("0%"));
 		labelTable.put(50, new JLabel("50%"));
 		labelTable.put(100, new JLabel("100%"));
@@ -129,7 +165,6 @@ public class FuzzyPNDialog extends JPanel {
 		placeEvaluationThresholdSlider.setPaintLabels(true);
 		this.add(placeEvaluationThresholdSlider);
 		
-		
 		intValue = (int) (settings.getPlaceEvalThreshold()*100);
 		placeEvaluationThresholdSlider.setValue(intValue);
 		placeEvaluationThresholdSlider.addChangeListener(new ChangeListener() {
@@ -138,5 +173,27 @@ public class FuzzyPNDialog extends JPanel {
 			}
 		});
 		this.add(placeEvaluationThresholdSlider);
+	
+		space = Box.createVerticalStrut(20);
+		this.add(space);
+
+		final JLabel allConnected = new JLabel();
+		allConnected.setText("All tasks connected");
+		this.add(allConnected);
+
+		space = Box.createHorizontalStrut(10);
+		this.add(space);
+
+		JCheckBox connCbx = new JCheckBox();
+		connCbx.setBackground(Color.GRAY);
+		connCbx.setSelected(settings.getHmSettings().isUseAllConnectedHeuristics());
+		connCbx.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				HeuristicsMinerSettings hMS = settings.getHmSettings();
+				hMS.setUseAllConnectedHeuristics(connCbx.isSelected());
+				settings.setHmSettings(hMS);
+			}
+		});
+		this.add(connCbx);
 	}
 }

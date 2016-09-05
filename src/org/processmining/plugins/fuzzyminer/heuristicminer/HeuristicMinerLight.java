@@ -1,6 +1,11 @@
 package org.processmining.plugins.fuzzyminer.heuristicminer;
 
-import org.deckfour.xes.classification.XEventClass;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+
+import org.deckfour.xes.factory.XFactory;
+import org.deckfour.xes.factory.XFactoryRegistry;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XEvent;
@@ -11,16 +16,10 @@ import org.processmining.models.heuristics.impl.ActivitiesMappingStructures;
 import org.processmining.models.heuristics.impl.HNSet;
 import org.processmining.models.heuristics.impl.HNSubSet;
 import org.processmining.models.heuristics.impl.HeuristicsNetImpl;
-import org.processmining.plugins.heuristicsnet.SimpleHeuristicsNet;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.HeuristicsMetrics;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.fitness.ContinuousSemantics;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.fitness.ImprovedContinuousSemantics;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.settings.HeuristicsMinerSettings;
-
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Date;
-import java.util.HashMap;
 
 public class HeuristicMinerLight {
 
@@ -95,7 +94,7 @@ public class HeuristicMinerLight {
             ArrayList<Integer> lastEvents = new ArrayList<Integer>(trace.size());
             Integer lastEventIndex = new Integer(-1);
             Integer penultEventIndex = new Integer(-1);
-
+            
             for (XEvent event : trace) {
 
                 //				XExtendedEvent extendedEvent = XExtendedEvent.wrap(event);
