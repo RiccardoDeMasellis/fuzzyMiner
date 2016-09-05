@@ -1,0 +1,14 @@
+<ivy-module version="2.0">
+    <info organisation="FBK" module="FuzzyMiner" revision="latest">
+        <description>
+            Version VERSION
+        </description>
+    </info>
+    <dependencies>
+        <dependency org="prom" name="ApacheUtils" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="BasicUtils" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="Widgets" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom-libs" name="OpenXES" rev="2.0" transitive="false" />
+        <dependency org="prom-libs" name="OpenXES-XStream" rev="2.0" transitive="false" />
+    </dependencies>
+</ivy-module>
