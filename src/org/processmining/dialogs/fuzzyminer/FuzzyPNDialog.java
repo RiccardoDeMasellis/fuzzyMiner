@@ -56,7 +56,7 @@ public class FuzzyPNDialog extends JPanel {
 		positiveObservationsSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				HeuristicsMinerSettings hMS= settings.getHmSettings();
-				hMS.setPositiveObservationThreshold((positiveObservationsSlider.getValue()));
+				//hMS.setPositiveObservationThreshold((positiveObservationsSlider.getValue()));
 				settings.setHmSettings(hMS);
 			}
 		});
@@ -190,7 +190,7 @@ public class FuzzyPNDialog extends JPanel {
 		connCbx.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				HeuristicsMinerSettings hMS = settings.getHmSettings();
-				hMS.setUseAllConnectedHeuristics(connCbx.isSelected());
+				//hMS.setUseAllConnectedHeuristics(connCbx.isSelected());
 				settings.setHmSettings(hMS);
 			}
 		});

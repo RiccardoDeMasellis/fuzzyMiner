@@ -29,7 +29,6 @@ public class LogFilterer {
 
 	        }
 		}
-		System.out.println("**** FREQUENCY MAP CONSTRUCTION OVER ******");
 		XLog filteredLog = XFactoryRegistry.instance().currentDefault().createLog();
 		filteredLog.setAttributes(log.getAttributes());
 		for (XTrace trace : log) {
@@ -37,7 +36,7 @@ public class LogFilterer {
 			filteredTrace.setAttributes(trace.getAttributes());
 	        for (XEvent event : trace) {
 	        	String eventKey = logInfo.getEventClasses(settings.getHmSettings().getClassifier()).getClassOf(event).getId(); 
-	        	if(activityFrequencyMap.get(eventKey)>settings.getHmSettings().getPositiveObservationThreshold()){
+	        	if(activityFrequencyMap.get(eventKey)>=settings.getHmSettings().getPositiveObservationThreshold()){
 	        		filteredTrace.add(event);
 	        	}
 	        }
