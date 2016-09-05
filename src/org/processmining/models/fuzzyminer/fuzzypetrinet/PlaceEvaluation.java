@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Created by demas on 22/08/16.
  */
-public class PlaceEvaluation<N extends AbstractDirectedGraphNode> {
+public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Runnable {
     private Set<N> placeOutputNodes, placeInputNodes;
     private int acceptedTracesNumber;
     private int currentTokenNumber;
@@ -65,6 +65,10 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> {
 		}
 
 
+    }
+
+    public void run() {
+        replayPlace();
     }
     
 

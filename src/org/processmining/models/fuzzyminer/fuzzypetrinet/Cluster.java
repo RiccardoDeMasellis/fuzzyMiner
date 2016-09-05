@@ -8,6 +8,7 @@ import org.processmining.plugins.fuzzyminer.fuzzycg2fuzzypn.Utils;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created by demas on 19/08/16.
@@ -56,7 +57,7 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
     }
 
 
-    public Set<PlaceEvaluation<N>> evaluateBestPlaces(XLog log) {
+    public Set<PlaceEvaluation<N>> evaluateBestPlaces(XLog log, ExecutorService exec) {
         // First generate the possible places
         Set<Set<N>> inputNodesPowerSet = Utils.powerSet(inputNodes);
         Set<Set<N>> outputNodesPowerSet = Utils.powerSet(outputNodes);
@@ -69,7 +70,8 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
                     PlaceEvaluation<N> placeEval = new PlaceEvaluation(outputNodeSet, inputNodeSet, log);
                     this.places.add(placeEval);
                     // Replay the place
-                    placeEval.replayPlace();
+                    //placeEval.replayPlace();
+                    exec.execute(placeEval);
                     result.add(placeEval);
                 }
             }
