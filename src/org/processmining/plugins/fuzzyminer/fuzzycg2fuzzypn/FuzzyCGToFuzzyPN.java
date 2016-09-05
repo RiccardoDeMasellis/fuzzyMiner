@@ -62,6 +62,13 @@ public class FuzzyCGToFuzzyPN {
         for (PlaceEvaluation<N> pe : placesToBeAdded)
             result.addPlaceFromPlaceEvaluation(pe);
 
+        /*
+        Add **ALL** transitions of the causal graph to the set of transition of the petrinet.
+        (Transition already present will not be added.)
+         */
+        for (FuzzyDirectedGraphNode node : graph.getNodes())
+            result.addTransition(node.getLabel());
+
         /* Then add the sure and uncertain arcs between transitions in the net coming from the causal graph
             I do not know which sure transitions have met the threshold thus have been replaced by a place transition,
              but such a check is directly in the method
