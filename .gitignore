@@ -18,3 +18,7 @@ hs_err_pid*
 *.iml
 /bin/
 /logs
+
+#eclipse
+.project
+/.settings
