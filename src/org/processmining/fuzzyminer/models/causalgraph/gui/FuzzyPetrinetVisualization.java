@@ -1,7 +1,32 @@
 package org.processmining.fuzzyminer.models.causalgraph.gui;
 
-import com.fluxicon.slickerbox.factory.SlickerDecorator;
-import com.fluxicon.slickerbox.factory.SlickerFactory;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.BasicMarqueeHandler;
@@ -17,18 +42,10 @@ import org.processmining.models.jgraph.ProMJGraph;
 import org.processmining.models.jgraph.elements.ProMGraphCell;
 import org.processmining.models.jgraph.elements.ProMGraphEdge;
 import org.processmining.models.jgraph.listeners.SelectionListener;
-import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.gui.ParametersPanel;
 import org.processmining.plugins.heuristicsnet.visualizer.annotatedvisualization.AnnotatedVisualizationGenerator;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.fluxicon.slickerbox.factory.SlickerDecorator;
+import com.fluxicon.slickerbox.factory.SlickerFactory;
 
 public class FuzzyPetrinetVisualization extends JPanel implements FuzzyGraphVisualization, Cleanable,
 ChangeListener, ActionListener {
@@ -54,10 +71,10 @@ ChangeListener, ActionListener {
 	private PIPPanel pip;
 	private JPanel zoomPanelON, zoomPanelOFF;
 	private ZoomPanel zoom;
-	private JPanel parametersPanelON, parametersPanelOFF;
-	private ParametersPanel parameters;
-	private JPanel setupPanelON, setupPanelOFF;
-	private SetupPanel setup;
+	//private JPanel parametersPanelON, parametersPanelOFF;
+	//private ParametersPanel parameters;
+	//private JPanel setupPanelON, setupPanelOFF;
+	//private SetupPanel setup;
 	private JPanel fitnessPanel;
 
 	private float zoomRatio, pipRatio;
@@ -75,7 +92,7 @@ ChangeListener, ActionListener {
 	
 	
 	
-	public FuzzyPetrinetVisualization(ProMJGraph graph) {
+	public FuzzyPetrinetVisualization(final ProMJGraph graph) {
 		// TODO Auto-generated constructor stub
 		
 		this.setLayout(null);
@@ -135,11 +152,11 @@ ChangeListener, ActionListener {
 				pipPanelOFF.setVisible(false);
 				pipPanelOFF.setEnabled(false);
 
-				setupPanelOFF.setVisible(false);
-				setupPanelOFF.setEnabled(false);
+				//setupPanelOFF.setVisible(false);
+				//setupPanelOFF.setEnabled(false);
 
-				parametersPanelOFF.setVisible(false);
-				parametersPanelOFF.setEnabled(false);
+				//parametersPanelOFF.setVisible(false);
+				//parametersPanelOFF.setEnabled(false);
 			}
 
 			public void mouseReleased(MouseEvent e) {
@@ -150,11 +167,11 @@ ChangeListener, ActionListener {
 				pipPanelOFF.setVisible(true);
 				pipPanelOFF.setEnabled(true);
 
-				setupPanelOFF.setVisible(true);
-				setupPanelOFF.setEnabled(true);
+				//setupPanelOFF.setVisible(true);
+				//setupPanelOFF.setEnabled(true);
 
-				parametersPanelOFF.setVisible(true);
-				parametersPanelOFF.setEnabled(true);
+				//parametersPanelOFF.setVisible(true);
+				//parametersPanelOFF.setEnabled(true);
 			}
 		};
 
@@ -361,7 +378,7 @@ ChangeListener, ActionListener {
 
 //		if (this.net instanceof SimpleHeuristicsNet) {
 
-			this.parametersPanelON = factory.createRoundedPanel(15,
+			/*this.parametersPanelON = factory.createRoundedPanel(15,
 					Color.LIGHT_GRAY);
 			this.parametersPanelOFF = factory.createRoundedPanel(15,
 					Color.DARK_GRAY);
@@ -448,7 +465,7 @@ ChangeListener, ActionListener {
 
 				public void mouseReleased(MouseEvent e) {
 				}
-			});
+			});*/
 //		} else
 //			this.parametersPanelON = new JPanel();
 
@@ -591,8 +608,8 @@ ChangeListener, ActionListener {
 		this.add(this.zoomPanelOFF);
 		this.add(this.pipPanelON);
 		this.add(this.pipPanelOFF);
-		this.add(this.parametersPanelON);
-		this.add(this.parametersPanelOFF);
+		//this.add(this.parametersPanelON);
+		//this.add(this.parametersPanelOFF);
 		// this.add(this.optionsPanelON);
 		// this.add(this.optionsPanelOFF);
 		/*this.add(this.setupPanelON);
@@ -644,10 +661,10 @@ ChangeListener, ActionListener {
 		this.zoomPanelON.setBounds(0, 40, zoomWidth + 10, zoomHeight);
 		this.zoomPanelOFF.setBounds(-10, 40, 40, 72);
 
-		int parametersHeight = this.parameters.getHeight();
+		/*int parametersHeight = this.parameters.getHeight();
 		this.parametersPanelON.setBounds(width - 580,
 				height - parametersHeight, 540, parametersHeight + 10);
-		this.parametersPanelOFF.setBounds(width - 165, height - 30, 125, 40);
+		this.parametersPanelOFF.setBounds(width - 165, height - 30, 125, 40);*/
 
 		// this.optionsPanelOFF.setBounds(width - 130, -10, 90, 40);
 
@@ -1015,7 +1032,7 @@ ChangeListener, ActionListener {
 			@Override
 			protected void changeHandled() {
 
-				scalePIP();
+				scalePIP(); 
 				repaintPIP(graph.getVisibleRect());
 			}
 		};

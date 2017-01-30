@@ -46,9 +46,14 @@ import javax.swing.table.TableColumn;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.BasicMarqueeHandler;
+import org.processmining.framework.plugin.impl.ProgressBarImpl;
 import org.processmining.framework.util.Cleanable;
 import org.processmining.framework.util.ui.scalableview.VerticalLabelUI;
+import org.processmining.fuzzyminer.models.causalgraph.FuzzyCausalGraph;
+import org.processmining.fuzzyminer.models.causalgraph.FuzzyDirectedGraphNode;
+import org.processmining.fuzzyminer.plugins.FuzzyCGMinerSettings;
 import org.processmining.models.connections.GraphLayoutConnection;
+import org.processmining.models.graphbased.ViewSpecificAttributeMap;
 import org.processmining.models.graphbased.directed.DirectedGraphEdge;
 import org.processmining.models.graphbased.directed.DirectedGraphElement;
 import org.processmining.models.graphbased.directed.DirectedGraphNode;
@@ -61,7 +66,6 @@ import org.processmining.models.jgraph.listeners.SelectionListener;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.operators.Operator;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.operators.Split;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.operators.Stats;
-import org.processmining.plugins.heuristicsnet.visualizer.annotatedvisualization.AnnotatedVisualizationGenerator;
 import org.processmining.plugins.heuristicsnet.visualizer.annotatedvisualization.AnnotatedVisualizationSettings;
 
 import com.fluxicon.slickerbox.factory.SlickerDecorator;
@@ -89,6 +93,11 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 	private PIPPanel pip;
 	private JPanel zoomPanelON, zoomPanelOFF;
 	private ZoomPanel zoom;
+	private JPanel configPanelON, configPanelOFF;
+	private ConfigurationPanel config;	
+	
+	private FuzzyCausalGraph fCG;
+	
 	//private JPanel splitsPanel, joinsPanel;
 	//private AnnotationsPanel splits, joins;
 	//private JPanel parametersPanelON, parametersPanelOFF;
@@ -98,9 +107,10 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 	//private SetupPanel setup;
 	//private JPanel fitnessPanel;
 
-	private float zoomRatio, pipRatio;
+
+	private float zoomRatio, pipRatio, configRatio;
 	private double normalScale;
-	private Rectangle normalBounds, zoomBounds, pipBounds;
+	private Rectangle normalBounds, zoomBounds, pipBounds, configBounds;
 
 	private boolean hasNodeSelected;
 
@@ -108,10 +118,11 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 			0);
 	private ContextMenuCreator creator = null;
 
-	public FuzzyCausalGraphVisualization(final ProMJGraph graph) {
+	public FuzzyCausalGraphVisualization(final ProMJGraph graph, FuzzyCausalGraph fCG) {
 
 		this.setLayout(null);
 		this.graph = graph;
+		this.fCG = fCG;
 
 		SlickerFactory factory = SlickerFactory.instance();
 		SlickerDecorator decorator = SlickerDecorator.instance();
@@ -178,6 +189,9 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 
 				zoomPanelOFF.setVisible(false);
 				zoomPanelOFF.setEnabled(false);
+				
+				configPanelOFF.setVisible(false);
+				configPanelOFF.setEnabled(false);
 
 				pipPanelOFF.setVisible(false);
 				pipPanelOFF.setEnabled(false);
@@ -194,6 +208,9 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 				zoomPanelOFF.setVisible(true);
 				zoomPanelOFF.setEnabled(true);
 
+				configPanelOFF.setVisible(true);
+				configPanelOFF.setEnabled(true);
+				
 				pipPanelOFF.setVisible(true);
 				pipPanelOFF.setEnabled(true);
 
@@ -245,6 +262,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 				//showParameters(false);
 				// showOptions(false);
 				showZoom(false);
+				showConfig(false);
 				showPIP(true);
 
 				scroll.getHorizontalScrollBar().setValue((int) (x * pipRatio));
@@ -353,6 +371,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 				//showParameters(false);
 				// showOptions(false);
 				showPIP(false);
+				showConfig(false);
 				showZoom(true);
 
 				scroll.getHorizontalScrollBar().setValue((int) (x * zoomRatio));
@@ -430,6 +449,95 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 			}
 		});
 
+		int sureThresholdValue = (int) (fCG.getSettings().getSureThreshold()*100);
+		int unsureThresholdValue = (int) (fCG.getSettings().getQuestionMarkThreshold()*100);
+
+		//this.configPanelON = factory.createRoundedPanel(200, Color.LIGHT_GRAY);
+		this.configPanelON = factory.createRoundedPanel(15, Color.LIGHT_GRAY);
+		this.configPanelOFF = factory.createRoundedPanel(15, Color.DARK_GRAY);
+		this.configPanelON.setLayout(null);
+		this.configPanelOFF.setLayout(null);
+		this.config = new ConfigurationPanel(factory, decorator, sureThresholdValue, unsureThresholdValue);
+		this.config.addSliderChangeListener(this);
+		this.configPanelON.add(this.config);
+		this.configPanelON.setVisible(false);
+		this.configPanelON.setEnabled(false);
+		JLabel configPanelTitle = factory.createLabel("Parameters");
+		configPanelTitle.setForeground(Color.WHITE);
+		configPanelTitle.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD,
+				18));
+		configPanelTitle.setUI(new VerticalLabelUI(true));
+		this.configPanelOFF.add(configPanelTitle);
+		configPanelTitle.setBounds(10, 10, 30, 120);
+
+		this.configPanelOFF.addMouseListener(new MouseListener() {
+
+			public void mouseClicked(MouseEvent e) {
+			}
+
+			public void mouseEntered(MouseEvent e) {
+
+				int x = scroll.getHorizontalScrollBar().getValue();
+				int y = scroll.getVerticalScrollBar().getValue();
+
+				showConfig(true);
+
+				scroll.getHorizontalScrollBar().setValue((int) (x * configRatio));
+				scroll.getVerticalScrollBar().setValue((int) (y * configRatio));
+
+			}
+
+			public void mouseExited(MouseEvent e) {
+			}
+
+			public void mousePressed(MouseEvent e) {
+			}
+
+			public void mouseReleased(MouseEvent e) {
+			}
+		});
+
+		this.configPanelON.addMouseListener(new MouseListener() {
+
+			public void mouseClicked(MouseEvent e) {
+			}
+
+			public void mouseEntered(MouseEvent e) {
+			}
+
+			public void mouseExited(MouseEvent e) {
+
+				int x = scroll.getHorizontalScrollBar().getValue();
+				int y = scroll.getVerticalScrollBar().getValue();
+
+				boolean flag = false;
+				if (e.getX() >= config.getWidth())
+					flag = true;
+				else {
+
+					if ((e.getY() >= config.getHeight()) || (e.getY() <= 0))
+						flag = true;
+				}
+
+				if (flag) {
+
+					showConfig(false);
+
+					scroll.getHorizontalScrollBar().setValue(
+							(int) (x / configRatio));
+					scroll.getVerticalScrollBar().setValue(
+							(int) (y / configRatio));
+
+				}
+			}
+
+			public void mousePressed(MouseEvent e) {
+			}
+
+			public void mouseReleased(MouseEvent e) {
+			}
+		});		
+		
 //		if (this.net instanceof SimpleHeuristicsNet) {
 
 /*			this.parametersPanelON = factory.createRoundedPanel(15,
@@ -671,6 +779,8 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 
 		this.add(this.zoomPanelON);
 		this.add(this.zoomPanelOFF);
+		this.add(this.configPanelON);
+		this.add(this.configPanelOFF);		
 		this.add(this.pipPanelON);
 		this.add(this.pipPanelOFF);
 		//this.add(this.parametersPanelON);
@@ -700,19 +810,33 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 		this.pip.setBounds(10, 20, pipWidth, pipHeight);
 
 		this.zoom.setHeight((int) (height * 0.66));
+		
+		//this.config.setHeight((int) (height * 0.66));
+		this.config.setHeight((int) (height * 0.66));
 
 		int zoomWidth = this.zoom.getSize().width;
 		int zoomHeight = this.zoom.getSize().height;
+		
+		int configWidth = this.config.getSize().width;
+		int configHeight = this.config.getSize().height;
 
 		this.pipRatio = (float) (height - pipHeight - 50)
 				/ (float) (height - 60);
 		this.zoomRatio = (float) (width - zoomWidth - 40)
 				/ (float) (width - 60);
+		this.configRatio = (float) (width - configWidth - 40)
+				/ (float) (width - 60);
+
 		this.normalBounds = new Rectangle(30, 30, width - 60, height - 60);
 		this.zoomBounds = new Rectangle(10 + zoomWidth,
 				30 + (int) ((1f - this.zoomRatio) * (height - 60)), width
 						- zoomWidth - 40,
 				(int) (this.zoomRatio * (height - 60)));
+		this.configBounds = new Rectangle(10 + configWidth,
+				30 + (int) ((1f - this.configRatio) * (height - 60)), (width
+						- configWidth - 40)*2,
+				(int) (this.configRatio * (height - 60)*2));
+		
 		this.pipBounds = new Rectangle(
 				30 + ((int) ((1f - this.pipRatio) * (width - 60))),
 				20 + pipHeight, (int) (this.pipRatio * (width - 60)), height
@@ -725,6 +849,9 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 		this.pipPanelOFF.setBounds(40, -10, 50, 40);
 		this.zoomPanelON.setBounds(0, 40, zoomWidth + 10, zoomHeight);
 		this.zoomPanelOFF.setBounds(-10, 40, 40, 72);
+		this.configPanelON.setBounds(0, 150, configWidth + 10, configHeight+30);
+		this.configPanelOFF.setBounds(-10, 150, 40, 120);
+
 
 		/*int parametersHeight = this.parameters.getHeight();
 		this.parametersPanelON.setBounds(width - 580,
@@ -742,6 +869,8 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 		double fitRatio = scaleToFit(this.graph, this.scroll, false);
 		this.zoom
 				.setFitValue((int) Math.floor(fitRatio * this.zoomRatio * 100));
+		/*this.config
+			.setSureCurrValue((int) Math.floor(fitRatio * this.configRatio * 100));	*/	
 		this.scalePIP();
 
 		/*this.joinsPanel.setBounds((int) (width / 2f) - 305, height - 300, 300,
@@ -771,6 +900,117 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 			this.scroll.setBounds(this.normalBounds);
 			graph.setScale(this.normalScale);
 		}
+	}
+	
+/*	private ProMJGraph recomputeJGraph(){
+        FuzzyCausalGraph newFCG = new FuzzyCausalGraph();
+        newFCG.setActivitiesMappingStructures(fCG.getActivitiesMappingStructures());
+        newFCG.setActivityFrequencyMap(fCG.getActivityFrequencyMap());
+        newFCG.setLog(fCG.getLog());
+        newFCG.setMetrics(fCG.getMetrics());
+        newFCG.setSettings(fCG.getSettings());
+        
+        int eventsNumber = fCG.getMetrics().getEventsNumber();
+        for(int i=0; i<eventsNumber; i++) {
+            String nodeILabel = fCG.getActivitiesMappingStructures().getActivitiesMapping()[i].getId();
+            FuzzyDirectedGraphNode nodeI = null, nodeJ = null;
+            nodeI = newFCG.addNode(nodeILabel);
+            for (int j=0; j<eventsNumber; j++) {
+                String nodeJLabel = fCG.getActivitiesMappingStructures().getActivitiesMapping()[j].getId();
+                nodeJ = newFCG.addNode(nodeJLabel);
+
+                double abdependency = fCG.getMetrics().getABdependencyMeasuresAll(i, j);
+                double dependencyAccepted = fCG.getMetrics().getDependencyMeasuresAccepted(i, j);
+
+                if (abdependency>=fCG.getSettings().getSureThreshold()){
+                	newFCG.addSureEdge(nodeI, nodeJ);
+                    System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
+                } else if (abdependency>=fCG.getSettings().getQuestionMarkThreshold()){
+                	newFCG.addUncertainEdge(nodeI, nodeJ);
+                    System.out.println("UNCERTAIN"+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
+                } 
+            }
+        }*/
+
+        
+        //GraphLayoutConnection layoutConnection = new GraphLayoutConnection(newFCG);
+		/*ProMGraphModel model = new ProMGraphModel(newFCG);
+		ProMJGraph jGraph = new ProMJGraph(model, new ViewSpecificAttributeMap(), layoutConnection);*/
+        /*fCG.setGraph(newFCG);
+        ProMJGraph jGraph = FuzzyCausalGraphVisualizer.createJGraph(fCG, new ViewSpecificAttributeMap(),  new ProgressBarImpl(null));
+		return jGraph;
+	}*/
+	
+	
+	/**
+	 * Recompute the fuzzyCausalGraph and the corresponding jgraph
+	 * @return
+	 */
+	private ProMJGraph recomputeJGraph(){
+       
+        int eventsNumber = fCG.getMetrics().getEventsNumber();
+        fCG.emptyGraph();
+        for(int i=0; i<eventsNumber; i++) {
+            String nodeILabel = fCG.getActivitiesMappingStructures().getActivitiesMapping()[i].getId();
+            FuzzyDirectedGraphNode nodeI = null, nodeJ = null;
+            nodeI = fCG.addNode(nodeILabel);
+            for (int j=0; j<eventsNumber; j++) {
+                String nodeJLabel = fCG.getActivitiesMappingStructures().getActivitiesMapping()[j].getId();
+                nodeJ = fCG.addNode(nodeJLabel);
+
+                double abdependency = fCG.getMetrics().getABdependencyMeasuresAll(i, j);
+                double dependencyAccepted = fCG.getMetrics().getDependencyMeasuresAccepted(i, j);
+
+                if (abdependency>=fCG.getSettings().getSureThreshold()){
+                	fCG.addSureEdge(nodeI, nodeJ);
+                    //System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
+                } else if (abdependency>=fCG.getSettings().getQuestionMarkThreshold()){
+                	fCG.addUncertainEdge(nodeI, nodeJ);
+                    //System.out.println("UNCERTAIN"+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
+                } 
+            }
+        }
+        ProMJGraph jGraph = FuzzyCausalGraphVisualizer.createJGraph(fCG, new ViewSpecificAttributeMap(),  new ProgressBarImpl(null));
+		return jGraph;
+	}	
+	
+	
+	
+	
+	private void showConfig(boolean status) {
+
+		configPanelOFF.setVisible(!status);
+		configPanelOFF.setEnabled(!status);
+		configPanelON.setVisible(status);
+		configPanelON.setEnabled(status);
+		
+		if (status) {
+
+			this.scroll.setBounds(this.configBounds);
+			graph.setScale(this.normalScale * this.configRatio);
+		} else {
+
+			this.scroll.setBounds(this.normalBounds);
+			graph.setScale(this.normalScale);
+		}
+		
+		/*if (status){
+			FuzzyCGMinerSettings settings = fCG.getSettings();
+			//settings.setSureThreshold(sureThresholdSlider.getValue()/100.0);
+			//settings.setQuestionMarkThreshold(unsureThresholdSlider.getValue()/100.0);
+			fCG.setSettings(settings);
+			this.graph = recomputeJGraph();
+			redraw();
+		} else {
+			FuzzyCGMinerSettings settings = fCG.getSettings();
+			//settings.setSureThreshold(sureThresholdSlider.getValue()/100.0);
+			//settings.setQuestionMarkThreshold(unsureThresholdSlider.getValue()/100.0);
+			fCG.setSettings(settings);
+			this.graph = recomputeJGraph();
+			redraw();
+		}*/
+
+
 
 	}
 
@@ -820,7 +1060,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 		int scrollPositionX = this.scroll.getHorizontalScrollBar().getValue();
 		int scrollPositionY = this.scroll.getVerticalScrollBar().getValue();
 
-		AnnotatedVisualizationGenerator generator = new AnnotatedVisualizationGenerator();
+		//AnnotatedVisualizationGenerator generator = new AnnotatedVisualizationGenerator();
 		/*HeuristicsNetGraph hng = generator.generate(this.net, this.setup
 				.getSettings());
 
@@ -1231,11 +1471,42 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 		Object source = e.getSource();
 
 		if (source instanceof JSlider) {
-
-			graph.setScale(((JSlider) source).getValue() / 100.0);
-			repaintPIP(graph.getVisibleRect());
-
-			this.normalScale = graph.getScale() / this.zoomRatio;
+			JSlider slider = ((JSlider) source);
+			if (slider.getName()!=null && slider.getName().equalsIgnoreCase("SureSlider")){
+				FuzzyCGMinerSettings settings = fCG.getSettings();
+				settings.setSureThreshold(((JSlider) source).getValue() / 100.0);
+				fCG.setSettings(settings);
+				this.graph = recomputeJGraph();
+				this.normalScale = graph.getScale() / this.zoomRatio;
+				//this.initGraph();
+				redraw();
+				showConfig(false);
+				showConfig(true);				
+				//graph.clearOffscreen();
+				//graph.setScale(this.normalScale);
+				//graph.refresh();
+				repaintPIP(graph.getVisibleRect());
+				
+			}
+			else if (slider.getName()!=null && slider.getName().equalsIgnoreCase("UnsureSlider")){
+				FuzzyCGMinerSettings settings = fCG.getSettings();
+				settings.setQuestionMarkThreshold(((JSlider) source).getValue() / 100.0);
+				fCG.setSettings(settings);
+				this.graph = recomputeJGraph();
+				this.normalScale = graph.getScale() / this.zoomRatio;
+				//this.initGraph();
+				redraw();
+				//graph.refresh();
+				showConfig(false);
+				showConfig(true);
+				//graph.clearOffscreen();
+				//graph.setScale(this.normalScale);
+				repaintPIP(graph.getVisibleRect());
+			}
+			else {
+				graph.setScale(((JSlider) source).getValue() / 100.0);
+				repaintPIP(graph.getVisibleRect());
+			}
 		}
 	}
 
@@ -1378,6 +1649,242 @@ class ZoomPanel extends JPanel {
 	}
 }
 
+class ConfigurationPanel extends JPanel {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8415559591750873767L;
+	private final JSlider sureThresholdSlider, unsureThresholdSlider;
+	private JLabel sureSliderMinValue, sureSliderMaxValue, sureSliderFitValue, sureSliderValue, sureSliderLabelValue;
+	private JLabel unsureSliderMinValue, unsureSliderMaxValue, unsureSliderFitValue, unsureSliderValue, unsureSliderLabelValue;
+
+
+	private int sureCurrValue;
+	private int unsureCurrValue;
+
+	public ConfigurationPanel(SlickerFactory factory, SlickerDecorator decorator,
+			int sureCurrValue, int unsureCurrValue) {
+
+		super(null);
+
+		int maximumValue = 100;
+		
+		this.sureCurrValue = sureCurrValue;
+		this.unsureCurrValue = unsureCurrValue;
+
+		this.sureThresholdSlider = factory.createSlider(1);
+		this.unsureThresholdSlider = factory.createSlider(1);
+		
+		sureThresholdSlider.setName("SureSlider");
+		unsureThresholdSlider.setName("UnsureSlider");
+		
+		this.sureThresholdSlider.setMinimum(0);
+		this.sureThresholdSlider.setMaximum(maximumValue);
+		this.sureThresholdSlider.setValue(sureCurrValue);
+
+		this.unsureThresholdSlider.setMinimum(0);
+		this.unsureThresholdSlider.setMaximum(maximumValue);
+		this.unsureThresholdSlider.setValue(unsureCurrValue);
+		
+		this.sureThresholdSlider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				updateSureSlider();
+			}
+		});
+		
+		this.unsureThresholdSlider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				updateUnsureSlider();
+			}
+		});
+
+		this.sureSliderMinValue = factory.createLabel("0%");
+		this.sureSliderMaxValue = factory.createLabel(maximumValue + "%");
+		this.sureSliderFitValue = factory.createLabel("Def >");
+		this.sureSliderValue = factory.createLabel(sureCurrValue + "%");
+		this.sureSliderLabelValue = factory.createLabel("Sure");
+
+		this.sureSliderMinValue.setHorizontalAlignment(SwingConstants.CENTER);
+		this.sureSliderMaxValue.setHorizontalAlignment(SwingConstants.CENTER);
+		this.sureSliderFitValue.setHorizontalAlignment(SwingConstants.RIGHT);
+		this.sureSliderValue.setHorizontalAlignment(SwingConstants.LEFT);
+		this.sureSliderLabelValue.setHorizontalAlignment(SwingConstants.CENTER);
+
+
+		this.sureSliderMinValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+		this.sureSliderMaxValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+		this.sureSliderFitValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+		this.sureSliderValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+		this.sureSliderLabelValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+
+		this.sureSliderMinValue.setForeground(Color.GRAY);
+		this.sureSliderMaxValue.setForeground(Color.GRAY);
+		this.sureSliderFitValue.setForeground(Color.GRAY);
+		this.sureSliderValue.setForeground(Color.DARK_GRAY);
+		this.sureSliderLabelValue.setForeground(Color.GRAY);
+
+		this.add(this.sureThresholdSlider);
+		this.add(this.sureSliderMinValue);
+		this.add(this.sureSliderMaxValue);
+		this.add(this.sureSliderFitValue);
+		this.add(this.sureSliderValue);
+		this.add(this.sureSliderLabelValue);
+		
+		this.unsureSliderMinValue = factory.createLabel("0%");
+		this.unsureSliderMaxValue = factory.createLabel(maximumValue + "%");
+		this.unsureSliderFitValue = factory.createLabel("Def >");
+		this.unsureSliderValue = factory.createLabel(unsureCurrValue + "%");
+		this.unsureSliderLabelValue = factory.createLabel("Unsure");
+
+		
+
+		this.unsureSliderMinValue.setHorizontalAlignment(SwingConstants.CENTER);
+		this.unsureSliderMaxValue.setHorizontalAlignment(SwingConstants.CENTER);
+		this.unsureSliderFitValue.setHorizontalAlignment(SwingConstants.RIGHT);
+		this.unsureSliderValue.setHorizontalAlignment(SwingConstants.LEFT);
+		this.unsureSliderLabelValue.setHorizontalAlignment(SwingConstants.CENTER);
+
+
+		this.unsureSliderMinValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+		this.unsureSliderMaxValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+		this.unsureSliderFitValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+		this.unsureSliderValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+		this.unsureSliderLabelValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+
+		this.unsureSliderMinValue.setForeground(Color.GRAY);
+		this.unsureSliderMaxValue.setForeground(Color.GRAY);
+		this.unsureSliderFitValue.setForeground(Color.GRAY);
+		this.unsureSliderValue.setForeground(Color.DARK_GRAY);
+		this.unsureSliderLabelValue.setForeground(Color.GRAY);
+
+		this.add(this.unsureThresholdSlider);
+		this.add(this.unsureSliderMinValue);
+		this.add(this.unsureSliderMaxValue);
+		this.add(this.unsureSliderFitValue);
+		this.add(this.unsureSliderValue);
+		this.add(this.unsureSliderLabelValue);
+
+		this.setBackground(Color.LIGHT_GRAY);
+	}
+
+	public void setHeight(int height) {
+
+		//this.setSize(115, height);
+		this.setSize(190, height);
+
+		int sliderHeight = height - 60;
+
+		// this.title.setBounds(0, (int) (height * 0.5) - 25, 30, 50);
+
+		this.sureThresholdSlider.setBounds(45, 30, 30, sliderHeight);
+		this.sureSliderMaxValue.setBounds(10, 10, 100, 20);
+		this.sureSliderMinValue.setBounds(10, height - 35, 100, 20);
+		this.sureSliderLabelValue.setBounds(10, height - 20, 100, 20);
+
+		int value = this.sureThresholdSlider.getValue();
+		int span = this.sureThresholdSlider.getMaximum() - this.sureThresholdSlider.getMinimum();
+		int position = 33 + (int) ((float) (this.sureThresholdSlider.getMaximum() - this.sureCurrValue)
+				/ (float) span * (sliderHeight - 28));
+		this.sureSliderFitValue.setBounds(-50, position, 100, 20);
+
+		if (value == this.sureCurrValue)
+			this.sureSliderValue.setBounds(80, position, 60, 20);
+		else {
+
+			position = 33 + (int) ((float) (this.sureThresholdSlider.getMaximum() - value)
+					/ (float) span * (sliderHeight - 28));
+			this.sureSliderValue.setBounds(80, position, 60, 20);
+		}
+		
+		
+		//UNSURE THRESHOLD SLIDER
+		
+		this.unsureThresholdSlider.setBounds(115, 30, 30, sliderHeight);
+		this.unsureSliderMaxValue.setBounds(80, 10, 100, 20);
+		this.unsureSliderMinValue.setBounds(80, height - 35, 100, 20);
+		this.unsureSliderLabelValue.setBounds(80, height - 20, 100, 20);
+
+		value = this.unsureThresholdSlider.getValue();
+		span = this.unsureThresholdSlider.getMaximum() - this.unsureThresholdSlider.getMinimum();
+		position = 33 + (int) ((float) (this.unsureThresholdSlider.getMaximum() - this.unsureCurrValue)
+				/ (float) span * (sliderHeight - 28));
+		this.unsureSliderFitValue.setBounds(60, position, 60, 20);
+
+		if (value == this.unsureCurrValue)
+			this.unsureSliderValue.setBounds(145, position, 60, 20);
+		else {
+
+			position = 33 + (int) ((float) (this.sureThresholdSlider.getMaximum() - value)
+					/ (float) span * (sliderHeight - 28));
+			this.unsureSliderValue.setBounds(145, position, 60, 20);
+		}
+		
+	}
+
+	private void updateSureSlider() {
+
+		int value = this.sureThresholdSlider.getValue();
+
+		int span = this.sureThresholdSlider.getMaximum() - this.sureThresholdSlider.getMinimum();
+		int position = 33 + (int) ((float) (this.sureThresholdSlider.getMaximum() - value)
+				/ (float) span * (this.sureThresholdSlider.getBounds().height - 28));
+
+		this.sureSliderValue.setText(value + "%");
+		this.sureSliderValue.setBounds(85, position, 60, 20);
+		
+	}
+
+	private void updateUnsureSlider() {
+		//UNSURE THRESHOLD SLIDER
+		int value = this.unsureThresholdSlider.getValue();
+
+		int span = this.unsureThresholdSlider.getMaximum() - this.unsureThresholdSlider.getMinimum();
+		int position = 33 + (int) ((float) (this.unsureThresholdSlider.getMaximum() - value)
+				/ (float) span * (this.unsureThresholdSlider.getBounds().height - 28));
+
+		this.unsureSliderValue.setText(value + "%");
+		this.unsureSliderValue.setBounds(155, position, 60, 20);
+	}
+
+	
+	public void setSureCurrValue(int value) {
+
+		this.sureCurrValue = value;
+
+		int span = this.sureThresholdSlider.getMaximum() - this.sureThresholdSlider.getMinimum();
+		int position = 33 + (int) ((float) (this.sureThresholdSlider.getMaximum() - value)
+				/ (float) span * (this.sureThresholdSlider.getBounds().height - 28));
+		this.sureSliderFitValue.setBounds(-60, position, 40, 20);
+	}
+	
+	public void setUnSureCurrValue(int value) {
+
+		this.unsureCurrValue = value;
+
+		int span = this.unsureThresholdSlider.getMaximum() - this.unsureThresholdSlider.getMinimum();
+		int position = 33 + (int) ((float) (this.unsureThresholdSlider.getMaximum() - value)
+				/ (float) span * (this.unsureThresholdSlider.getBounds().height - 28));
+		this.unsureSliderFitValue.setBounds(60, position, 40, 20);
+	}
+
+	public void addSliderChangeListener(ChangeListener listener) {
+		this.sureThresholdSlider.addChangeListener(listener);
+		this.unsureThresholdSlider.addChangeListener(listener);
+	}
+}
+
+
 class PIPPanel extends JPanel implements MouseListener, MouseMotionListener {
 
 	private static final int PIPSIZE = 250;
@@ -1389,7 +1896,7 @@ class PIPPanel extends JPanel implements MouseListener, MouseMotionListener {
 	private Stroke stroke = new BasicStroke(2);
 	private Color color = Color.BLUE;
 	private JScrollPane parentScroll;
-	private final FuzzyCausalGraphVisualization panel;
+	private final FuzzyGraphVisualization panel;
 
 	private ProMJGraph pipGraph;
 
@@ -1401,7 +1908,7 @@ class PIPPanel extends JPanel implements MouseListener, MouseMotionListener {
 		this.setPIPgraph(pipGraph);
 
 		this.parentScroll = parentScroll;
-		this.panel = (FuzzyCausalGraphVisualization) panel;
+		this.panel = panel;
 
 		setPreferredSize(new Dimension(PIPSIZE, PIPSIZE));
 		setMinimumSize(new Dimension(PIPSIZE, PIPSIZE));
@@ -1990,9 +2497,7 @@ class AnnotationsPanel extends JPanel {
 
 class SetupPanel extends JPanel {
 
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 8408305033071764421L;
 	private final AnnotatedVisualizationSettings settings;
 	private boolean hasChanged;

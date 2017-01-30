@@ -1,30 +1,35 @@
 package org.processmining.fuzzyminer.models.fuzzypetrinet;
 
-import org.deckfour.xes.model.XLog;
-import org.processmining.models.graphbased.directed.AbstractDirectedGraphEdge;
-import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
-import org.processmining.fuzzyminer.algorithms.fuzzycg2fuzzypn.Utils;
-
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import org.deckfour.xes.model.XLog;
+import org.processmining.fuzzyminer.algorithms.fuzzycg2fuzzypn.Utils;
+import org.processmining.models.graphbased.directed.AbstractDirectedGraphEdge;
+import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
+
+
 
 /**
  * Created by demas on 19/08/16.
  */
 
-/*
-    The usage of this class is the following:
-    1) Use the constructor to build the cluster;
-    2) add all the edges belonging to the cluster (ignoring the inputNodes and outputNodes);
-    3) once all the edges have been added, call the methods updateInputNodes and updateOutputNodes which updates the input and output nodes and prevents other edges to be added:
-    the cluster is considered stable and hence immutable.
- */
-public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDirectedGraphNode> {
+public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDirectedGraphNode> implements Runnable {
     private Set<E> edges;
     private Set<N> inputNodes, outputNodes;
     private Set<PlaceEvaluation<N>> places;
+    
+    // new variables for the thread implementation, to be initialized later.
+    private XLog log;
+    private Map<String, Integer> activityFrequencyMap;
+    private double placeEvaluationThreshold;
+    private double prePlaceEvaluationThreshold;
+    
+    private Set<PlaceEvaluation<N>> placesAboveThreshold;
 
 
     public Cluster(Set<E> edges) {
@@ -41,8 +46,18 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
             outputNodes.add((N) edge.getSource());
         }
     }
+    
+    
 
-    public Set<E> getEdges() {
+    public void setPrePlaceEvaluationThreshold(double prePlaceEvaluationThreshold) {
+		this.prePlaceEvaluationThreshold = prePlaceEvaluationThreshold;
+	}
+
+	public void setPlaceEvaluationThreshold(double placeEvaluationThreshold) {
+		this.placeEvaluationThreshold = placeEvaluationThreshold;
+	}
+
+	public Set<E> getEdges() {
         return new HashSet<>(edges);
     }
 
@@ -55,46 +70,79 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
     public Set<N> getOutputNodes() {
         return new HashSet<>(outputNodes);
     }
+    
+
+	public void setLog(XLog log) {
+		this.log = log;
+	}
+
+	public void setActivityFrequencyMap(Map<String, Integer> activityFrequencyMap) {
+		this.activityFrequencyMap = activityFrequencyMap;
+	}
 
 
-    public Set<PlaceEvaluation<N>> evaluateBestPlaces(XLog log, ExecutorService exec) {
+	public Set<PlaceEvaluation<N>> getPlacesAboveThreshold() {
+		return placesAboveThreshold;
+	}
+
+	private void setPlacesAboveThreshold(Set<PlaceEvaluation<N>> placeAboveThreshold) {
+		this.placesAboveThreshold = placeAboveThreshold;
+	}
+
+	public void run() {
+    	evaluatePlaces();
+    	setPlacesAboveThreshold(computePlacesAboveThreshold(placeEvaluationThreshold));
+    }
+
+
+    public void evaluatePlaces() {
         // First generate the possible places
+    	System.out.println("Start building powerSets");
+    	long startTime = System.currentTimeMillis();
         Set<Set<N>> inputNodesPowerSet = Utils.powerSet(inputNodes);
         Set<Set<N>> outputNodesPowerSet = Utils.powerSet(outputNodes);
-
-        Set<PlaceEvaluation<N>> result = new HashSet<>();
+        long stopTime = System.currentTimeMillis();
+        double elapsedTime = (stopTime-startTime)/60000.0;
+        System.out.println("End building powerSets in " + elapsedTime + " mins.");
+        
+        ExecutorService exec = Executors.newCachedThreadPool();
 
         for (Set<N> outputNodeSet : outputNodesPowerSet) {
             for (Set<N> inputNodeSet : inputNodesPowerSet) {
                 if (outputNodeSet.size() != 0 && inputNodeSet.size() != 0) {
-                    PlaceEvaluation<N> placeEval = new PlaceEvaluation(outputNodeSet, inputNodeSet, log);
+                    PlaceEvaluation<N> placeEval = new PlaceEvaluation(outputNodeSet, inputNodeSet, log, activityFrequencyMap, prePlaceEvaluationThreshold);
                     this.places.add(placeEval);
-                    // Replay the place
-                    //placeEval.replayPlace();
+                    
                     exec.execute(placeEval);
-                    result.add(placeEval);
                 }
             }
         }
-        return result;
+        exec.shutdown();
+        try {
+            exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
+    
 
-
-    public Set<PlaceEvaluation<N>> getPlacesAboveThreshold(double threshold) {
+    public Set<PlaceEvaluation<N>> computePlacesAboveThreshold(double threshold) {
         Set<PlaceEvaluation<N>> result = new HashSet<>();
         for (PlaceEvaluation pe : this.places) {
+            System.out.println("Place evaluation "+pe.toString());
+            System.out.println("score: "+pe.evaluateReplayScore()+" threshold: "+threshold);        	
             if (pe.evaluateReplayScore() >= threshold)
                 result.add(pe);
         }
         return result;
     }
 
-    public Set<PlaceEvaluation<N>> getNonRedundantPlacesAboveThreshold(double threshold) {
+    
+    /*public Set<PlaceEvaluation<N>> getNonRedundantPlacesAboveThreshold(double threshold) {
         Set<PlaceEvaluation<N>> aboveThreshold = this.getPlacesAboveThreshold(threshold);
-        aboveThreshold.removeAll(getRedundantPlaces(aboveThreshold));
+        //aboveThreshold.removeAll(getRedundantPlaces(aboveThreshold));
         return aboveThreshold;
-    }
-
+    }*/
 
 
     @Override
@@ -107,15 +155,18 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
     }
 
 
-    private static <N extends AbstractDirectedGraphNode> Set<PlaceEvaluation<N>> getRedundantPlaces(Set<PlaceEvaluation<N>> placesAboveThreshold) {
-        Set<PlaceEvaluation<N>> toBeDiscarded = new HashSet<>();
+
+/*    private static <N extends AbstractDirectedGraphNode> Set<PlaceEvaluation<N>> getRedundantPlaces(Set<PlaceEvaluation<N>> placesAboveThreshold) {
+        System.out.println("Redundant place computation started!");
+    	Set<PlaceEvaluation<N>> toBeDiscarded = new HashSet<>();
 
         for (PlaceEvaluation<N> p : placesAboveThreshold) {
             if(isRedundant(placesAboveThreshold, p))
                 toBeDiscarded.add(p);
         }
+        System.out.println("Redundant place computation ended!");
         return toBeDiscarded;
-    }
+    }*/
 
 
     /* To be called AFTER evaluateBestPlaces!
@@ -125,7 +176,7 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
        the union of output sets is equal to pe output set
        the intersection of output sets is empty
      */
-    private static <N extends AbstractDirectedGraphNode> boolean isRedundant(Set<PlaceEvaluation<N>> aboveThreshold, PlaceEvaluation<N> pe) {
+    /*private static <N extends AbstractDirectedGraphNode> boolean isRedundant(Set<PlaceEvaluation<N>> aboveThreshold, PlaceEvaluation<N> pe) {
         // First of all, remove pe from above threshold.
         Set<PlaceEvaluation<N>> otherPlaces = new HashSet<>();
         otherPlaces.addAll(aboveThreshold);
@@ -144,6 +195,7 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
             // Each next() is an array of indices representing the current choice of elements.
             while (it.hasNext()) {
                 int[] indexesArray = it.next();
+                //System.out.println("OtherPlaces number: " + otherPlacesArray.length + ". Current combination: " + Arrays.toString(indexesArray));
                 Set<PlaceEvaluation<N>> currentCombination = new HashSet<>();
 
                 // Build the set of PlacesEvalutions corresponding to the current choice of elements
@@ -181,10 +233,21 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
             unionOutputPlaces.addAll(p.getPlaceOutputNodes());
         }
 
-        if (intersectionInputPlaces.size() != 0 && intersectionOutputPlaces.size() != 0)
+        if (intersectionInputPlaces.size() != 0 || intersectionOutputPlaces.size() != 0)
             return false;
+        
+        if (unionInputPlaces.equals(placeEval.getPlaceInputNodes()) && unionOutputPlaces.equals(placeEval.getPlaceOutputNodes())){
+        	System.out.println("Removed "+placeEval+" because of:");
+        	for (PlaceEvaluation<N> placeEvaluation : currentCombinationArray) {
+				System.out.println(placeEvaluation);
+			}
+        }
 
         return (unionInputPlaces.equals(placeEval.getPlaceInputNodes()) && unionOutputPlaces.equals(placeEval.getPlaceOutputNodes()));
-    }
+    }*/
 
+
+
+
+    
 }

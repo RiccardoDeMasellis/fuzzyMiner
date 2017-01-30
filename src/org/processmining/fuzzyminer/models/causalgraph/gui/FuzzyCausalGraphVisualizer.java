@@ -7,11 +7,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 
-import org.processmining.fuzzyminer.models.causalgraph.FuzzyCausalGraph;
 import org.jgraph.graph.AttributeMap.SerializablePoint2D;
 import org.jgraph.graph.GraphConstants;
 import org.processmining.contexts.uitopia.annotations.Visualizer;
@@ -20,6 +20,7 @@ import org.processmining.framework.plugin.Progress;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.framework.plugin.impl.ProgressBarImpl;
+import org.processmining.fuzzyminer.models.causalgraph.FuzzyCausalGraph;
 import org.processmining.models.connections.GraphLayoutConnection;
 import org.processmining.models.graphbased.AttributeMap;
 import org.processmining.models.graphbased.ViewSpecificAttributeMap;
@@ -39,8 +40,7 @@ import com.jgraph.layout.hierarchical.JGraphHierarchicalLayout;
 public class FuzzyCausalGraphVisualizer {
 	
 	@PluginVariant(requiredParameterLabels = { 0 })
-	public static JComponent visualize(PluginContext context, FuzzyCausalGraph fCG) {
-
+	public static JComponent visualize(PluginContext context, final FuzzyCausalGraph fCG) {
 		return FuzzyCausalGraphVisualizer.getVisualizationPanel(fCG, new ProgressBarImpl(context));
 	}
 
@@ -48,17 +48,17 @@ public class FuzzyCausalGraphVisualizer {
 	};
 
 	public static FuzzyCausalGraphVisualization getVisualizationPanel(
-			DirectedGraph<?, ?> graph, 
+			DirectedGraph<?, ?> graph,
 			Progress progress) {
 		return getResultsPanel(graph, new ViewSpecificAttributeMap(), progress);
 	}
 
-	public static FuzzyCausalGraphVisualization getResultsPanel(DirectedGraph<?, ?> graph,
+	public static FuzzyCausalGraphVisualization getResultsPanel(DirectedGraph<?, ?> graph,  
 			ViewSpecificAttributeMap map, Progress progress) {
 		
 		ProMJGraph jgraph = createJGraph(graph, map, progress);
 
-		return new FuzzyCausalGraphVisualization(jgraph);
+		return new FuzzyCausalGraphVisualization(jgraph, (FuzzyCausalGraph) graph);
 	}
 	
 	public static ProMJGraph createJGraph(DirectedGraph<?, ?> fuzzyCausalNet,
@@ -68,6 +68,8 @@ public class FuzzyCausalGraphVisualizer {
 		
 		ProMGraphModel model = new ProMGraphModel(fuzzyCausalNet);
 		ProMJGraph jGraph = new ProMJGraph(model, map, layoutConnection);
+		
+		Set nodes = model.getGraph().getNodes();
 
 		/*Map attributes = jGraph.getGraphLayoutCache().getRoots()[12].getAllAttributes();
 		attributes.put("labelAlongEdge", new Boolean(true));
@@ -96,7 +98,7 @@ public class FuzzyCausalGraphVisualizer {
 		layout.setParallelEdgeSpacing(15);
 		layout.setFixRoots(false);
 
-		layout.setOrientation(map.get(fuzzyCausalNet, AttributeMap.PREF_ORIENTATION, SwingConstants.SOUTH));
+		layout.setOrientation(map.get(fuzzyCausalNet, AttributeMap.PREF_ORIENTATION, SwingConstants.NORTH));
 
 		if(!layoutConnection.isLayedOut()){
 		

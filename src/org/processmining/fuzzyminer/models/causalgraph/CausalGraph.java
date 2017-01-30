@@ -1,10 +1,14 @@
 package org.processmining.fuzzyminer.models.causalgraph;
 
-import org.processmining.models.graphbased.directed.*;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.processmining.models.graphbased.directed.AbstractDirectedGraph;
+import org.processmining.models.graphbased.directed.DirectedGraph;
+import org.processmining.models.graphbased.directed.DirectedGraphEdge;
+import org.processmining.models.graphbased.directed.DirectedGraphElement;
+import org.processmining.models.graphbased.directed.DirectedGraphNode;
 
 /**
  * Created by demas on 27/07/16.
@@ -20,7 +24,10 @@ public abstract class CausalGraph<N extends DirectedGraphNode, E extends Directe
 
     public CausalGraph(Set<N> nodes) {
         this();
-        this.nodes = nodes;
+        synchronized (this.nodes) {
+        	 this.nodes = nodes;
+		}
+       
         for (N node : nodes)
             this.graphElementAdded(node);
     }
@@ -56,7 +63,7 @@ public abstract class CausalGraph<N extends DirectedGraphNode, E extends Directe
 
     @Override
     public Set<E> getEdges() {
-        HashSet<E> result = new HashSet<>();
+        Set<E> result = new HashSet<>();
         for (DirectedGraphNode node : this.nodes) {
             result.addAll(this.getInEdges(node));
             result.addAll(this.getOutEdges(node));

@@ -1,5 +1,11 @@
 package org.processmining.fuzzyminer.models.fuzzypetrinet;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.processmining.fuzzyminer.models.causalgraph.FuzzyDirectedGraphEdge;
 import org.processmining.fuzzyminer.models.causalgraph.FuzzyDirectedSureGraphEdge;
 import org.processmining.models.graphbased.directed.AbstractDirectedGraphNode;
@@ -9,8 +15,6 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Arc;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetImpl;
-
-import java.util.*;
 
 /**
  * Created by demas on 27/07/16.
@@ -46,7 +50,7 @@ public class FuzzyPetrinet extends PetrinetImpl {
 
     /**
      * The semantics o the method is the following. It adds a SureTransitionsArc between transition source and target if there is no
-     * place already connecting source and target. This beacuse when building the fuzzyNet, we first add all the places and respective
+     * place already connecting source and target. This because when building the fuzzyNet, we first add all the places and respective
      * transitions, and then add the (sure and uncertain) arcs connecting two transitions. Things are complicated by the presence of
      * the weight, which is not taken into consideration in this first version (all arcs have weight=1). However, to be on the safe side,
      * the method checks if there already is a sureArc connecting the same source and transition but with a different weight, and if
@@ -87,7 +91,7 @@ public class FuzzyPetrinet extends PetrinetImpl {
 
     /**
      * The semantics o the method is the following. It adds a UncertainTransitionsArc between transition source and target if there is no
-     * place already connecting source and target. This beacuse when building the fuzzyNet, we first add all the places and respective
+     * place already connecting source and target. This because when building the fuzzyNet, we first add all the places and respective
      * transitions, and then add the (sure and uncertain) arcs connecting two transitions. Things are complicated by the presence of
      * the weight, which is not taken into consideration in this first version (all arcs have weight=1). However, to be on the safe side,
      * the method checks if there already is a sureArc connecting the same source and transition but with a different weight, and if
@@ -198,7 +202,36 @@ public class FuzzyPetrinet extends PetrinetImpl {
         }
     }
 
+    /**
+     *Returns a place named label
+     * @param label
+     * @return
+     */
+    public synchronized Place getPlace(String label){
+    	Place place = null;
+    	Collection<Place> places = super.getPlaces();
+    	for (Place itPlace : places) {
+			if (itPlace.getLabel().equals(label))
+				place = itPlace; 
+		}
+    	return place;
+    }
 
+    /**
+     * Returns a transition named label
+     * @param label
+     * @return
+     */
+    public synchronized Transition getTransition(String label){
+    	Transition transition = null;
+    	Collection<Transition> transitions = super.getTransitions();
+    	for (Transition itTransition : transitions) {
+			if (itTransition.getLabel().equals(label))
+				transition = itTransition; 
+		}
+    	return transition;
+    }
+    
     /*
     In the following the exact rewriting of methods of AbstractResetInhibitorNet
     JUST TO HAVE RIGHT IN THIS CLASS THE METHOD USEFUL FOR US (as in the superclass there are a plethora of methods)

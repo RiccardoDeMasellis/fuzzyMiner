@@ -14,13 +14,16 @@ import javax.swing.SwingConstants;
 import org.jgraph.graph.AttributeMap.SerializablePoint2D;
 import org.jgraph.graph.GraphConstants;
 import org.processmining.contexts.uitopia.annotations.Visualizer;
+import org.processmining.framework.connections.ConnectionCannotBeObtained;
+import org.processmining.framework.connections.ConnectionManager;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.Progress;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
+import org.processmining.framework.plugin.events.Logger.MessageLevel;
 import org.processmining.framework.plugin.impl.ProgressBarImpl;
-import org.processmining.models.connections.GraphLayoutConnection;
 import org.processmining.fuzzyminer.models.fuzzypetrinet.FuzzyPetrinet;
+import org.processmining.models.connections.GraphLayoutConnection;
 import org.processmining.models.graphbased.AttributeMap;
 import org.processmining.models.graphbased.ViewSpecificAttributeMap;
 import org.processmining.models.graphbased.directed.DirectedGraph;
@@ -39,22 +42,35 @@ import com.jgraph.layout.hierarchical.JGraphHierarchicalLayout;
 public class FuzzyPetrinetVisualizer {
 	
 	@PluginVariant(requiredParameterLabels = { 0 })
-	public static JComponent visualize(PluginContext context, FuzzyPetrinet fPN) {
+    public static JComponent visualize(PluginContext context, FuzzyPetrinet fPN) throws Exception {
+	       
+        JComponent result = FuzzyPetrinetVisualizer.getVisualizationPanel(fPN, new ProgressBarImpl(context));
+        context.addConnection(new GraphLayoutConnection(fPN.getGraph()));
+        final ConnectionManager cm = context.getConnectionManager();
+        try {
+            if (cm.getConnections(GraphLayoutConnection.class, context) != null)
+                return result;
+            return null;
+        } catch (final ConnectionCannotBeObtained e) {
+            // No connections available
+            context.log("Connection does not exist", MessageLevel.DEBUG);
+            return null;
+        }
 
-		return FuzzyPetrinetVisualizer.getVisualizationPanel(fPN, new ProgressBarImpl(context));
-	}
+
+    }
 
 	protected FuzzyPetrinetVisualizer() {
 	};
 
 	public static FuzzyPetrinetVisualization getVisualizationPanel(
 			DirectedGraph<?, ?> graph, 
-			Progress progress) {
+			Progress progress) throws Exception {
 		return getResultsPanel(graph, new ViewSpecificAttributeMap(), progress);
 	}
 
 	public static FuzzyPetrinetVisualization getResultsPanel(DirectedGraph<?, ?> graph,
-			ViewSpecificAttributeMap map, Progress progress) {
+			ViewSpecificAttributeMap map, Progress progress) throws Exception {
 		
 		ProMJGraph jgraph = createJGraph(graph, map, progress);
 
@@ -62,7 +78,7 @@ public class FuzzyPetrinetVisualizer {
 	}
 	
 	public static ProMJGraph createJGraph(DirectedGraph<?, ?> fuzzyPetrinet,
-			ViewSpecificAttributeMap map, Progress progress){
+			ViewSpecificAttributeMap map, Progress progress) throws Exception{
 		
 		GraphLayoutConnection layoutConnection = new GraphLayoutConnection(fuzzyPetrinet);
 		
@@ -91,7 +107,15 @@ public class FuzzyPetrinetVisualizer {
 			facade.setDirected(true);
 			facade.resetControlPoints();
 			if (layout instanceof JGraphHierarchicalLayout) {
+				try{
 				facade.run((JGraphHierarchicalLayout) layout, true);
+				}catch(Exception ex){
+					if (ex instanceof IllegalArgumentException){
+						Exception nEx = new Exception("Impossible to visualize the Petri Net: too many places");
+						nEx.setStackTrace(ex.getStackTrace());
+						throw nEx;
+					}
+				}
 			} else {
 				facade.run(layout, true);
 			}
@@ -255,7 +279,7 @@ public class FuzzyPetrinetVisualizer {
 			DirectedGraph<?, ?> graph, 
 			HeuristicsNet net, 
 			AnnotatedVisualizationSettings settings, 
-			Progress progress) {
+			Progress progress) throws Exception {
 		
 		return getResultsPanel(graph, new ViewSpecificAttributeMap(), progress);
 	}

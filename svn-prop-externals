@@ -1,0 +1,4 @@
+stdlib https://svn.win.tue.nl/repos/prom/Releases/Framework/lib
+    src-test/test https://svn.win.tue.nl/repos/prom/Framework/trunk/src-Plugins/test
+    .settings https://svn.win.tue.nl/repos/prom/Settings
+    latestrelease https://svn.win.tue.nl/repos/prom/Releases/Packages/FuzzyMiner

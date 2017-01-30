@@ -3,55 +3,79 @@ package org.processmining.fuzzyminer.plugins;
 import org.deckfour.uitopia.api.event.TaskListener.InteractionResult;
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.classification.XEventNameClassifier;
-import org.deckfour.xes.info.XLogInfo;
-import org.deckfour.xes.info.XLogInfoFactory;
-import org.deckfour.xes.model.XLog;
-import org.processmining.fuzzyminer.algorithms.fuzzycg2fuzzypn.FuzzyCGToFuzzyPN;
-import org.processmining.fuzzyminer.algorithms.preprocessing.LogFilterer;
-import org.processmining.fuzzyminer.algorithms.preprocessing.LogPreprocessor;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
-import org.processmining.fuzzyminer.dialogs.FuzzyPNDialog;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
+import org.processmining.fuzzyminer.algorithms.fuzzycg2fuzzypn.FuzzyCGToFuzzyPN;
+import org.processmining.fuzzyminer.dialogs.FuzzyPNDialog;
 import org.processmining.fuzzyminer.models.causalgraph.FuzzyCausalGraph;
 import org.processmining.fuzzyminer.models.fuzzypetrinet.FuzzyPetrinet;
+import org.processmining.models.connections.petrinets.behavioral.FinalMarkingConnection;
+import org.processmining.models.connections.petrinets.behavioral.InitialMarkingConnection;
+import org.processmining.models.graphbased.directed.petrinet.elements.Place;
+import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
+import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.settings.HeuristicsMinerSettings;
 
 /**
  * Created by demas on 25/07/16.
  */
 
-@Plugin(name = "Fuzzy Petri Net Miner", parameterLabels = {"log", "Fuzzy Petri Net Configuration" }, 
-	    returnLabels = { "Fuzzy Petri Net", "Fuzzy Causal Graph"}, returnTypes = {FuzzyPetrinet.class, FuzzyCausalGraph.class})
+@Plugin(name = "Fuzzy Petri Net Miner", parameterLabels = {"Fuzzy Causal Graph", "Fuzzy Petri Net Configuration" }, 
+	    returnLabels = { "Fuzzy Petri Net"}, returnTypes = {FuzzyPetrinet.class})
 public class FuzzyPNMinerPlugin {
 
-	private Object[] privateFPNMinerPlugin(PluginContext context, XLog log, FuzzyMinerSettings settings) {
-		Object[] output = new Object[2];
-		
-		XLog preprocessedLog = LogPreprocessor.preprocessLog(log);
-		XLogInfo logInfo = XLogInfoFactory.createLogInfo(preprocessedLog, settings.getHmSettings().getClassifier());
-		System.out.println("**** PREPROCESSING OVER ******");
-		XLog filteredLog = LogFilterer.filterLogByActivityFrequency(preprocessedLog, logInfo, settings);
-		System.out.println("**** FILTERING OVER ******");
-		FuzzyCGMiner miner = new FuzzyCGMiner(filteredLog, filteredLog.getInfo(settings.getHmSettings().getClassifier()), settings);
-		FuzzyCausalGraph fCG = miner.mineFCG(settings);
-        FuzzyPetrinet fPN = FuzzyCGToFuzzyPN.fuzzyCGToFuzzyPN(fCG, filteredLog, settings);
-        
-		output[0] = fPN;
-		output[1] = fCG;
-		return output;
+	private FuzzyPetrinet privateFPNMinerPlugin(PluginContext context, FuzzyCausalGraph fCG, FuzzyMinerSettings settings) {		
+        FuzzyPetrinet fPN = FuzzyCGToFuzzyPN.fuzzyCGToFuzzyPN(fCG, fCG.getLog(), settings);
+        fPN = addPlacesAndMarkings(context, fPN);
+		return fPN;
 
 	}
 	
+	/**
+	 * Add initial and end place, as well as the initial and final marking
+	 * @param context
+	 * @param fPN
+	 * @return fPN
+	 */
+	private FuzzyPetrinet addPlacesAndMarkings(PluginContext context, FuzzyPetrinet fPN){
+        Place startPlace = fPN.addPlace("start");
+        Marking im = new Marking();
+        im.add(startPlace);
+        Transition startTransition = fPN.getTransition("start");
+        fPN.addArc(startPlace, startTransition);
+        
+        Place endPlace = fPN.addPlace("end");
+        Marking fm = new Marking();
+        fm.add(endPlace);        
+        Transition endTransition = fPN.getTransition("end");
+        fPN.addArc(endTransition, endPlace);
+               
+        context.getProvidedObjectManager().createProvidedObject(
+                "Initial marking for " + fPN.getLabel(),
+                im, Marking.class, context);
+        context.addConnection(new InitialMarkingConnection(fPN, 
+                im));
+
+        context.getProvidedObjectManager().createProvidedObject(
+                    "Final marking for " + fPN.getLabel(),
+                    fm, Marking.class, context);
+        context.addConnection(new FinalMarkingConnection(fPN, fm));
+        
+        
+		return fPN;
+	}
+	
+		
 	/**
 	 * The plug-in variant that runs in any context and requires a configuration.
 	 */ 
 	@UITopiaVariant(affiliation = "FBK", author = "R. De Masellis et al.", email = "r.demasellis|dfmchiara@fbk.eu")
 	@PluginVariant(variantLabel = "FuzzyPNMiner, parameters", requiredParameterLabels = { 0, 1})
-	public Object[] configuredFPNMinerPlugin(PluginContext context, XLog log, FuzzyMinerSettings settings) {
-		return privateFPNMinerPlugin(context, log, settings);
+	public FuzzyPetrinet configuredFPNMinerPlugin(PluginContext context, FuzzyCausalGraph fCG, FuzzyMinerSettings settings) {
+		return privateFPNMinerPlugin(context, fCG, settings);
 	}
 	
 	/**
@@ -59,7 +83,7 @@ public class FuzzyPNMinerPlugin {
 	 */
 	@UITopiaVariant(affiliation = "FBK", author = "R. De Masellis et al.", email = "r.demasellis|dfmchiara@fbk.eu")
 	@PluginVariant(variantLabel = "FuzzyPNMiner, parameters", requiredParameterLabels = { 0 })
-	public Object[] defaultFCGMinerPlugin(PluginContext context, XLog log) {
+	public FuzzyPetrinet defaultFCGMinerPlugin(PluginContext context, FuzzyCausalGraph fCG) {
 		// Get the default configuration.
 		XEventClassifier nameCl = new XEventNameClassifier();
 		HeuristicsMinerSettings hMS = new HeuristicsMinerSettings();
@@ -67,33 +91,30 @@ public class FuzzyPNMinerPlugin {
 			
 		FuzzyMinerSettings settings = new FuzzyMinerSettings();
 		// Do the heavy lifting.
-	    return privateFPNMinerPlugin(context, log, settings);
+	    return privateFPNMinerPlugin(context, fCG, settings);
 	}
 	
 	/**
 	 * The plug-in variant that runs in a UI context and uses a dialog to get the configuration.
 	 */
 	@UITopiaVariant(affiliation = "FBK", author = "R. De Masellis et al.", email = "r.demasellis|dfmchiara@fbk.eu")
-	@PluginVariant(variantLabel = "FuzzyPNMiner, dialog", requiredParameterLabels = { 0 })
-	public Object[] dialogFPNMinerPlugin(UIPluginContext context, XLog log) {
+	@PluginVariant(variantLabel = "FuzzyPNMiner, dialog", requiredParameterLabels = { 0})
+	public FuzzyPetrinet dialogFPNMinerPlugin(UIPluginContext context, FuzzyCausalGraph fCG) {
 		// Get the default configuration.
 	    FuzzyMinerSettings settings = new FuzzyMinerSettings();
-	    
-		XEventClassifier nameCl = new XEventNameClassifier();
-		HeuristicsMinerSettings hMS = new HeuristicsMinerSettings();
-		hMS.setClassifier(nameCl);  
-		settings.setHmSettings(hMS);
-		
+	     
 	    // Get a dialog for this configuration.
-	    FuzzyPNDialog dialog = new FuzzyPNDialog(context, log, settings);
+	    FuzzyPNDialog dialog = new FuzzyPNDialog(context, fCG, settings);
 	    // Show the dialog. User can now change the configuration.
 	    InteractionResult result = context.showWizard("Fuzzy Petri Net Settings", true, true, dialog);
 	    // User has close the dialog.
 	    if (result == InteractionResult.FINISHED) {
 			// Do the heavy lifting.
-	    	return privateFPNMinerPlugin(context, log, settings);
+	    	return privateFPNMinerPlugin(context, fCG, settings);
 	    }
 	    // Dialog got canceled.
 	    return null;
 	}	
+	
+	
 }
