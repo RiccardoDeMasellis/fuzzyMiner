@@ -31,6 +31,7 @@ public class MainFuzzyCausalGraph {
 	//private static String LOGFILENAME = "logs/registrationLog.xes";
     private static double SURETHRESHOLD = 0.8;
     private static double QUESTIONMARKTHRESHOLD = 0.7;
+    private static double PARALLELISMTHRESHOLD = 0.1;
     private static double PLACEEVALTHRESHOLD = 0.8;
     private static double POSITIVEOBSERVATIONDEGREE = 0.3;
     private static double PREPLACEEVALUATIONTHRESHOLD = 0.1;
@@ -56,7 +57,7 @@ public class MainFuzzyCausalGraph {
         /*hMS.setPositiveObservationThreshold(0);
         hMS.setUseAllConnectedHeuristics(true);*/
 
-        FuzzyCGMinerSettings cGSettings = new FuzzyCGMinerSettings(hMS, POSITIVEOBSERVATIONDEGREE,SURETHRESHOLD, QUESTIONMARKTHRESHOLD);
+        FuzzyCGMinerSettings cGSettings = new FuzzyCGMinerSettings(hMS, POSITIVEOBSERVATIONDEGREE,SURETHRESHOLD, QUESTIONMARKTHRESHOLD, PARALLELISMTHRESHOLD);
         XLog filteredLog = LogFilterer.filterLogByActivityFrequency(preprocessedLog, logInfo, cGSettings);
         
         

@@ -1,8 +1,6 @@
 package org.processmining.fuzzyminer.plugins;
 
 import org.deckfour.uitopia.api.event.TaskListener.InteractionResult;
-import org.deckfour.xes.classification.XEventClassifier;
-import org.deckfour.xes.classification.XEventNameClassifier;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.PluginContext;
@@ -17,7 +15,6 @@ import org.processmining.models.connections.petrinets.behavioral.InitialMarkingC
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.semantics.petrinet.Marking;
-import org.processmining.plugins.heuristicsnet.miner.heuristics.miner.settings.HeuristicsMinerSettings;
 
 /**
  * Created by demas on 25/07/16.
@@ -83,11 +80,8 @@ public class FuzzyPNMinerPlugin {
 	 */
 	@UITopiaVariant(affiliation = "FBK", author = "R. De Masellis et al.", email = "r.demasellis|dfmchiara@fbk.eu")
 	@PluginVariant(variantLabel = "FuzzyPNMiner, parameters", requiredParameterLabels = { 0 })
-	public FuzzyPetrinet defaultFCGMinerPlugin(PluginContext context, FuzzyCausalGraph fCG) {
+	public FuzzyPetrinet defaultFPNMinerPlugin(PluginContext context, FuzzyCausalGraph fCG) {
 		// Get the default configuration.
-		XEventClassifier nameCl = new XEventNameClassifier();
-		HeuristicsMinerSettings hMS = new HeuristicsMinerSettings();
-		hMS.setClassifier(nameCl);
 			
 		FuzzyMinerSettings settings = new FuzzyMinerSettings();
 		// Do the heavy lifting.

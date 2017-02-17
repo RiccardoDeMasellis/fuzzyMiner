@@ -17,7 +17,7 @@ public class FuzzyCGMinerSettings {
 
 	// Settings of the original HeuristicsMiner
     private HeuristicsMinerSettings hmSettings;
-   
+    
     private double positiveObservationDegreeThreshold;
     private boolean useAllConnectedHeuristics;
    
@@ -25,29 +25,40 @@ public class FuzzyCGMinerSettings {
     private double sureThreshold;
 
     /*
-        Threshold between 0 and sureThreshold above which the causality is considered uncertain.
+        Threshold between 0 and 1 above which the causality is considered uncertain.
         Notice that questionMarkThreshold must be obviously < Threshold.
     */
     private double questionMarkThreshold;
+    
+    
+    /*
+     * Threshold between 0 and 0.5. The closer to 0 is the value, the stricter are the  conditions for parallelism, i.e., 
+     * the more perfect should be the balance between the different proportions.  The closer is the value to 0.5, the more
+     * the branches are considered in parallel despite the difference in the proportion. 
+     */
+    private double parallelismThreshold;
     
     
     
     private static double POSITIVEOBSERVATIONDEGREE = 0.3;
     private static double SURETHRESHOLD = 0.6;
     private static double QUESTIONMARKTHRESHOLD = 0.5;
+    private static double PARALLELLISMTHRESHOLD = 0.3;
     
     private Map<String, Integer> activityFrequencyMap;
 
-    public FuzzyCGMinerSettings(HeuristicsMinerSettings hms, double positiveObservationDegreeThreshold, double sureThreshold, double questionMarkThreshold) {
+    public FuzzyCGMinerSettings(HeuristicsMinerSettings hms, double positiveObservationDegreeThreshold, 
+    		double sureThreshold, double questionMarkThreshold, double parallelismThreshold) {
         this.hmSettings = hms;
         this.positiveObservationDegreeThreshold = positiveObservationDegreeThreshold;
         this.sureThreshold = sureThreshold;
         this.questionMarkThreshold = questionMarkThreshold;
+        this.parallelismThreshold = parallelismThreshold;
         this.activityFrequencyMap = new HashMap<>();
     }
     
     public FuzzyCGMinerSettings(){
-    	this(new HeuristicsMinerSettings(), POSITIVEOBSERVATIONDEGREE, SURETHRESHOLD, QUESTIONMARKTHRESHOLD);
+    	this(new HeuristicsMinerSettings(), POSITIVEOBSERVATIONDEGREE, SURETHRESHOLD, QUESTIONMARKTHRESHOLD, PARALLELLISMTHRESHOLD);
     }
        
     public Map<String, Integer> getActivityFrequencyMap() {
@@ -101,6 +112,14 @@ public class FuzzyCGMinerSettings {
 	public void setQuestionMarkThreshold(double questionMarkThreshold) {
 		this.questionMarkThreshold = questionMarkThreshold;
 	}
+	
+    public void setParallelismThreshold(double parallelismThreshold) {
+        this.parallelismThreshold = parallelismThreshold;
+    }
+	
+    public double getParallelismThreshold() {
+        return parallelismThreshold;
+    }
 
 	@Override
     public boolean equals(Object o) {
@@ -111,6 +130,7 @@ public class FuzzyCGMinerSettings {
         if (Double.compare(that.getPositiveObservationDegreeThreshold(), getPositiveObservationDegreeThreshold()) != 0) return false;
         if (Double.compare(that.getSureThreshold(), getSureThreshold()) != 0) return false;
         if (Double.compare(that.getQuestionMarkThreshold(), getQuestionMarkThreshold()) != 0) return false;
+        if (Double.compare(that.getParallelismThreshold(), getParallelismThreshold()) != 0) return false;
         return getHmSettings().equals(that.getHmSettings());
 
         
@@ -126,7 +146,9 @@ public class FuzzyCGMinerSettings {
         temp = Double.doubleToLongBits(getSureThreshold());
         result = 31 * result + (int) (temp ^ (temp >>> 32));    
         temp = Double.doubleToLongBits(getQuestionMarkThreshold());
-        result = 31 * result + (int) (temp ^ (temp >>> 32));        
+        result = 31 * result + (int) (temp ^ (temp >>> 32));  
+        temp = Double.doubleToLongBits(getParallelismThreshold());
+        result = 31 * result + (int) (temp ^ (temp >>> 32));          
         return result;
     }
 }

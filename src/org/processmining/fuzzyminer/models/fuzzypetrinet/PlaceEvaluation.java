@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.deckfour.xes.extension.std.XConceptExtension;
+import org.deckfour.xes.extension.std.XLifecycleExtension;
+import org.deckfour.xes.extension.std.XLifecycleExtension.StandardModel;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
@@ -19,6 +21,7 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
     private XLog log;
     private Map<String, Integer> activityFrequencyMap;
     double prePlaceEvaluationThreshold;
+    //boolean outputOccurred;
 
     public PlaceEvaluation(Set<N> placeOutputNodes, Set<N> placeInputNodes, XLog log, Map<String, Integer> activityFrequencyMap, double prePlaceEvaluationThreshold) {
         this.placeOutputNodes = placeOutputNodes;
@@ -28,6 +31,7 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
         this.currentTokenNumber = 0;
         this.activityFrequencyMap = activityFrequencyMap;
         this.prePlaceEvaluationThreshold = prePlaceEvaluationThreshold;
+        //this.outputOccurred = false;
     }
     
     /*
@@ -154,8 +158,10 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
     public void replayPlace() {
         // for each trace in the log
     	for (XTrace trace : log) {
+    		//this.outputOccurred = false;
     		this.replayPlaceOnTrace(trace);
             // update Accepted traces
+    		//if (isCurrentTokenNumberZero() || this.outputOccurred==false)
     		if (isCurrentTokenNumberZero())
     			increaseAcceptedTracesNumber();
     		resetCurrentTokenNumber();
@@ -163,12 +169,12 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
     }
 
     public void run() {
-    	if (preEvaluate())
+    	//if (preEvaluate())
     		replayPlace();
     }
     
 
-    public void replayPlaceOnTrace(XTrace trace){
+   /* public void replayPlaceOnTrace(XTrace trace){
 
 		for (XEvent event : trace) {
 			String eventName = XConceptExtension.instance().extractName(event);
@@ -185,10 +191,7 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
 			//if we have at least a token, we decrease the token number and return it
 			// otherwise, we increase the token number
 			if (isInput && isOutput){
-				if (this.currentTokenNumber>0)
-					decreaseTokenNumber();
-				else 
-					increaseTokenNumber();
+				decreaseTokenNumber();
 			} else{
 				//if it is output increase
 				if (isOutput)
@@ -201,6 +204,48 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
 						return;
 				}
 					
+			}
+			
+		}
+    }*/
+    
+    public void replayPlaceOnTrace(XTrace trace){
+
+		for (XEvent event : trace) {
+			String eventName = XConceptExtension.instance().extractName(event);
+			StandardModel eventTransition = XLifecycleExtension.instance().extractStandardTransition(event);
+			if (eventTransition==null || eventTransition.equals(XLifecycleExtension.StandardModel.COMPLETE)){
+			
+				boolean isInput=false, isOutput = false;
+				for (N placeOutputNode : getPlaceOutputNodes()) {
+					if (placeOutputNode.getLabel().equalsIgnoreCase(eventName))
+						isOutput = true;
+				}
+				for (N placeInputNode : getPlaceInputNodes()) {
+					if (placeInputNode.getLabel().equalsIgnoreCase(eventName))
+						isInput=true;
+				}
+				//if it is both input and output: be conservative, i.e., 
+				//if we have at least a token, we decrease the token number and return it
+				// otherwise, we increase the token number
+//				if (isInput && isOutput){
+//					if (this.currentTokenNumber>0)
+//						decreaseTokenNumber();
+//					else 
+//						increaseTokenNumber();
+//				} else{
+				
+					//if it is output increase
+					if (isInput){
+						decreaseTokenNumber();
+				        // CHECK: if negative return;
+						if (isCurrentTokenNumberNegative())
+							return;
+					}
+					if (isOutput)
+						increaseTokenNumber();
+					 // if it is input decrease
+				//}
 			}
 			
 		}
@@ -230,6 +275,7 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
     }
 
     public void increaseTokenNumber() {
+    	//this.outputOccurred = true;
         this.currentTokenNumber++;
     }
 

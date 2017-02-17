@@ -31,13 +31,32 @@ public class FuzzyCGToFuzzyPN {
 		// We consider only sure edges!
 		Set<FuzzyDirectedSureGraphEdge> edges = graph.getSureEdges();
 
+		// We remove self-looping edges and store them in a set!
+		Set<FuzzyDirectedSureGraphEdge> selfLoopingEdges = new HashSet<>();
+		Set<FuzzyDirectedGraphNode> selfLoopingNodes = new HashSet<>();
+		for (FuzzyDirectedSureGraphEdge e : edges) {
+			if (e.getSource().equals(e.getTarget())) {
+				selfLoopingEdges.add(e);
+				selfLoopingNodes.add(e.getSource());
+			}
+		}
+		// Remove the selfLoopingEdges from the set of edges
+		boolean cambiato = edges.removeAll(selfLoopingEdges);
+		System.out.println("**********" + cambiato);
+		System.out.println(selfLoopingEdges);
+
 		// Build the clusters
 		Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> clusters = identifyClusters(edges);
 
 		//Reduce the clusters, so as each cluster does not contain more than k edges
 		System.out.println("*********** Start resizing clusters ***********");
 		long startTime = System.currentTimeMillis();
-		Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> reducedClusters = reduceClusters(clusters, pNSettings.getMaxClusterSize());
+
+		//Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> reducedClusters = reduceClusters(clusters, pNSettings.getMaxClusterSize());
+		Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> reducedClusters = clusters;
+		System.out.println(reducedClusters);
+
+
 		long stopTime = System.currentTimeMillis();
 		double elapsedTime = (stopTime - startTime)/60000.0;
 		System.out.println("*********** End resizing clusters in time: " + elapsedTime + " mins ***********");
@@ -70,34 +89,70 @@ public class FuzzyCGToFuzzyPN {
 		 * and the equals has been defined as having same input and output sets.
 		 */
 		Set<PlaceEvaluation<FuzzyDirectedGraphNode>> allPlaceEvaluations = new HashSet<>();
-		
+
 		for (Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode> c : reducedClusters) {
 			for (PlaceEvaluation<FuzzyDirectedGraphNode> pe : c.getPlacesAboveThreshold()) {
-					allPlaceEvaluations.add(pe);
+				allPlaceEvaluations.add(pe);
 			}
 		}
-		
+
 		/*
 		 * Now in allPlaceEvaluation I have all the places that have to be added. Start the computation for nonRedundancy!
 		 */
 		Set<PlaceEvaluation<FuzzyDirectedGraphNode>> nonRedundantPlaces = computeNonRedundantPlaces(allPlaceEvaluations);
-		
-		
+
+
 		/*
 		 * Now that I eliminated redundant places I can add the others to the net.
 		 */
 		for (PlaceEvaluation<FuzzyDirectedGraphNode> pe : nonRedundantPlaces) {
 			result.addPlaceFromPlaceEvaluation(pe);
-			System.out.println(pe);
-			System.out.println(pe.evaluateReplayScore());
+			//System.out.println(pe);
+			//System.out.println(pe.evaluateReplayScore());
 		}
 
 		/*
         Add **ALL** transitions of the causal graph to the set of transition of the petrinet.
         (Transition already present will not be added.)
 		 */
-		for (FuzzyDirectedGraphNode node : graph.getNodes())
-			result.addTransition(node.getLabel());
+
+		// ALSO:
+
+		/*
+		 * Re-adding cycles originally present in the causal graph.
+		 * For each self-looping transition t, add a silent transiton st. From each output place op in t* add an edge op->st and for each input place ip *t, add an edge st->ip.
+		 */
+		/*for (FuzzyDirectedGraphNode node : graph.getNodes()) {
+			Transition t = result.addTransition(node.getLabel());
+
+			// Add self loop with the strategy described above
+			if(selfLoopingNodes.contains(node)) {
+				Set<PetrinetNode> outputPlaces = result.getOutputNodes(t);
+				Set<PetrinetNode> inputPlaces = result.getInputNodes(t);
+				Transition silentTransition = result.addTransition("silent"+node.getLabel());
+				silentTransition.setInvisible(true);
+
+				for(PetrinetNode outp : outputPlaces) {
+					// Rapid check...
+					if (!(outp instanceof Place))
+						throw new RuntimeException("OutputPlace of a Transition should be places!");
+					result.addArc((Place)outp, silentTransition);
+				}	
+
+				for (PetrinetNode inp : inputPlaces) {
+					// Rapid check...
+					if (!(inp instanceof Place))
+						throw new RuntimeException("InputPlace of a Transition should be places!");
+					result.addArc(silentTransition, (Place)inp);
+				}
+			}
+		}*/
+
+
+
+
+
+
 
 		/* Then add the sure and uncertain arcs between transitions in the net coming from the causal graph
             I do not know which sure transitions have met the threshold thus have been replaced by a place transition,
@@ -108,11 +163,11 @@ public class FuzzyCGToFuzzyPN {
 
 		return result;
 	}
-	
-	
+
+
 	private static <N extends AbstractDirectedGraphNode> Set<PlaceEvaluation<N>> computeNonRedundantPlaces(Set<PlaceEvaluation<N>> allPlaces) {
 		Set<PlaceEvaluation<N>> result = new HashSet<>();
-		
+
 		// Check the redundancy place by place
 		for(PlaceEvaluation<N> pe : allPlaces) {
 			if (!(isRedundant(pe, allPlaces)))
@@ -120,25 +175,25 @@ public class FuzzyCGToFuzzyPN {
 		}
 		return result;
 	}
-	
-	
+
+
 	private static <N extends AbstractDirectedGraphNode> boolean isRedundant(PlaceEvaluation<N> pe, Set<PlaceEvaluation<N>> allPlaces) {
 		// If pe has a single inputNode or a single OutputNode cannot be redundant!
 		if (pe.getPlaceInputNodes().size()==1 || pe.getPlaceOutputNodes().size()==1)
 			return false;
-		
+
 		// Otherwise, let us compute the possible partitions of the input and those of the output:
 		List<List<List<List<N>>>> outputNodePartitions = Utils.getAllPartitions(pe.getPlaceOutputNodes());
 		List<List<List<List<N>>>> inputNodePartitions = Utils.getAllPartitions(pe.getPlaceInputNodes());
-		
+
 		// I only need to check the bijections from output to inputs which partition sets WITH THE SAME CARDINALITY!
 		// Hence, I need to compute the smallest of the two List of List of ...
 		int partitionsToCheck = Math.min(outputNodePartitions.size(), inputNodePartitions.size());
-		
+
 		//this number cannot be one, given the check on the input and output nodes...
 		if (partitionsToCheck == 1)
 			throw new RuntimeException("Something wrong with the isRedundant algorithm");
-		
+
 		// no need to check the partitions with a single element...
 		for (int i=1; i<partitionsToCheck; i++) {
 			/* Compute all possible bijections from outputPartition of size i+1 and inputPartition of size i+1!
@@ -147,7 +202,7 @@ public class FuzzyCGToFuzzyPN {
 			 */
 			List<List<List<N>>> allOutputPartitionsOfiElements = outputNodePartitions.get(i);
 			List<List<List<N>>> allInputPartitionsOfiElements = inputNodePartitions.get(i);
-			
+
 			for (int ii=0; ii<allOutputPartitionsOfiElements.size(); ii++) {
 				for (int jj=0; jj<allInputPartitionsOfiElements.size(); jj++) {
 					/*
@@ -156,12 +211,12 @@ public class FuzzyCGToFuzzyPN {
 					for (List<List<N>> currentInputPerm : Utils.generatePerm(new ArrayList<List<N>>(allInputPartitionsOfiElements.get(jj)))) {
 						// Now that I have a permutation, I have to check that all placeEval of the current bijection are in allPlaceEvaluation
 						boolean allPresent = true;
-						
+
 						// I already know how many elements will be in the partition! They are i!
 						for (int k=0; k<i; k++) {
 							Set<N> currentOutputSet = new HashSet<N>(allOutputPartitionsOfiElements.get(ii).get(k));
 							Set<N> currentInputSet = new HashSet<N>(currentInputPerm.get(k));
-						
+
 							// Now check if the placeEval is present!
 							PlaceEvaluation<N> currentPE = new PlaceEvaluation<N>(currentOutputSet, currentInputSet, null, null, 0);
 							if (!allPlaces.contains(currentPE)) {
@@ -182,9 +237,9 @@ public class FuzzyCGToFuzzyPN {
 		}
 		return false;
 	}
-	
-	
-	
+
+
+
 	// Build the clusters by least fixpoint computations, according to the definition on the paper.
 	private static <E extends AbstractDirectedGraphEdge, N extends AbstractDirectedGraphNode> Set<Cluster<E, N>> identifyClusters(Set<E> edges) {
 		HashSet<Cluster<E, N>> clusterSet = new HashSet<>();

@@ -105,11 +105,12 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
         double elapsedTime = (stopTime-startTime)/60000.0;
         System.out.println("End building powerSets in " + elapsedTime + " mins.");
         
-        ExecutorService exec = Executors.newCachedThreadPool();
+        ExecutorService exec = Executors.newFixedThreadPool(10);//.newCachedThreadPool();
+        //ExecutorService exec = Executors.newCachedThreadPool();
 
         for (Set<N> outputNodeSet : outputNodesPowerSet) {
             for (Set<N> inputNodeSet : inputNodesPowerSet) {
-                if (outputNodeSet.size() != 0 && inputNodeSet.size() != 0) {
+                if ( (outputNodeSet.size() != 0) && (inputNodeSet.size() != 0) && (!isSyphon(outputNodeSet, inputNodeSet)) && (this.checkPlaceConsistency(outputNodeSet, inputNodeSet)) ) {
                     PlaceEvaluation<N> placeEval = new PlaceEvaluation(outputNodeSet, inputNodeSet, log, activityFrequencyMap, prePlaceEvaluationThreshold);
                     this.places.add(placeEval);
                     
@@ -119,18 +120,54 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
         }
         exec.shutdown();
         try {
-            exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            exec.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
     
-
+    
+    /*
+     * Given a place p, Checks if the inputTransitions *p are a subset (even not proper) of the outputTransitions p*.
+     */
+    private static <N extends AbstractDirectedGraphNode> boolean isSyphon(Set<N> outputNodes, Set<N> inputNodes) {
+    	if (inputNodes.containsAll(outputNodes))
+    		return true;
+    	return false;
+    }
+    
+    
+    /*
+     * Given a place p, check if **each** output node there exists an edge in the graph with **ALL** input nodes.
+     */
+    private boolean checkPlaceConsistency(Set<N> outputNodes, Set<N> inputNodes) {
+    	boolean result = true;
+    	for (N outNode : outputNodes) {
+    		for (N inNode : inputNodes) {
+    			if (!this.containsEdge(outNode, inNode)) {
+    				System.out.println("PlaceEvaluation not consistent! OutputNodes: " + outNode + " InputNodes: " + inNode);
+    				return false; 
+    			}
+    		}
+    	}
+    	return result;
+    }
+    
+    private boolean containsEdge(N outputNode, N inputNode) {
+    	for (E edge : this.edges) {
+    		if (edge.getSource().equals(outputNode) && edge.getTarget().equals(inputNode))
+    			return true;
+    	}
+    	return false;
+    }
+    
+    
+    
     public Set<PlaceEvaluation<N>> computePlacesAboveThreshold(double threshold) {
         Set<PlaceEvaluation<N>> result = new HashSet<>();
         for (PlaceEvaluation pe : this.places) {
             System.out.println("Place evaluation "+pe.toString());
-            System.out.println("score: "+pe.evaluateReplayScore()+" threshold: "+threshold);        	
+            System.out.println("Accepted Traces: " + pe.getAcceptedTracesNumber() + " score: "+pe.evaluateReplayScore()+" threshold: "+threshold);     	
             if (pe.evaluateReplayScore() >= threshold)
                 result.add(pe);
         }

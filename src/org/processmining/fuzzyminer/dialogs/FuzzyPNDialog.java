@@ -28,7 +28,8 @@ public class FuzzyPNDialog extends JPanel {
 
 	public FuzzyPNDialog(UIPluginContext context, FuzzyCausalGraph fCG, 
 			final FuzzyMinerSettings settings) {
-		super(new GridLayout(2,1));
+		//super(new GridLayout(2,1));
+		super(new GridLayout(1,1));
 		this.settings = settings;
 		
 		Component space = Box.createHorizontalStrut(10);
@@ -69,38 +70,49 @@ public class FuzzyPNDialog extends JPanel {
 		space = Box.createVerticalStrut(20);
 		this.add(space);
 		
-		final JLabel maxClusterSizeLabel = new JLabel();
-		maxClusterSizeLabel.setText("Max size of clusters");
-		this.add(maxClusterSizeLabel);
-
-		space = Box.createHorizontalStrut(10);
-		this.add(space);
-	
-		final JSlider maxClusterSizeSlider = new JSlider();
 		
-		maxClusterSizeSlider.setMinimum(0);
-		maxClusterSizeSlider.setMaximum(30);
 		
-		intValue = settings.getMaxClusterSize();
-		maxClusterSizeSlider.setValue(intValue);
-		maxClusterSizeSlider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				settings.setMaxClusterSize(maxClusterSizeSlider.getValue());
-			}
-		});
-		maxClusterSizeSlider.setMajorTickSpacing(5);
-		maxClusterSizeSlider.setMinorTickSpacing(1);
-		maxClusterSizeSlider.setPaintTicks(true);
-		labelTable = new Hashtable<Integer, JLabel>();
-		labelTable.put(0, new JLabel("0"));
-		labelTable.put(15, new JLabel("15"));
-		labelTable.put(30, new JLabel("30"));
-		maxClusterSizeSlider.setLabelTable(labelTable);
-		maxClusterSizeSlider.setPaintLabels(true);
-		this.add(maxClusterSizeSlider);
+		/*
+		 *  ******************** MAX CLUSTER SIZE **************************************************
+		 */
+//		
+//		final JLabel maxClusterSizeLabel = new JLabel();
+//		maxClusterSizeLabel.setText("Max size of clusters");
+//		this.add(maxClusterSizeLabel);
+//
+//		space = Box.createHorizontalStrut(10);
+//		this.add(space);
+//	
+//
+//		final JSlider maxClusterSizeSlider = new JSlider();
+//		
+//		maxClusterSizeSlider.setMinimum(0);
+//		maxClusterSizeSlider.setMaximum(50);
+//		
+//		intValue = settings.getMaxClusterSize();
+//		maxClusterSizeSlider.setValue(intValue);
+//		maxClusterSizeSlider.addChangeListener(new ChangeListener() {
+//			public void stateChanged(ChangeEvent e) {
+//				settings.setMaxClusterSize(maxClusterSizeSlider.getValue());
+//			}
+//		});
+//		maxClusterSizeSlider.setMajorTickSpacing(10);
+//		maxClusterSizeSlider.setMinorTickSpacing(5);
+//		maxClusterSizeSlider.setPaintTicks(true);
+//		labelTable = new Hashtable<Integer, JLabel>();
+//		labelTable.put(0, new JLabel("0"));
+//		labelTable.put(25, new JLabel("25"));
+//		labelTable.put(50, new JLabel("50"));
+//		maxClusterSizeSlider.setLabelTable(labelTable);
+//		maxClusterSizeSlider.setPaintLabels(true);
+//		this.add(maxClusterSizeSlider);
+//		
+//		space = Box.createVerticalStrut(20);
+//		this.add(space);
 		
-		space = Box.createVerticalStrut(20);
-		this.add(space);
+		/*
+		 *  ******************** END MAX CLUSTER SIZE **************************************************
+		 */
 		
 
 		/*final JLabel allConnected = new JLabel();

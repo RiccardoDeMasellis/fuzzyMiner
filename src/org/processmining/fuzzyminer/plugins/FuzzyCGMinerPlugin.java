@@ -56,8 +56,7 @@ public class FuzzyCGMinerPlugin {
 		XEventClassifier nameCl = new XEventNameClassifier();
 		HeuristicsMinerSettings hMS = new HeuristicsMinerSettings();
 		hMS.setClassifier(nameCl);
-		
-			
+					
 		FuzzyCGMinerSettings settings = new FuzzyCGMinerSettings();
 		settings.setHmSettings(hMS);
 		// Do the heavy lifting.

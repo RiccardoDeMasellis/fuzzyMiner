@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 
+import org.deckfour.xes.extension.std.XLifecycleExtension;
+import org.deckfour.xes.extension.std.XLifecycleExtension.StandardModel;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XEvent;
@@ -34,12 +36,14 @@ public class HeuristicMinerLight {
     protected ActivitiesMappingStructures activitiesMappingStructures;
 
     protected HeuristicsMinerSettings settings;
+    
 
     //	private HeuristicsMinerGUI ui = null;
 
     //-------------------------------------------------------------------------
 
-    public HeuristicMinerLight(XLog log) {
+
+	public HeuristicMinerLight(XLog log) {
 
         this.log = log;
         this.settings = new HeuristicsMinerSettings();
@@ -55,7 +59,9 @@ public class HeuristicMinerLight {
         this.metrics = new HeuristicsMetrics(logInfo);
     }
 
-    public HeuristicMinerLight(XLog log, HeuristicsMinerSettings settings) {
+
+
+	public HeuristicMinerLight(XLog log, HeuristicsMinerSettings settings) {
         this(log, XLogInfoFactory.createLogInfo(log, settings.getClassifier()));
         this.settings = settings;
     }
@@ -64,6 +70,10 @@ public class HeuristicMinerLight {
 
         this(log, logInfo);
         this.settings = settings;
+  
+        /*this.settings.setDependencyThreshold(1.0);
+        this.settings.setAndThreshold(0.0);
+        this.settings.setRelativeToBestThreshold(0.0);*/
     }
 
     /*
@@ -78,7 +88,8 @@ public class HeuristicMinerLight {
     DEMAS made this method from private to public.
      */
     public HeuristicsNet makeBasicRelations(HeuristicsMetrics metrics) {
-
+    	
+   	
         if (this.log.size() <= 0) {
             return new HeuristicsNetImpl(activitiesMappingStructures);
         }
@@ -102,8 +113,11 @@ public class HeuristicMinerLight {
                 //				String eventTransition = XLogInfoImpl.LIFECYCLE_TRANSITION_CLASSIFIER.getClassIdentity(event);
                 //String eventKey = XLogInfoImpl.STANDARD_CLASSIFIER.getClassIdentity(event);
                 String eventKey = logInfo.getEventClasses(settings.getClassifier()).getClassOf(event).getId();
+    			StandardModel eventTransition = XLifecycleExtension.instance().extractStandardTransition(event);
+                //String eventTransition = XConceptExtension.instance().getEventAttributes(XConceptExtension.);
                 //String eventKey = eventName + "+" + eventTransition;
                 eventIndex = keys.get(eventKey);
+                
 
                 /*CHIARA commented
                  * if (!lastEvents.contains(eventIndex)) {
@@ -115,46 +129,48 @@ public class HeuristicMinerLight {
                     }
                 }*/
 
-                metrics.incrementEventCount(eventIndex, 1);
-
-                if (lastEventIndex != -1) {
-
-                    metrics.incrementDirectSuccessionCount(lastEventIndex, eventIndex, 1);
-
-                    /* CHIARA commented
-                     * if (lastEventIndex == eventIndex)
-                        metrics.incrementL1LdependencyMeasuresAll(eventIndex, 1);
-                       */
-                }
-
-                if (penultEventIndex == eventIndex) {
-
-                    metrics.incrementSuccession2Count(eventIndex, lastEventIndex, 1);
-                }
-
-				/*
-				 * if (penultEventIndex == eventIndex) {
-				 *
-				 * succession2Count.set(eventIndex, lastEventIndex,
-				 * succession2Count.get(eventIndex, lastEventIndex) + 1); }
-				 */
-
-                //antepenultEventIndex = penultEventIndex;
-
-                penultEventIndex = lastEventIndex;
-                lastEventIndex = eventIndex;
-                lastEvents.add(eventIndex);
-
-                //System.out.println(penultEventIndex+"\t"+lastEventIndex);
+    			if (eventTransition==null || eventTransition.equals(XLifecycleExtension.StandardModel.COMPLETE)){
+	                metrics.incrementEventCount(eventIndex, 1);
+	
+	                if (lastEventIndex != -1) {
+	
+	                    metrics.incrementDirectSuccessionCount(lastEventIndex, eventIndex, 1);
+	
+	                    /* CHIARA commented
+	                     * if (lastEventIndex == eventIndex)
+	                        metrics.incrementL1LdependencyMeasuresAll(eventIndex, 1);
+	                       */
+	                }
+	
+	                if (penultEventIndex == eventIndex) {
+	
+	                    metrics.incrementSuccession2Count(eventIndex, lastEventIndex, 1);
+	                }
+	
+					/*
+					 * if (penultEventIndex == eventIndex) {
+					 *
+					 * succession2Count.set(eventIndex, lastEventIndex,
+					 * succession2Count.get(eventIndex, lastEventIndex) + 1); }
+					 */
+	
+	                //antepenultEventIndex = penultEventIndex;
+	
+	                penultEventIndex = lastEventIndex;
+	                lastEventIndex = eventIndex;
+	                lastEvents.add(eventIndex);
+	
+	                //System.out.println(penultEventIndex+"\t"+lastEventIndex);
+	            }
+	
+	            //
+	            int startEventIndex = lastEvents.get(0);
+	            metrics.incrementStartCount(startEventIndex, 1);
+	
+	            //
+	            int endEventIndex = lastEvents.get(lastEvents.size() - 1);
+	            metrics.incrementEndCount(endEventIndex, 1);
             }
-
-            //
-            int startEventIndex = lastEvents.get(0);
-            metrics.incrementStartCount(startEventIndex, 1);
-
-            //
-            int endEventIndex = lastEvents.get(lastEvents.size() - 1);
-            metrics.incrementEndCount(endEventIndex, 1);
         }
 
         System.out.println(keys + "\n");
@@ -224,6 +240,11 @@ public class HeuristicMinerLight {
                 double dependencyMeasureL2L = calculateL2LDependencyMeasure(i, j, metrics);
                 metrics.setL2LdependencyMeasuresAll(i, j, dependencyMeasureL2L);
                 metrics.setL2LdependencyMeasuresAll(j, i, dependencyMeasureL2L);
+                
+                /*if (i==j){
+                	double selfLoopDependency = calculateLoopDependencyMeasure(i,metrics);
+                	metrics.setABdependencyMeasuresAll(i, j, selfLoopDependency);
+                }*/
 
                 if (i > j) {
 
@@ -361,7 +382,7 @@ public class HeuristicMinerLight {
                 }
             }
         }
-
+        
         //Step 3: Given the InputSets and OutputSets build
         //        OR-subsets;
 
@@ -479,6 +500,19 @@ public class HeuristicMinerLight {
 
         return net;
     }
+    
+    private double calculateLoopDependencyMeasure(int i, HeuristicsMetrics metrics) {
+
+        double measure = 0.0;
+
+        double successionCountII = metrics.getDirectSuccessionCount(i, i);
+
+        measure = successionCountII
+                / (successionCountII + settings.getDependencyDivisor());
+
+        return measure;
+    }
+ 
 
     private double calculateDependencyMeasure(int i, int j, HeuristicsMetrics metrics) {
 
@@ -756,4 +790,5 @@ public class HeuristicMinerLight {
             return true;
         }
     }
+    
 }

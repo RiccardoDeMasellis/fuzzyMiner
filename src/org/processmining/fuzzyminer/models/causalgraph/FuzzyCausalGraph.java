@@ -1,7 +1,9 @@
 package org.processmining.fuzzyminer.models.causalgraph;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +18,8 @@ import org.processmining.plugins.heuristicsnet.miner.heuristics.HeuristicsMetric
 public class FuzzyCausalGraph extends CausalGraph<FuzzyDirectedGraphNode, FuzzyDirectedGraphEdge> {
 	private Map<String, FuzzyDirectedGraphNode> labelNodeMap;
 	private Map<String, Integer> activityFrequencyMap;
+    protected List<Double> rowSumDirectDependency;
+	
 	private XLog log;
 	private ActivitiesMappingStructures activitiesMappingStructures;
 	private HeuristicsMetrics metrics;
@@ -26,6 +30,7 @@ public class FuzzyCausalGraph extends CausalGraph<FuzzyDirectedGraphNode, FuzzyD
 		this.labelNodeMap = new HashMap<>();
 		this.activityFrequencyMap = new HashMap<>();
 		this.log = null;
+		this.rowSumDirectDependency = new ArrayList<Double>();
 	}
 	
 	public Map<String, Integer> getActivityFrequencyMap() {
@@ -67,7 +72,18 @@ public class FuzzyCausalGraph extends CausalGraph<FuzzyDirectedGraphNode, FuzzyD
 	public void setMetrics(HeuristicsMetrics metrics) {
 		this.metrics = metrics;
 	}
+
+	public void setRowSumDirectDependency(List<Double> rowSumDirectDependency) {
+		this.rowSumDirectDependency = rowSumDirectDependency;
+	}
 	
+	public Double getRowSumDirectDependency(int row) {
+		return rowSumDirectDependency.get(row);
+	}
+
+	public void setRowSumDirectDependency(int row, double value) {
+		this.rowSumDirectDependency.set(row, value);
+	}
 
 	/**
 	 * We build fuzzyCausalGraph with a strong limitation: we do not ever have two nodes with the same
@@ -88,13 +104,13 @@ public class FuzzyCausalGraph extends CausalGraph<FuzzyDirectedGraphNode, FuzzyD
 			return alreadyPresent;
 	}
 	
-	public void addSureEdge(FuzzyDirectedGraphNode sourceNode, FuzzyDirectedGraphNode targetNode){
-		FuzzyDirectedSureGraphEdge sureEdge = new FuzzyDirectedSureGraphEdge(sourceNode, targetNode);
+	public void addSureEdge(FuzzyDirectedGraphNode sourceNode, FuzzyDirectedGraphNode targetNode, String value){
+		FuzzyDirectedSureGraphEdge sureEdge = new FuzzyDirectedSureGraphEdge(sourceNode, targetNode, value);
 		super.addEdge(sureEdge);
 	}
 	
-	public void addUncertainEdge(FuzzyDirectedGraphNode sourceNode, FuzzyDirectedGraphNode targetNode){
-		FuzzyDirectedUncertainGraphEdge sureEdge = new FuzzyDirectedUncertainGraphEdge(sourceNode, targetNode);
+	public void addUncertainEdge(FuzzyDirectedGraphNode sourceNode, FuzzyDirectedGraphNode targetNode, String value){
+		FuzzyDirectedUncertainGraphEdge sureEdge = new FuzzyDirectedUncertainGraphEdge(sourceNode, targetNode, value);
 		super.addEdge(sureEdge);
 	}
 

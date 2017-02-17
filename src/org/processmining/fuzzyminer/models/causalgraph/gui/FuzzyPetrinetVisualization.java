@@ -42,7 +42,6 @@ import org.processmining.models.jgraph.ProMJGraph;
 import org.processmining.models.jgraph.elements.ProMGraphCell;
 import org.processmining.models.jgraph.elements.ProMGraphEdge;
 import org.processmining.models.jgraph.listeners.SelectionListener;
-import org.processmining.plugins.heuristicsnet.visualizer.annotatedvisualization.AnnotatedVisualizationGenerator;
 
 import com.fluxicon.slickerbox.factory.SlickerDecorator;
 import com.fluxicon.slickerbox.factory.SlickerFactory;
@@ -755,7 +754,7 @@ ChangeListener, ActionListener {
 		int scrollPositionX = this.scroll.getHorizontalScrollBar().getValue();
 		int scrollPositionY = this.scroll.getVerticalScrollBar().getValue();
 
-		AnnotatedVisualizationGenerator generator = new AnnotatedVisualizationGenerator();
+		//AnnotatedVisualizationGenerator generator = new AnnotatedVisualizationGenerator();
 		/*HeuristicsNetGraph hng = generator.generate(this.net, this.setup
 				.getSettings());
 

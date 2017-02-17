@@ -7,10 +7,10 @@ import org.processmining.models.graphbased.AttributeMap;
  */
 public class FuzzyDirectedUncertainGraphEdge extends FuzzyDirectedGraphEdge {
 
-    public FuzzyDirectedUncertainGraphEdge(FuzzyDirectedGraphNode source, FuzzyDirectedGraphNode target) {
+    public FuzzyDirectedUncertainGraphEdge(FuzzyDirectedGraphNode source, FuzzyDirectedGraphNode target, String  value) {
         super(source, target);
-		getAttributeMap().put(AttributeMap.LABEL, "?");
-		getAttributeMap().put(AttributeMap.LABELALONGEDGE, true);
+		getAttributeMap().put(AttributeMap.LABEL, "[?] "+ value);
+		getAttributeMap().put(AttributeMap.LABELALONGEDGE, false);
 		getAttributeMap().put(AttributeMap.SHOWLABEL, true);
 
     }

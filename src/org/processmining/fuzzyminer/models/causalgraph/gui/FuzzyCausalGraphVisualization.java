@@ -451,13 +451,14 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 
 		int sureThresholdValue = (int) (fCG.getSettings().getSureThreshold()*100);
 		int unsureThresholdValue = (int) (fCG.getSettings().getQuestionMarkThreshold()*100);
+		int parallelismThresholdValue = (int) (fCG.getSettings().getParallelismThreshold()*100);
 
 		//this.configPanelON = factory.createRoundedPanel(200, Color.LIGHT_GRAY);
 		this.configPanelON = factory.createRoundedPanel(15, Color.LIGHT_GRAY);
 		this.configPanelOFF = factory.createRoundedPanel(15, Color.DARK_GRAY);
 		this.configPanelON.setLayout(null);
 		this.configPanelOFF.setLayout(null);
-		this.config = new ConfigurationPanel(factory, decorator, sureThresholdValue, unsureThresholdValue);
+		this.config = new ConfigurationPanel(factory, decorator, sureThresholdValue, unsureThresholdValue, parallelismThresholdValue);
 		this.config.addSliderChangeListener(this);
 		this.configPanelON.add(this.config);
 		this.configPanelON.setVisible(false);
@@ -957,17 +958,39 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
             for (int j=0; j<eventsNumber; j++) {
                 String nodeJLabel = fCG.getActivitiesMappingStructures().getActivitiesMapping()[j].getId();
                 nodeJ = fCG.addNode(nodeJLabel);
+                
+				double directSuccession = fCG.getMetrics().getDirectSuccessionCount(i, j);
+				double directSuccessionDependency = fCG.getRowSumDirectDependency(i)>0? (directSuccession/fCG.getRowSumDirectDependency(i)):0.0;
+				double abdependencyMetric = Math.abs(fCG.getMetrics().getABdependencyMeasuresAll(i, j));
+				
 
-                double abdependency = fCG.getMetrics().getABdependencyMeasuresAll(i, j);
+				// the sure/unsure edge can be added if and only if the
+				// abdependency metrics is higher than the parallelism threshold, 
+				// as otherwise it would mean that they are candidate for parallelism
+				//BigDecimal bD = new BigDecimal(abdependencyMetric);
+				double roundedDSD = (Math.round(directSuccessionDependency * 100.0)/100.0);
+
+				
+				if (directSuccessionDependency>=fCG.getSettings().getSureThreshold() && (abdependencyMetric>fCG.getSettings().getParallelismThreshold() || (i==j))){
+					fCG.addSureEdge(nodeI, nodeJ, new Double(roundedDSD).toString());
+					System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+directSuccessionDependency+" "+abdependencyMetric);
+				} else if (directSuccessionDependency>=fCG.getSettings().getQuestionMarkThreshold() && (abdependencyMetric>fCG.getSettings().getParallelismThreshold()|| (i==j))){
+					fCG.addUncertainEdge(nodeI, nodeJ, new Double(roundedDSD).toString());
+					System.out.println("UNCERTAIN"+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+directSuccessionDependency+" "+abdependencyMetric);
+				}	
+
+               /* double abdependency = fCG.getMetrics().getABdependencyMeasuresAll(i, j);
                 double dependencyAccepted = fCG.getMetrics().getDependencyMeasuresAccepted(i, j);
+                //double longDependencyAccepted = fCG.getMetrics().getLongRangeDependencyMeasures(i, j);
+
 
                 if (abdependency>=fCG.getSettings().getSureThreshold()){
                 	fCG.addSureEdge(nodeI, nodeJ);
-                    //System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
+                    //System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted+" "+longDependencyAccepted);
                 } else if (abdependency>=fCG.getSettings().getQuestionMarkThreshold()){
                 	fCG.addUncertainEdge(nodeI, nodeJ);
-                    //System.out.println("UNCERTAIN"+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted);
-                } 
+                    //System.out.println("UNCERTAIN"+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+abdependency+" "+dependencyAccepted+" "+longDependencyAccepted);
+                }*/ 
             }
         }
         ProMJGraph jGraph = FuzzyCausalGraphVisualizer.createJGraph(fCG, new ViewSpecificAttributeMap(),  new ProgressBarImpl(null));
@@ -1065,10 +1088,10 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 				.getSettings());
 
 		this.graph = FuzzyCausalGraphVisualizer.createJGraph(hng, new ViewSpecificAttributeMap(), null);*/
-
+		
 		this.initGraph();
-
-		this.remove(this.scroll);
+		
+	this.remove(this.scroll);
 
 		AdjustmentListener aListener = new AdjustmentListener() {
 			public void adjustmentValueChanged(AdjustmentEvent e) {
@@ -1189,6 +1212,7 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 				for (SelectionListener listener : selectionListeners) {
 					listener.SelectionChanged(event);
 				}
+
 
 				// retrieve inputs/outputs for the selected event
 /*				if (net instanceof AnnotatedHeuristicsNet) {
@@ -1477,15 +1501,16 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 				settings.setSureThreshold(((JSlider) source).getValue() / 100.0);
 				fCG.setSettings(settings);
 				this.graph = recomputeJGraph();
-				this.normalScale = graph.getScale() / this.zoomRatio;
+				//this.normalScale = graph.getScale() / this.zoomRatio;
 				//this.initGraph();
 				redraw();
-				showConfig(false);
+				//showConfig(false);
 				showConfig(true);				
 				//graph.clearOffscreen();
 				//graph.setScale(this.normalScale);
 				//graph.refresh();
 				repaintPIP(graph.getVisibleRect());
+				//this.normalScale = graph.getScale() / this.zoomRatio;
 				
 			}
 			else if (slider.getName()!=null && slider.getName().equalsIgnoreCase("UnsureSlider")){
@@ -1493,19 +1518,37 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 				settings.setQuestionMarkThreshold(((JSlider) source).getValue() / 100.0);
 				fCG.setSettings(settings);
 				this.graph = recomputeJGraph();
-				this.normalScale = graph.getScale() / this.zoomRatio;
+				//this.normalScale = graph.getScale() / this.zoomRatio;
 				//this.initGraph();
 				redraw();
 				//graph.refresh();
-				showConfig(false);
+				//showConfig(false);
 				showConfig(true);
 				//graph.clearOffscreen();
 				//graph.setScale(this.normalScale);
 				repaintPIP(graph.getVisibleRect());
 			}
+			else if (slider.getName()!=null && slider.getName().equalsIgnoreCase("ParallelismSlider")){
+				FuzzyCGMinerSettings settings = fCG.getSettings();
+				settings.setParallelismThreshold(((JSlider) source).getValue() / 100.0);
+				fCG.setSettings(settings);
+				this.graph = recomputeJGraph();
+				//this.normalScale = graph.getScale() / this.zoomRatio;
+				//this.initGraph();
+				redraw();
+				//graph.refresh();
+				//showConfig(false);
+				showConfig(true);
+				//graph.clearOffscreen();
+				//graph.setScale(this.normalScale);
+				repaintPIP(graph.getVisibleRect());
+			}
+			
 			else {
 				graph.setScale(((JSlider) source).getValue() / 100.0);
 				repaintPIP(graph.getVisibleRect());
+				this.normalScale = graph.getScale() / this.zoomRatio;
+
 			}
 		}
 	}
@@ -1655,16 +1698,18 @@ class ConfigurationPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 8415559591750873767L;
-	private final JSlider sureThresholdSlider, unsureThresholdSlider;
+	private final JSlider sureThresholdSlider, unsureThresholdSlider, parallelismThresholdSlider;
 	private JLabel sureSliderMinValue, sureSliderMaxValue, sureSliderFitValue, sureSliderValue, sureSliderLabelValue;
 	private JLabel unsureSliderMinValue, unsureSliderMaxValue, unsureSliderFitValue, unsureSliderValue, unsureSliderLabelValue;
+	private JLabel parallelismSliderMinValue, parallelismSliderMaxValue, parallelismSliderFitValue, parallelismSliderValue, parallelismSliderLabelValue;
 
 
 	private int sureCurrValue;
 	private int unsureCurrValue;
+	private int parallelismCurrValue;
 
 	public ConfigurationPanel(SlickerFactory factory, SlickerDecorator decorator,
-			int sureCurrValue, int unsureCurrValue) {
+			int sureCurrValue, int unsureCurrValue, int parallelismCurrValue) {
 
 		super(null);
 
@@ -1672,12 +1717,15 @@ class ConfigurationPanel extends JPanel {
 		
 		this.sureCurrValue = sureCurrValue;
 		this.unsureCurrValue = unsureCurrValue;
+		this.parallelismCurrValue = parallelismCurrValue;
 
 		this.sureThresholdSlider = factory.createSlider(1);
 		this.unsureThresholdSlider = factory.createSlider(1);
+		this.parallelismThresholdSlider = factory.createSlider(1);
 		
 		sureThresholdSlider.setName("SureSlider");
 		unsureThresholdSlider.setName("UnsureSlider");
+		parallelismThresholdSlider.setName("ParallelismSlider");
 		
 		this.sureThresholdSlider.setMinimum(0);
 		this.sureThresholdSlider.setMaximum(maximumValue);
@@ -1686,6 +1734,11 @@ class ConfigurationPanel extends JPanel {
 		this.unsureThresholdSlider.setMinimum(0);
 		this.unsureThresholdSlider.setMaximum(maximumValue);
 		this.unsureThresholdSlider.setValue(unsureCurrValue);
+		
+		this.parallelismThresholdSlider.setMinimum(0);
+		this.parallelismThresholdSlider.setMaximum(maximumValue);
+		this.parallelismThresholdSlider.setValue(parallelismCurrValue);
+
 		
 		this.sureThresholdSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -1696,6 +1749,12 @@ class ConfigurationPanel extends JPanel {
 		this.unsureThresholdSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				updateUnsureSlider();
+			}
+		});
+		
+		this.parallelismThresholdSlider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				updateParallelismSlider();
 			}
 		});
 
@@ -1774,14 +1833,52 @@ class ConfigurationPanel extends JPanel {
 		this.add(this.unsureSliderFitValue);
 		this.add(this.unsureSliderValue);
 		this.add(this.unsureSliderLabelValue);
+		
+		this.parallelismSliderMinValue = factory.createLabel("0%");
+		this.parallelismSliderMaxValue = factory.createLabel(maximumValue + "%");
+		this.parallelismSliderFitValue = factory.createLabel("Def >");
+		this.parallelismSliderValue = factory.createLabel(parallelismCurrValue + "%");
+		this.parallelismSliderLabelValue = factory.createLabel("Parallelism");
 
+		this.parallelismSliderMinValue.setHorizontalAlignment(SwingConstants.CENTER);
+		this.parallelismSliderMaxValue.setHorizontalAlignment(SwingConstants.CENTER);
+		this.parallelismSliderFitValue.setHorizontalAlignment(SwingConstants.RIGHT);
+		this.parallelismSliderValue.setHorizontalAlignment(SwingConstants.LEFT);
+		this.parallelismSliderLabelValue.setHorizontalAlignment(SwingConstants.CENTER);
+
+
+		this.parallelismSliderMinValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+		this.parallelismSliderMaxValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+		this.parallelismSliderFitValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+		this.parallelismSliderValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+		this.parallelismSliderLabelValue.setFont(new java.awt.Font("Dialog",
+				java.awt.Font.BOLD, 14));
+
+		this.parallelismSliderMinValue.setForeground(Color.GRAY);
+		this.parallelismSliderMaxValue.setForeground(Color.GRAY);
+		this.parallelismSliderFitValue.setForeground(Color.GRAY);
+		this.parallelismSliderValue.setForeground(Color.DARK_GRAY);
+		this.parallelismSliderLabelValue.setForeground(Color.GRAY);
+
+		this.add(this.parallelismThresholdSlider);
+		this.add(this.parallelismSliderMinValue);
+		this.add(this.parallelismSliderMaxValue);
+		this.add(this.parallelismSliderFitValue);
+		this.add(this.parallelismSliderValue);
+		this.add(this.parallelismSliderLabelValue);
+				
 		this.setBackground(Color.LIGHT_GRAY);
 	}
 
 	public void setHeight(int height) {
 
 		//this.setSize(115, height);
-		this.setSize(190, height);
+		//this.setSize(190, height);
+		this.setSize(250, height);
 
 		int sliderHeight = height - 60;
 
@@ -1819,15 +1916,37 @@ class ConfigurationPanel extends JPanel {
 		span = this.unsureThresholdSlider.getMaximum() - this.unsureThresholdSlider.getMinimum();
 		position = 33 + (int) ((float) (this.unsureThresholdSlider.getMaximum() - this.unsureCurrValue)
 				/ (float) span * (sliderHeight - 28));
-		this.unsureSliderFitValue.setBounds(60, position, 60, 20);
+		this.unsureSliderFitValue.setBounds(20, position, 100, 20);
 
 		if (value == this.unsureCurrValue)
 			this.unsureSliderValue.setBounds(145, position, 60, 20);
 		else {
 
-			position = 33 + (int) ((float) (this.sureThresholdSlider.getMaximum() - value)
+			position = 33 + (int) ((float) (this.unsureThresholdSlider.getMaximum() - value)
 					/ (float) span * (sliderHeight - 28));
 			this.unsureSliderValue.setBounds(145, position, 60, 20);
+		}
+		
+		//PARALLELISM THRESHOLD SLIDER
+		
+		this.parallelismThresholdSlider.setBounds(185, 30, 30, sliderHeight);
+		this.parallelismSliderMaxValue.setBounds(150, 10, 100, 20);
+		this.parallelismSliderMinValue.setBounds(150, height - 35, 100, 20);
+		this.parallelismSliderLabelValue.setBounds(150, height - 20, 100, 20);
+
+		value = this.parallelismThresholdSlider.getValue();
+		span = this.parallelismThresholdSlider.getMaximum() - this.parallelismThresholdSlider.getMinimum();
+		position = 33 + (int) ((float) (this.parallelismThresholdSlider.getMaximum() - this.parallelismCurrValue)
+				/ (float) span * (sliderHeight - 28));
+		this.parallelismSliderFitValue.setBounds(130, position, 60, 20);
+
+		if (value == this.parallelismCurrValue)
+			this.parallelismSliderValue.setBounds(210, position, 60, 20);
+		else {
+
+			position = 33 + (int) ((float) (this.parallelismThresholdSlider.getMaximum() - value)
+					/ (float) span * (sliderHeight - 28));
+			this.parallelismSliderValue.setBounds(210, position, 60, 20);
 		}
 		
 	}
@@ -1857,6 +1976,17 @@ class ConfigurationPanel extends JPanel {
 		this.unsureSliderValue.setBounds(155, position, 60, 20);
 	}
 
+	private void updateParallelismSlider() {
+		//PARALLELISM THRESHOLD SLIDER
+		int value = this.parallelismThresholdSlider.getValue();
+
+		int span = this.parallelismThresholdSlider.getMaximum() - this.parallelismThresholdSlider.getMinimum();
+		int position = 33 + (int) ((float) (this.parallelismThresholdSlider.getMaximum() - value)
+				/ (float) span * (this.parallelismThresholdSlider.getBounds().height - 28));
+
+		this.parallelismSliderValue.setText(value + "%");
+		this.parallelismSliderValue.setBounds(215, position, 60, 20);
+	}
 	
 	public void setSureCurrValue(int value) {
 
@@ -1878,9 +2008,21 @@ class ConfigurationPanel extends JPanel {
 		this.unsureSliderFitValue.setBounds(60, position, 40, 20);
 	}
 
+	public void setParallelismCurrValue(int value) {
+
+		this.parallelismCurrValue = value;
+
+		int span = this.parallelismThresholdSlider.getMaximum() - this.parallelismThresholdSlider.getMinimum();
+		int position = 33 + (int) ((float) (this.parallelismThresholdSlider.getMaximum() - value)
+				/ (float) span * (this.parallelismThresholdSlider.getBounds().height - 28));
+		this.parallelismSliderFitValue.setBounds(180, position, 40, 20);
+	}
+	
+	
 	public void addSliderChangeListener(ChangeListener listener) {
 		this.sureThresholdSlider.addChangeListener(listener);
 		this.unsureThresholdSlider.addChangeListener(listener);
+		this.parallelismThresholdSlider.addChangeListener(listener);
 	}
 }
 
