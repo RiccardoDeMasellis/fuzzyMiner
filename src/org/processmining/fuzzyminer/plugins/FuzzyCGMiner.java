@@ -48,6 +48,7 @@ public class FuzzyCGMiner  extends HeuristicMinerLight {
 
 		HeuristicsNet originalNet = this.makeBasicRelations(this.getMetrics());
 		fCG.setRowSumDirectDependency(this.computeRowSumDirectDependency());
+		fCG.setColumnSumDirectDependency(this.computeColumnSumDirectDependency());
 
 		int eventsNumber = this.getMetrics().getEventsNumber();
 		//for(int i=0; i<eventsNumber; i++) {
@@ -61,21 +62,29 @@ public class FuzzyCGMiner  extends HeuristicMinerLight {
 				nodeJ = fCG.addNode(nodeJLabel);
 
 				double directSuccession = metrics.getDirectSuccessionCount(i, j);
-				double directSuccessionDependency = fCG.getRowSumDirectDependency(i)>0? (directSuccession/fCG.getRowSumDirectDependency(i)):0.0;
+				double outputDirectSuccessionDependency = (fCG.getRowSumDirectDependency(i)>0) ? (directSuccession/fCG.getRowSumDirectDependency(i)) :0.0;
+				double inputDirectSuccessionDependency = (fCG.getColumnSumDirectDependency(j)>0) ? (directSuccession/fCG.getColumnSumDirectDependency(j)) :0.0;
+				
+				//double directSuccessionDependency = (0.5*outputDirectSuccessionDependency)+(0.5*inputDirectSuccessionDependency); 
+				double directSuccessionDependency = (2*(directSuccession))/(fCG.getColumnSumDirectDependency(j) + fCG.getRowSumDirectDependency(i));	
+				
 				double abdependencyMetric = Math.abs(metrics.getABdependencyMeasuresAll(i, j));
+				
+				double causalityMetric = (fCGSettings.getCausalityWeight()*directSuccessionDependency) + ((1-fCGSettings.getCausalityWeight())*abdependencyMetric);
 				
 
 				// the sure/unsure edge can be added if and only if the
 				// dependency metrics is higher than the parallelism threshold, 
 				// as otherwise it would mean that they are candidate for parallelism
 				//BigDecimal bD = new BigDecimal(abdependencyMetric);
-				double roundedDSD = (Math.round(directSuccessionDependency * 100.0)/100.0);
+				double roundedODSD = (Math.round(outputDirectSuccessionDependency * 100.0)/100.0);
+				double roundedIDSD = (Math.round(inputDirectSuccessionDependency * 100.0)/100.0);
 
-				if (directSuccessionDependency>=fCGSettings.getSureThreshold() && (abdependencyMetric>fCG.getSettings().getParallelismThreshold() || (i==j))){
-					fCG.addSureEdge(nodeI, nodeJ, new Double(roundedDSD).toString());
+				if (causalityMetric>=fCGSettings.getSureThreshold()){
+					fCG.addSureEdge(nodeI, nodeJ, new Double(roundedODSD), new Double(roundedIDSD));
 					System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+directSuccessionDependency+" "+abdependencyMetric);
-				} else if (directSuccessionDependency>=fCGSettings.getQuestionMarkThreshold() && (abdependencyMetric>fCG.getSettings().getParallelismThreshold()|| (i==j))){
-					fCG.addUncertainEdge(nodeI, nodeJ, new Double(roundedDSD).toString());
+				} else if (causalityMetric>=fCGSettings.getQuestionMarkThreshold()){
+					fCG.addUncertainEdge(nodeI, nodeJ, new Double(roundedODSD), new Double(roundedIDSD));
 					System.out.println("UNCERTAIN"+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+directSuccessionDependency+" "+abdependencyMetric);
 				}			
 
@@ -120,7 +129,20 @@ public class FuzzyCGMiner  extends HeuristicMinerLight {
         return rowSumDirectDependency;
 	}
 
+	private List<Double> computeColumnSumDirectDependency(){
+		List<Double> columnSumDirectDependency = new ArrayList<Double>();
+        for (int j = 0; j < metrics.getEventsNumber(); j++) {
+    		double sumDirectDependency = 0.0;
 
+            for (int i = 0; i < metrics.getEventsNumber(); i++) {
+            	sumDirectDependency += metrics.getDirectSuccessionCount(i, j);
+	        }
+            
+            columnSumDirectDependency.add(j, sumDirectDependency);
+        }
+        
+        return columnSumDirectDependency;
+	}
 
 
 	/* public void addUncertaintyInputSet(int x, int value){ this.uncertaintyInputSet[x].add(value); }

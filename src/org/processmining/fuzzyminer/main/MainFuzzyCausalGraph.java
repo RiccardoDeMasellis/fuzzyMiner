@@ -35,7 +35,8 @@ public class MainFuzzyCausalGraph {
     private static double PLACEEVALTHRESHOLD = 0.8;
     private static double POSITIVEOBSERVATIONDEGREE = 0.3;
     private static double PREPLACEEVALUATIONTHRESHOLD = 0.1;
-    private static int MAXCLUSTERSIZE = 5;
+    private static int MAXCLUSTERSIZE = 10;
+    private static boolean MAXCLUSTERSIZEENABLED = false;
 
 
     public static void main(String args[]) {
@@ -61,7 +62,7 @@ public class MainFuzzyCausalGraph {
         XLog filteredLog = LogFilterer.filterLogByActivityFrequency(preprocessedLog, logInfo, cGSettings);
         
         
-        FuzzyMinerSettings pNSettings = new FuzzyMinerSettings(PREPLACEEVALUATIONTHRESHOLD, PLACEEVALTHRESHOLD, MAXCLUSTERSIZE);
+        FuzzyMinerSettings pNSettings = new FuzzyMinerSettings(PREPLACEEVALUATIONTHRESHOLD, PLACEEVALTHRESHOLD, MAXCLUSTERSIZEENABLED);
         FuzzyCGMiner miner = new FuzzyCGMiner(filteredLog, filteredLog.getInfo(cGSettings.getHmSettings().getClassifier()), cGSettings);
         System.out.println("*********** Start mining the FuzzyCausalGraph ***********");
         FuzzyCausalGraph fCG = miner.mineFCG(cGSettings);

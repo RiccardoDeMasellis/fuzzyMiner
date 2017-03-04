@@ -133,37 +133,37 @@ public class FuzzyCGDialog extends JPanel {
 		space = Box.createVerticalStrut(20);
 		this.add(space);
 
-		final JLabel parallelismThresholdLabel = new JLabel();
-		parallelismThresholdLabel.setText("Parallelism threshold");
-		this.add(parallelismThresholdLabel);
+		final JLabel causalityWeightLabel = new JLabel();
+		causalityWeightLabel.setText("Causality weight threshold");
+		this.add(causalityWeightLabel);
 
 		space = Box.createHorizontalStrut(10);
 		this.add(space);
 		
-		final JSlider parallelismThresholdSlider = new JSlider();
-		parallelismThresholdSlider.setMinimum(0);
-		parallelismThresholdSlider.setMaximum(100);
+		final JSlider causalityWeightSlider = new JSlider();
+		causalityWeightSlider.setMinimum(0);
+		causalityWeightSlider.setMaximum(100);
 		
-		parallelismThresholdSlider.setMajorTickSpacing(50);
-		parallelismThresholdSlider.setMinorTickSpacing(10);
-		parallelismThresholdSlider.setPaintTicks(true);
+		causalityWeightSlider.setMajorTickSpacing(50);
+		causalityWeightSlider.setMinorTickSpacing(10);
+		causalityWeightSlider.setPaintTicks(true);
 		labelTable = new Hashtable<Integer, JLabel>();
 		labelTable.put(0, new JLabel("0%"));
 		labelTable.put(50, new JLabel("50%"));
 		labelTable.put(100, new JLabel("100%"));
-		parallelismThresholdSlider.setLabelTable(labelTable);
-		parallelismThresholdSlider.setPaintLabels(true);
-		this.add(parallelismThresholdSlider);
+		causalityWeightSlider.setLabelTable(labelTable);
+		causalityWeightSlider.setPaintLabels(true);
+		this.add(causalityWeightSlider);
 		
 		
-		intValue = (int) (settings.getParallelismThreshold()*100);
-		parallelismThresholdSlider.setValue(intValue);
-		parallelismThresholdSlider.addChangeListener(new ChangeListener() {
+		intValue = (int) (settings.getCausalityWeight()*100);
+		causalityWeightSlider.setValue(intValue);
+		causalityWeightSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				settings.setParallelismThreshold(parallelismThresholdSlider.getValue()/100.0);
+				settings.setCausalityWeight(causalityWeightSlider.getValue()/100.0);
 			}
 		});
-		this.add(parallelismThresholdSlider);
+		this.add(causalityWeightSlider);
 
 
 		

@@ -21,7 +21,8 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
     private XLog log;
     private Map<String, Integer> activityFrequencyMap;
     double prePlaceEvaluationThreshold;
-    //boolean outputOccurred;
+    // A trace in the log is "active" if, during the replay it has activated at least one outputTransition or inputTransition.
+    int activeTracesNumber;
 
     public PlaceEvaluation(Set<N> placeOutputNodes, Set<N> placeInputNodes, XLog log, Map<String, Integer> activityFrequencyMap, double prePlaceEvaluationThreshold) {
         this.placeOutputNodes = placeOutputNodes;
@@ -31,7 +32,7 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
         this.currentTokenNumber = 0;
         this.activityFrequencyMap = activityFrequencyMap;
         this.prePlaceEvaluationThreshold = prePlaceEvaluationThreshold;
-        //this.outputOccurred = false;
+        this.activeTracesNumber = 0;
     }
     
     /*
@@ -159,10 +160,14 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
         // for each trace in the log
     	for (XTrace trace : log) {
     		//this.outputOccurred = false;
-    		this.replayPlaceOnTrace(trace);
+    		boolean peActivatedByTrace;
+    		peActivatedByTrace = this.replayPlaceOnTrace(trace);
+    		if (peActivatedByTrace) {
+    			this.activeTracesNumber++;
+    		}
             // update Accepted traces
     		//if (isCurrentTokenNumberZero() || this.outputOccurred==false)
-    		if (isCurrentTokenNumberZero())
+    		if (isCurrentTokenNumberZero() && peActivatedByTrace)
     			increaseAcceptedTracesNumber();
     		resetCurrentTokenNumber();
     	}
@@ -209,8 +214,14 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
 		}
     }*/
     
-    public void replayPlaceOnTrace(XTrace trace){
-
+    
+    /*
+     * The return value is true if trace "activated" the place evaluation, i.e., the trace had at least one
+     * event corresponding to an output transition (so input to the place) or an input transition; otherwise it returns false.
+     */
+    public boolean replayPlaceOnTrace(XTrace trace){
+    	boolean result = false;
+    	
 		for (XEvent event : trace) {
 			String eventName = XConceptExtension.instance().extractName(event);
 			StandardModel eventTransition = XLifecycleExtension.instance().extractStandardTransition(event);
@@ -218,12 +229,16 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
 			
 				boolean isInput=false, isOutput = false;
 				for (N placeOutputNode : getPlaceOutputNodes()) {
-					if (placeOutputNode.getLabel().equalsIgnoreCase(eventName))
+					if (placeOutputNode.getLabel().equalsIgnoreCase(eventName)) {
 						isOutput = true;
+						result = true;
+					}
 				}
 				for (N placeInputNode : getPlaceInputNodes()) {
-					if (placeInputNode.getLabel().equalsIgnoreCase(eventName))
+					if (placeInputNode.getLabel().equalsIgnoreCase(eventName)) {
 						isInput=true;
+						result = true;
+					}
 				}
 				//if it is both input and output: be conservative, i.e., 
 				//if we have at least a token, we decrease the token number and return it
@@ -240,7 +255,7 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
 						decreaseTokenNumber();
 				        // CHECK: if negative return;
 						if (isCurrentTokenNumberNegative())
-							return;
+							return result;
 					}
 					if (isOutput)
 						increaseTokenNumber();
@@ -249,6 +264,7 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
 			}
 			
 		}
+		return result;
     }
 
     public void increaseAcceptedTracesNumber() {
@@ -268,10 +284,19 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
         return acceptedTracesNumber;
     }
 
+    /*
+     * Now changed: the score is not anymore: #acceptedTraces/#allTracesInTheLog but
+     * it is #acceptedTraces/#activeTraces
+     */
     public double evaluateReplayScore() {
+    	if (this.activeTracesNumber==0)
+    		return 0.0;
+    	
         double acceptedTraces = new Double(this.getAcceptedTracesNumber());
-        double logS = new Double(log.size());
-    	return acceptedTraces/logS;
+        //double logS = new Double(log.size());
+    	//return acceptedTraces/logS;
+        double activeTraces = new Double(this.activeTracesNumber);
+        return acceptedTraces/activeTraces;
     }
 
     public void increaseTokenNumber() {
@@ -293,6 +318,10 @@ public class PlaceEvaluation<N extends AbstractDirectedGraphNode> implements Run
     
     public void resetCurrentTokenNumber(){
     	currentTokenNumber = 0;
+    }
+    
+    public int getActiveTracesNumber() {
+    	return this.activeTracesNumber;
     }
 
 }

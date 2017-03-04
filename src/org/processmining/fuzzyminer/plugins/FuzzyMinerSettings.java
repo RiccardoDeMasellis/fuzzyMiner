@@ -8,11 +8,19 @@ public class FuzzyMinerSettings {
 
 
     private double prePlaceEvaluationThreshold;
+
+	private double placeEvalThreshold;
     
+	private int maxeEdgeClusterSize; 
+    private int maxClusterSize; 
+	private boolean maxClusterSizeEnabled;
+
     
     private static double PREPLACEEVALUATIONTHRESHOLD = 0.1;
     private static double PLACEEVALTHRESHOLD = 0.7;
-    private static int MAXCLUSTERSIZE = 5;
+    private static int MAXEDGECLUSTERSIZE = 6;
+    private static int MAXCLUSTERSIZE = 10000;
+    private static boolean MAXCLUSTERSIZEENABLED = false;
 
     
     public double getPrePlaceEvaluationThreshold() {
@@ -23,18 +31,17 @@ public class FuzzyMinerSettings {
 		this.prePlaceEvaluationThreshold = prePlaceEvaluationThreshold;
 	}
 
-	private double placeEvalThreshold;
     
-    private int maxClusterSize; 
-    
-    public FuzzyMinerSettings(double prePlaceEvalThreshold, double placeEvalThreshold, int maxClusterSize) {
+    public FuzzyMinerSettings(double prePlaceEvalThreshold, double placeEvalThreshold, boolean maxClusterSizeEnabled) {
         this.prePlaceEvaluationThreshold = prePlaceEvalThreshold;
         this.placeEvalThreshold = placeEvalThreshold;
-        this.maxClusterSize = maxClusterSize;
+        this.maxClusterSizeEnabled = maxClusterSizeEnabled;
+        this.maxClusterSize = MAXCLUSTERSIZE;
+        this.maxeEdgeClusterSize = MAXEDGECLUSTERSIZE;
     }
     
     public FuzzyMinerSettings(){
-    	this(PREPLACEEVALUATIONTHRESHOLD, PLACEEVALTHRESHOLD, MAXCLUSTERSIZE);
+    	this(PREPLACEEVALUATIONTHRESHOLD, PLACEEVALTHRESHOLD, MAXCLUSTERSIZEENABLED);
     }
     
     public double getPlaceEvalThreshold() {
@@ -42,16 +49,24 @@ public class FuzzyMinerSettings {
     }
     
    
-    public int getMaxClusterSize() {
-		return maxClusterSize;
+    public boolean isMaxClusterSizeEnabled() {
+		return maxClusterSizeEnabled;
 	}
 
 	public void setPlaceEvalThreshold(double placeEvalThreshold) {
 		this.placeEvalThreshold = placeEvalThreshold;
 	}
 	
-	public void setMaxClusterSize(int maxClusterSize) {
-		this.maxClusterSize = maxClusterSize;
+	public void setMaxClusterSizeEnabled(boolean maxClusterSizeEnabled) {
+		this.maxClusterSizeEnabled = maxClusterSizeEnabled;
+	}
+	
+    public int getMaxeEdgeClusterSize() {
+		return maxeEdgeClusterSize;
+	}
+
+	public int getMaxClusterSize() {
+		return maxClusterSize;
 	}
 
 	@Override
@@ -63,7 +78,7 @@ public class FuzzyMinerSettings {
 
         if (Double.compare(that.getPrePlaceEvaluationThreshold(), prePlaceEvaluationThreshold) != 0) return false;       
         if (Double.compare(that.getPlaceEvalThreshold(), placeEvalThreshold) != 0) return false;
-        return (Integer.compare(that.getMaxClusterSize(), maxClusterSize) == 0);
+        return (Boolean.compare(that.isMaxClusterSizeEnabled(), maxClusterSizeEnabled) == 0);
 
         
     }
@@ -77,7 +92,7 @@ public class FuzzyMinerSettings {
         result = 31 * result + (int) (temp ^ (temp >>> 32));        
         temp = Double.doubleToLongBits(getPlaceEvalThreshold());
         result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = (new Integer(getMaxClusterSize())).longValue();
+        temp = isMaxClusterSizeEnabled()? 1231:1237;
         result = 31 * result + (int) (temp ^ (temp >>> 32));        
         return result;
     }

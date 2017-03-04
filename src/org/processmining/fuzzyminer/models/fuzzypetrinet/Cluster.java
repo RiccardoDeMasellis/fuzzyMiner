@@ -167,7 +167,9 @@ public class Cluster<E extends AbstractDirectedGraphEdge, N extends AbstractDire
         Set<PlaceEvaluation<N>> result = new HashSet<>();
         for (PlaceEvaluation pe : this.places) {
             System.out.println("Place evaluation "+pe.toString());
-            System.out.println("Accepted Traces: " + pe.getAcceptedTracesNumber() + " score: "+pe.evaluateReplayScore()+" threshold: "+threshold);     	
+            System.out.println("Accepted Traces: " + pe.getAcceptedTracesNumber() + " active Traces " + pe.getActiveTracesNumber());
+            System.out.println("score: " + pe.evaluateReplayScore() + " threshold: "+threshold);
+            System.out.println();
             if (pe.evaluateReplayScore() >= threshold)
                 result.add(pe);
         }

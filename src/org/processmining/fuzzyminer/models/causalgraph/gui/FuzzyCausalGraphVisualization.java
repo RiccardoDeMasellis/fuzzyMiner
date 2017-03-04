@@ -451,14 +451,14 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 
 		int sureThresholdValue = (int) (fCG.getSettings().getSureThreshold()*100);
 		int unsureThresholdValue = (int) (fCG.getSettings().getQuestionMarkThreshold()*100);
-		int parallelismThresholdValue = (int) (fCG.getSettings().getParallelismThreshold()*100);
+		int causalityWeightValue = (int) (fCG.getSettings().getCausalityWeight()*100);
 
 		//this.configPanelON = factory.createRoundedPanel(200, Color.LIGHT_GRAY);
 		this.configPanelON = factory.createRoundedPanel(15, Color.LIGHT_GRAY);
 		this.configPanelOFF = factory.createRoundedPanel(15, Color.DARK_GRAY);
 		this.configPanelON.setLayout(null);
 		this.configPanelOFF.setLayout(null);
-		this.config = new ConfigurationPanel(factory, decorator, sureThresholdValue, unsureThresholdValue, parallelismThresholdValue);
+		this.config = new ConfigurationPanel(factory, decorator, sureThresholdValue, unsureThresholdValue, causalityWeightValue);
 		this.config.addSliderChangeListener(this);
 		this.configPanelON.add(this.config);
 		this.configPanelON.setVisible(false);
@@ -960,24 +960,31 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
                 nodeJ = fCG.addNode(nodeJLabel);
                 
 				double directSuccession = fCG.getMetrics().getDirectSuccessionCount(i, j);
-				double directSuccessionDependency = fCG.getRowSumDirectDependency(i)>0? (directSuccession/fCG.getRowSumDirectDependency(i)):0.0;
+				
+				double outputDirectSuccessionDependency = (fCG.getRowSumDirectDependency(i)>0) ? directSuccession/fCG.getRowSumDirectDependency(i) :0.0;
+				double inputDirectSuccessionDependency = (fCG.getColumnSumDirectDependency(j)>0) ? directSuccession/fCG.getColumnSumDirectDependency(j) :0.0;
+
+				//double directSuccessionDependency = (0.5*outputDirectSuccessionDependency)+(0.5*inputDirectSuccessionDependency);
+				double directSuccessionDependency = (2*(directSuccession))/(fCG.getColumnSumDirectDependency(j) + fCG.getRowSumDirectDependency(i));
 				double abdependencyMetric = Math.abs(fCG.getMetrics().getABdependencyMeasuresAll(i, j));
+				double causalityMetric = (fCG.getSettings().getCausalityWeight()*directSuccessionDependency) + ((1-fCG.getSettings().getCausalityWeight())*abdependencyMetric);
 				
 
 				// the sure/unsure edge can be added if and only if the
 				// abdependency metrics is higher than the parallelism threshold, 
 				// as otherwise it would mean that they are candidate for parallelism
 				//BigDecimal bD = new BigDecimal(abdependencyMetric);
-				double roundedDSD = (Math.round(directSuccessionDependency * 100.0)/100.0);
+				double roundedODSD = (Math.round(outputDirectSuccessionDependency * 100.0)/100.0);
+				double roundedIDSD = (Math.round(inputDirectSuccessionDependency * 100.0)/100.0);
 
 				
-				if (directSuccessionDependency>=fCG.getSettings().getSureThreshold() && (abdependencyMetric>fCG.getSettings().getParallelismThreshold() || (i==j))){
-					fCG.addSureEdge(nodeI, nodeJ, new Double(roundedDSD).toString());
+				if (causalityMetric>=fCG.getSettings().getSureThreshold()){
+					fCG.addSureEdge(nodeI, nodeJ, new Double(roundedODSD), new Double(roundedIDSD));
 					System.out.println("SURE "+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+directSuccessionDependency+" "+abdependencyMetric);
-				} else if (directSuccessionDependency>=fCG.getSettings().getQuestionMarkThreshold() && (abdependencyMetric>fCG.getSettings().getParallelismThreshold()|| (i==j))){
-					fCG.addUncertainEdge(nodeI, nodeJ, new Double(roundedDSD).toString());
+				} else if (causalityMetric>=fCG.getSettings().getQuestionMarkThreshold()){
+					fCG.addUncertainEdge(nodeI, nodeJ, new Double(roundedODSD), new Double(roundedIDSD));
 					System.out.println("UNCERTAIN"+nodeI.getLabel()+" -> "+nodeJ.getLabel()+" "+directSuccessionDependency+" "+abdependencyMetric);
-				}	
+				}		
 
                /* double abdependency = fCG.getMetrics().getABdependencyMeasuresAll(i, j);
                 double dependencyAccepted = fCG.getMetrics().getDependencyMeasuresAccepted(i, j);
@@ -1528,9 +1535,9 @@ public class FuzzyCausalGraphVisualization extends JPanel implements FuzzyGraphV
 				//graph.setScale(this.normalScale);
 				repaintPIP(graph.getVisibleRect());
 			}
-			else if (slider.getName()!=null && slider.getName().equalsIgnoreCase("ParallelismSlider")){
+			else if (slider.getName()!=null && slider.getName().equalsIgnoreCase("CausalityWeightSlider")){
 				FuzzyCGMinerSettings settings = fCG.getSettings();
-				settings.setParallelismThreshold(((JSlider) source).getValue() / 100.0);
+				settings.setCausalityWeight(((JSlider) source).getValue() / 100.0);
 				fCG.setSettings(settings);
 				this.graph = recomputeJGraph();
 				//this.normalScale = graph.getScale() / this.zoomRatio;
@@ -1698,18 +1705,18 @@ class ConfigurationPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 8415559591750873767L;
-	private final JSlider sureThresholdSlider, unsureThresholdSlider, parallelismThresholdSlider;
+	private final JSlider sureThresholdSlider, unsureThresholdSlider, causalityWeightSlider;
 	private JLabel sureSliderMinValue, sureSliderMaxValue, sureSliderFitValue, sureSliderValue, sureSliderLabelValue;
 	private JLabel unsureSliderMinValue, unsureSliderMaxValue, unsureSliderFitValue, unsureSliderValue, unsureSliderLabelValue;
-	private JLabel parallelismSliderMinValue, parallelismSliderMaxValue, parallelismSliderFitValue, parallelismSliderValue, parallelismSliderLabelValue;
+	private JLabel causalityWeightSliderMinValue, causalityWeightSliderMaxValue, causalityWeightSliderFitValue, causalityWeightSliderValue, causalityWeightSliderLabelValue;
 
 
 	private int sureCurrValue;
 	private int unsureCurrValue;
-	private int parallelismCurrValue;
+	private int causalityWeightCurrValue;
 
 	public ConfigurationPanel(SlickerFactory factory, SlickerDecorator decorator,
-			int sureCurrValue, int unsureCurrValue, int parallelismCurrValue) {
+			int sureCurrValue, int unsureCurrValue, int causalityWeightCurrValue) {
 
 		super(null);
 
@@ -1717,15 +1724,15 @@ class ConfigurationPanel extends JPanel {
 		
 		this.sureCurrValue = sureCurrValue;
 		this.unsureCurrValue = unsureCurrValue;
-		this.parallelismCurrValue = parallelismCurrValue;
+		this.causalityWeightCurrValue = causalityWeightCurrValue;
 
 		this.sureThresholdSlider = factory.createSlider(1);
 		this.unsureThresholdSlider = factory.createSlider(1);
-		this.parallelismThresholdSlider = factory.createSlider(1);
+		this.causalityWeightSlider = factory.createSlider(1);
 		
 		sureThresholdSlider.setName("SureSlider");
 		unsureThresholdSlider.setName("UnsureSlider");
-		parallelismThresholdSlider.setName("ParallelismSlider");
+		causalityWeightSlider.setName("CausalityWeightSlider");
 		
 		this.sureThresholdSlider.setMinimum(0);
 		this.sureThresholdSlider.setMaximum(maximumValue);
@@ -1735,9 +1742,9 @@ class ConfigurationPanel extends JPanel {
 		this.unsureThresholdSlider.setMaximum(maximumValue);
 		this.unsureThresholdSlider.setValue(unsureCurrValue);
 		
-		this.parallelismThresholdSlider.setMinimum(0);
-		this.parallelismThresholdSlider.setMaximum(maximumValue);
-		this.parallelismThresholdSlider.setValue(parallelismCurrValue);
+		this.causalityWeightSlider.setMinimum(0);
+		this.causalityWeightSlider.setMaximum(maximumValue);
+		this.causalityWeightSlider.setValue(causalityWeightCurrValue);
 
 		
 		this.sureThresholdSlider.addChangeListener(new ChangeListener() {
@@ -1752,9 +1759,9 @@ class ConfigurationPanel extends JPanel {
 			}
 		});
 		
-		this.parallelismThresholdSlider.addChangeListener(new ChangeListener() {
+		this.causalityWeightSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				updateParallelismSlider();
+				updateCausalityWeightSlider();
 			}
 		});
 
@@ -1834,42 +1841,42 @@ class ConfigurationPanel extends JPanel {
 		this.add(this.unsureSliderValue);
 		this.add(this.unsureSliderLabelValue);
 		
-		this.parallelismSliderMinValue = factory.createLabel("0%");
-		this.parallelismSliderMaxValue = factory.createLabel(maximumValue + "%");
-		this.parallelismSliderFitValue = factory.createLabel("Def >");
-		this.parallelismSliderValue = factory.createLabel(parallelismCurrValue + "%");
-		this.parallelismSliderLabelValue = factory.createLabel("Parallelism");
+		this.causalityWeightSliderMinValue = factory.createLabel("0%");
+		this.causalityWeightSliderMaxValue = factory.createLabel(maximumValue + "%");
+		this.causalityWeightSliderFitValue = factory.createLabel("Def >");
+		this.causalityWeightSliderValue = factory.createLabel(causalityWeightCurrValue + "%");
+		this.causalityWeightSliderLabelValue = factory.createLabel("Causality");
 
-		this.parallelismSliderMinValue.setHorizontalAlignment(SwingConstants.CENTER);
-		this.parallelismSliderMaxValue.setHorizontalAlignment(SwingConstants.CENTER);
-		this.parallelismSliderFitValue.setHorizontalAlignment(SwingConstants.RIGHT);
-		this.parallelismSliderValue.setHorizontalAlignment(SwingConstants.LEFT);
-		this.parallelismSliderLabelValue.setHorizontalAlignment(SwingConstants.CENTER);
+		this.causalityWeightSliderMinValue.setHorizontalAlignment(SwingConstants.CENTER);
+		this.causalityWeightSliderMaxValue.setHorizontalAlignment(SwingConstants.CENTER);
+		this.causalityWeightSliderFitValue.setHorizontalAlignment(SwingConstants.RIGHT);
+		this.causalityWeightSliderValue.setHorizontalAlignment(SwingConstants.LEFT);
+		this.causalityWeightSliderLabelValue.setHorizontalAlignment(SwingConstants.CENTER);
 
 
-		this.parallelismSliderMinValue.setFont(new java.awt.Font("Dialog",
+		this.causalityWeightSliderMinValue.setFont(new java.awt.Font("Dialog",
 				java.awt.Font.BOLD, 14));
-		this.parallelismSliderMaxValue.setFont(new java.awt.Font("Dialog",
+		this.causalityWeightSliderMaxValue.setFont(new java.awt.Font("Dialog",
 				java.awt.Font.BOLD, 14));
-		this.parallelismSliderFitValue.setFont(new java.awt.Font("Dialog",
+		this.causalityWeightSliderFitValue.setFont(new java.awt.Font("Dialog",
 				java.awt.Font.BOLD, 14));
-		this.parallelismSliderValue.setFont(new java.awt.Font("Dialog",
+		this.causalityWeightSliderValue.setFont(new java.awt.Font("Dialog",
 				java.awt.Font.BOLD, 14));
-		this.parallelismSliderLabelValue.setFont(new java.awt.Font("Dialog",
+		this.causalityWeightSliderLabelValue.setFont(new java.awt.Font("Dialog",
 				java.awt.Font.BOLD, 14));
 
-		this.parallelismSliderMinValue.setForeground(Color.GRAY);
-		this.parallelismSliderMaxValue.setForeground(Color.GRAY);
-		this.parallelismSliderFitValue.setForeground(Color.GRAY);
-		this.parallelismSliderValue.setForeground(Color.DARK_GRAY);
-		this.parallelismSliderLabelValue.setForeground(Color.GRAY);
+		this.causalityWeightSliderMinValue.setForeground(Color.GRAY);
+		this.causalityWeightSliderMaxValue.setForeground(Color.GRAY);
+		this.causalityWeightSliderFitValue.setForeground(Color.GRAY);
+		this.causalityWeightSliderValue.setForeground(Color.DARK_GRAY);
+		this.causalityWeightSliderLabelValue.setForeground(Color.GRAY);
 
-		this.add(this.parallelismThresholdSlider);
-		this.add(this.parallelismSliderMinValue);
-		this.add(this.parallelismSliderMaxValue);
-		this.add(this.parallelismSliderFitValue);
-		this.add(this.parallelismSliderValue);
-		this.add(this.parallelismSliderLabelValue);
+		this.add(this.causalityWeightSlider);
+		this.add(this.causalityWeightSliderMinValue);
+		this.add(this.causalityWeightSliderMaxValue);
+		this.add(this.causalityWeightSliderFitValue);
+		this.add(this.causalityWeightSliderValue);
+		this.add(this.causalityWeightSliderLabelValue);
 				
 		this.setBackground(Color.LIGHT_GRAY);
 	}
@@ -1927,26 +1934,26 @@ class ConfigurationPanel extends JPanel {
 			this.unsureSliderValue.setBounds(145, position, 60, 20);
 		}
 		
-		//PARALLELISM THRESHOLD SLIDER
+		//CAUSALITY THRESHOLD SLIDER
 		
-		this.parallelismThresholdSlider.setBounds(185, 30, 30, sliderHeight);
-		this.parallelismSliderMaxValue.setBounds(150, 10, 100, 20);
-		this.parallelismSliderMinValue.setBounds(150, height - 35, 100, 20);
-		this.parallelismSliderLabelValue.setBounds(150, height - 20, 100, 20);
+		this.causalityWeightSlider.setBounds(185, 30, 30, sliderHeight);
+		this.causalityWeightSliderMaxValue.setBounds(150, 10, 100, 20);
+		this.causalityWeightSliderMinValue.setBounds(150, height - 35, 100, 20);
+		this.causalityWeightSliderLabelValue.setBounds(150, height - 20, 100, 20);
 
-		value = this.parallelismThresholdSlider.getValue();
-		span = this.parallelismThresholdSlider.getMaximum() - this.parallelismThresholdSlider.getMinimum();
-		position = 33 + (int) ((float) (this.parallelismThresholdSlider.getMaximum() - this.parallelismCurrValue)
+		value = this.causalityWeightSlider.getValue();
+		span = this.causalityWeightSlider.getMaximum() - this.causalityWeightSlider.getMinimum();
+		position = 33 + (int) ((float) (this.causalityWeightSlider.getMaximum() - this.causalityWeightCurrValue)
 				/ (float) span * (sliderHeight - 28));
-		this.parallelismSliderFitValue.setBounds(130, position, 60, 20);
+		this.causalityWeightSliderFitValue.setBounds(130, position, 60, 20);
 
-		if (value == this.parallelismCurrValue)
-			this.parallelismSliderValue.setBounds(210, position, 60, 20);
+		if (value == this.causalityWeightCurrValue)
+			this.causalityWeightSliderValue.setBounds(210, position, 60, 20);
 		else {
 
-			position = 33 + (int) ((float) (this.parallelismThresholdSlider.getMaximum() - value)
+			position = 33 + (int) ((float) (this.causalityWeightSlider.getMaximum() - value)
 					/ (float) span * (sliderHeight - 28));
-			this.parallelismSliderValue.setBounds(210, position, 60, 20);
+			this.causalityWeightSliderValue.setBounds(210, position, 60, 20);
 		}
 		
 	}
@@ -1976,16 +1983,16 @@ class ConfigurationPanel extends JPanel {
 		this.unsureSliderValue.setBounds(155, position, 60, 20);
 	}
 
-	private void updateParallelismSlider() {
-		//PARALLELISM THRESHOLD SLIDER
-		int value = this.parallelismThresholdSlider.getValue();
+	private void updateCausalityWeightSlider() {
+		//CAUSALITY THRESHOLD SLIDER
+		int value = this.causalityWeightSlider.getValue();
 
-		int span = this.parallelismThresholdSlider.getMaximum() - this.parallelismThresholdSlider.getMinimum();
-		int position = 33 + (int) ((float) (this.parallelismThresholdSlider.getMaximum() - value)
-				/ (float) span * (this.parallelismThresholdSlider.getBounds().height - 28));
+		int span = this.causalityWeightSlider.getMaximum() - this.causalityWeightSlider.getMinimum();
+		int position = 33 + (int) ((float) (this.causalityWeightSlider.getMaximum() - value)
+				/ (float) span * (this.causalityWeightSlider.getBounds().height - 28));
 
-		this.parallelismSliderValue.setText(value + "%");
-		this.parallelismSliderValue.setBounds(215, position, 60, 20);
+		this.causalityWeightSliderValue.setText(value + "%");
+		this.causalityWeightSliderValue.setBounds(215, position, 60, 20);
 	}
 	
 	public void setSureCurrValue(int value) {
@@ -2008,21 +2015,21 @@ class ConfigurationPanel extends JPanel {
 		this.unsureSliderFitValue.setBounds(60, position, 40, 20);
 	}
 
-	public void setParallelismCurrValue(int value) {
+	public void setCausalityWeightCurrValue(int value) {
 
-		this.parallelismCurrValue = value;
+		this.causalityWeightCurrValue = value;
 
-		int span = this.parallelismThresholdSlider.getMaximum() - this.parallelismThresholdSlider.getMinimum();
-		int position = 33 + (int) ((float) (this.parallelismThresholdSlider.getMaximum() - value)
-				/ (float) span * (this.parallelismThresholdSlider.getBounds().height - 28));
-		this.parallelismSliderFitValue.setBounds(180, position, 40, 20);
+		int span = this.causalityWeightSlider.getMaximum() - this.causalityWeightSlider.getMinimum();
+		int position = 33 + (int) ((float) (this.causalityWeightSlider.getMaximum() - value)
+				/ (float) span * (this.causalityWeightSlider.getBounds().height - 28));
+		this.causalityWeightSliderFitValue.setBounds(180, position, 40, 20);
 	}
 	
 	
 	public void addSliderChangeListener(ChangeListener listener) {
 		this.sureThresholdSlider.addChangeListener(listener);
 		this.unsureThresholdSlider.addChangeListener(listener);
-		this.parallelismThresholdSlider.addChangeListener(listener);
+		this.causalityWeightSlider.addChangeListener(listener);
 	}
 }
 

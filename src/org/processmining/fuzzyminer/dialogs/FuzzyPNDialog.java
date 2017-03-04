@@ -1,13 +1,16 @@
 package org.processmining.fuzzyminer.dialogs;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.util.Hashtable;
 
 import javax.swing.Box;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -28,8 +31,8 @@ public class FuzzyPNDialog extends JPanel {
 
 	public FuzzyPNDialog(UIPluginContext context, FuzzyCausalGraph fCG, 
 			final FuzzyMinerSettings settings) {
-		//super(new GridLayout(2,1));
-		super(new GridLayout(1,1));
+		super(new GridLayout(2,1));
+		//super(new GridLayout(1,1));
 		this.settings = settings;
 		
 		Component space = Box.createHorizontalStrut(10);
@@ -40,7 +43,7 @@ public class FuzzyPNDialog extends JPanel {
 		placeEvaluationThresholdLabel.setText("Place Evaluation Threshold");
 		this.add(placeEvaluationThresholdLabel);
 
-		space = Box.createHorizontalStrut(10);
+		space = Box.createHorizontalStrut(1);
 		this.add(space);
 		
 		final JSlider placeEvaluationThresholdSlider = new JSlider();
@@ -69,6 +72,32 @@ public class FuzzyPNDialog extends JPanel {
 	
 		space = Box.createVerticalStrut(20);
 		this.add(space);
+		
+
+		/*
+		 *  ******************** MAX CLUSTER SIZE ENABLED **************************************************
+		 */
+		
+		/*space = Box.createVerticalStrut(10);
+		this.add(space);*/
+		
+		final JLabel maxClusterSizeEnabled = new JLabel();
+		maxClusterSizeEnabled.setText("Maximum Cluster Size Enabled");
+		this.add(maxClusterSizeEnabled);
+
+		space = Box.createHorizontalStrut(1);
+		this.add(space);
+
+		final JCheckBox mCSizeCbx = new JCheckBox();
+		mCSizeCbx.setBackground(new Color(150,150,150));
+		mCSizeCbx.setHorizontalAlignment(SwingConstants.CENTER);
+		mCSizeCbx.setSelected(settings.isMaxClusterSizeEnabled());
+		mCSizeCbx.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				settings.setMaxClusterSizeEnabled(mCSizeCbx.isSelected());
+			}
+		});
+		this.add(mCSizeCbx);
 		
 		
 		

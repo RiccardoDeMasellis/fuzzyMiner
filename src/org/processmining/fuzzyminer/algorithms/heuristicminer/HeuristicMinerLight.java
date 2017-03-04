@@ -241,10 +241,10 @@ public class HeuristicMinerLight {
                 metrics.setL2LdependencyMeasuresAll(i, j, dependencyMeasureL2L);
                 metrics.setL2LdependencyMeasuresAll(j, i, dependencyMeasureL2L);
                 
-                /*if (i==j){
+                if (i==j){
                 	double selfLoopDependency = calculateLoopDependencyMeasure(i,metrics);
                 	metrics.setABdependencyMeasuresAll(i, j, selfLoopDependency);
-                }*/
+                }
 
                 if (i > j) {
 
@@ -266,7 +266,11 @@ public class HeuristicMinerLight {
                 if (i != j) {
 
                     double dependencyMeasure = calculateDependencyMeasure(i, j, metrics);
-                    metrics.setABdependencyMeasuresAll(i, j, dependencyMeasure);
+                    
+                    if (dependencyMeasure > 0)
+                    	metrics.setABdependencyMeasuresAll(i, j, dependencyMeasure);
+                    else
+                    	metrics.setABdependencyMeasuresAll(i, j, 0);
 
                     if (dependencyMeasure > metrics.getBestOutputMeasure(i)) {
 

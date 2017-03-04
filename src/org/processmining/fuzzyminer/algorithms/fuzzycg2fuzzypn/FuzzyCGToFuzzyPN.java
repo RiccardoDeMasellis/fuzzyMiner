@@ -32,7 +32,7 @@ public class FuzzyCGToFuzzyPN {
 		Set<FuzzyDirectedSureGraphEdge> edges = graph.getSureEdges();
 
 		// We remove self-looping edges and store them in a set!
-		Set<FuzzyDirectedSureGraphEdge> selfLoopingEdges = new HashSet<>();
+		/*Set<FuzzyDirectedSureGraphEdge> selfLoopingEdges = new HashSet<>();
 		Set<FuzzyDirectedGraphNode> selfLoopingNodes = new HashSet<>();
 		for (FuzzyDirectedSureGraphEdge e : edges) {
 			if (e.getSource().equals(e.getTarget())) {
@@ -43,7 +43,7 @@ public class FuzzyCGToFuzzyPN {
 		// Remove the selfLoopingEdges from the set of edges
 		boolean cambiato = edges.removeAll(selfLoopingEdges);
 		System.out.println("**********" + cambiato);
-		System.out.println(selfLoopingEdges);
+		System.out.println(selfLoopingEdges);*/
 
 		// Build the clusters
 		Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> clusters = identifyClusters(edges);
@@ -52,8 +52,11 @@ public class FuzzyCGToFuzzyPN {
 		System.out.println("*********** Start resizing clusters ***********");
 		long startTime = System.currentTimeMillis();
 
-		//Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> reducedClusters = reduceClusters(clusters, pNSettings.getMaxClusterSize());
 		Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> reducedClusters = clusters;
+		if (pNSettings.isMaxClusterSizeEnabled()){
+			reducedClusters = reduceClusters(clusters, pNSettings.getMaxClusterSize(), pNSettings.getMaxeEdgeClusterSize());
+		}
+		//Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> reducedClusters = reduceClusters(clusters, pNSettings.getMaxClusterSize());
 		System.out.println(reducedClusters);
 
 
@@ -95,17 +98,28 @@ public class FuzzyCGToFuzzyPN {
 				allPlaceEvaluations.add(pe);
 			}
 		}
+		
+		System.out.println();
+		System.out.println("PLACES ABOVE THRESHOLD:");
+		System.out.println(allPlaceEvaluations);
+		System.out.println();
+		
 
 		/*
 		 * Now in allPlaceEvaluation I have all the places that have to be added. Start the computation for nonRedundancy!
 		 */
 		Set<PlaceEvaluation<FuzzyDirectedGraphNode>> nonRedundantPlaces = computeNonRedundantPlaces(allPlaceEvaluations);
+		
+		/*
+		 * Remove places that are subset of other places. A place p is subset of q if pre(p) subseteq pre(q) AND post(p) subseteq post(q).
+		 */
+		Set<PlaceEvaluation<FuzzyDirectedGraphNode>> finalPlaces = computeSubsetPlaces(nonRedundantPlaces);
 
 
 		/*
 		 * Now that I eliminated redundant places I can add the others to the net.
 		 */
-		for (PlaceEvaluation<FuzzyDirectedGraphNode> pe : nonRedundantPlaces) {
+		for (PlaceEvaluation<FuzzyDirectedGraphNode> pe : finalPlaces) {
 			result.addPlaceFromPlaceEvaluation(pe);
 			//System.out.println(pe);
 			//System.out.println(pe.evaluateReplayScore());
@@ -122,28 +136,34 @@ public class FuzzyCGToFuzzyPN {
 		 * Re-adding cycles originally present in the causal graph.
 		 * For each self-looping transition t, add a silent transiton st. From each output place op in t* add an edge op->st and for each input place ip *t, add an edge st->ip.
 		 */
-		/*for (FuzzyDirectedGraphNode node : graph.getNodes()) {
-			Transition t = result.addTransition(node.getLabel());
+		
+		/*Set<FuzzyDirectedGraphNode> addedSelfLoopingNodes = new HashSet<>();
 
+		for (FuzzyDirectedGraphNode node : graph.getNodes()) {
+			Transition t = result.addTransition(node.getLabel());
 			// Add self loop with the strategy described above
 			if(selfLoopingNodes.contains(node)) {
 				Set<PetrinetNode> outputPlaces = result.getOutputNodes(t);
 				Set<PetrinetNode> inputPlaces = result.getInputNodes(t);
-				Transition silentTransition = result.addTransition("silent"+node.getLabel());
-				silentTransition.setInvisible(true);
-
-				for(PetrinetNode outp : outputPlaces) {
-					// Rapid check...
-					if (!(outp instanceof Place))
-						throw new RuntimeException("OutputPlace of a Transition should be places!");
-					result.addArc((Place)outp, silentTransition);
-				}	
-
-				for (PetrinetNode inp : inputPlaces) {
-					// Rapid check...
-					if (!(inp instanceof Place))
-						throw new RuntimeException("InputPlace of a Transition should be places!");
-					result.addArc(silentTransition, (Place)inp);
+				// The hidden transition is added iff inputPlaces and outputPlaces are not empty
+				if (!outputPlaces.isEmpty() && !inputPlaces.isEmpty()){
+					Transition silentTransition = result.addTransition("silent"+node.getLabel());
+					silentTransition.setInvisible(true);
+	
+					for(PetrinetNode outp : outputPlaces) {
+						// Rapid check...
+						if (!(outp instanceof Place))
+							throw new RuntimeException("OutputPlace of a Transition should be places!");
+						result.addArc((Place)outp, silentTransition);
+					}	
+	
+					for (PetrinetNode inp : inputPlaces) {
+						// Rapid check...
+						if (!(inp instanceof Place))
+							throw new RuntimeException("InputPlace of a Transition should be places!");
+						result.addArc(silentTransition, (Place)inp);
+					}
+					addedSelfLoopingNodes.add(node);
 				}
 			}
 		}*/
@@ -159,9 +179,37 @@ public class FuzzyCGToFuzzyPN {
              but such a check is directly in the method
 		 */
 		for (FuzzyDirectedGraphEdge edge : graph.getEdges())
-			result.addTransitionsArcFromFCGEdge(edge);
+			/* Although we do not know which sure transitions have met the threshold, we know which sure transitions have been 
+			connected to a hidden transition for the self-loop, since we stored them in the addedSelfLoopingNodes. Since the check
+			in the method is not going to work in this case, we need to exploit the information in addedSelfLoopingNodes to explicitly
+			decide here whether to add the FCG transitions and we add them iff they are not self-loop of transitions that have been already
+			added back with the hidden transitions.  
+			*/
+			//if (!edge.getSource().equals(edge.getTarget()) || !addedSelfLoopingNodes.contains(edge.getSource()))
+				result.addTransitionsArcFromFCGEdge(edge);
 
 		return result;
+	}
+	
+	private static <N extends AbstractDirectedGraphNode> Set<PlaceEvaluation<N>> computeSubsetPlaces(Set<PlaceEvaluation<N>> allPlaces) {
+		Set<PlaceEvaluation<N>> result = new HashSet<>();
+		// Check the subset place by place
+		for(PlaceEvaluation<N> pe : allPlaces) {
+			if (!(isSubset(pe, allPlaces)))
+				result.add(pe);
+		}
+		return result;
+	}
+	
+	private static <N extends AbstractDirectedGraphNode> boolean isSubset(PlaceEvaluation<N> pe, Set<PlaceEvaluation<N>> allPlaces) {
+		for (PlaceEvaluation<N> other : allPlaces) {
+			if (!other.equals(pe) && other.getPlaceOutputNodes().containsAll(pe.getPlaceOutputNodes()) && other.getPlaceInputNodes().containsAll(pe.getPlaceInputNodes())) {
+				System.out.println("Place Evaluation: " + pe);
+				System.out.println("is subset of: " + other);
+				return true;
+			}
+		}
+		return false;
 	}
 
 
@@ -212,8 +260,8 @@ public class FuzzyCGToFuzzyPN {
 						// Now that I have a permutation, I have to check that all placeEval of the current bijection are in allPlaceEvaluation
 						boolean allPresent = true;
 
-						// I already know how many elements will be in the partition! They are i!
-						for (int k=0; k<i; k++) {
+						// I already know how many elements will be in the partition! They are i+1!
+						for (int k=0; k<i+1; k++) {
 							Set<N> currentOutputSet = new HashSet<N>(allOutputPartitionsOfiElements.get(ii).get(k));
 							Set<N> currentInputSet = new HashSet<N>(currentInputPerm.get(k));
 
@@ -314,14 +362,15 @@ public class FuzzyCGToFuzzyPN {
 	/*
 	 * Given a set of clusters, analyzes them and if they are too large it splits them 
 	 */
-	private static <E extends AbstractDirectedGraphEdge, N extends AbstractDirectedGraphNode> Set<Cluster<E, N>> reduceClusters(Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> clusters, int k){
+	private static <E extends AbstractDirectedGraphEdge, N extends AbstractDirectedGraphNode> Set<Cluster<E, N>> reduceClusters(Set<Cluster<FuzzyDirectedSureGraphEdge, FuzzyDirectedGraphNode>> clusters, int maxClusterSize, int k){
 		Set<Cluster<E, N>> resizedClusters = new HashSet<>();
 		// For each cluster:
 		for (Cluster cluster : clusters) {
 			//Analyze the clusters
 			//System.out.println("**** Start analyzing cluster for resizing " + cluster + " ****");
-			//Check if the cluster is larger than k
-			if (cluster.getEdges().size()>k){
+			//Check if the number of power sets of the cluster is larger than maxClusterSize
+			//if (cluster.getEdges().size()>k){
+			if ((Math.pow(2.0,cluster.getOutputNodes().size())*Math.pow(2.0,cluster.getInputNodes().size())) > maxClusterSize){
 				resizedClusters.addAll(splitCluster(cluster, k));
 			} else 
 				resizedClusters.add(cluster);
